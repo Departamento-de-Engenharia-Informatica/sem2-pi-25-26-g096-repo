@@ -56,7 +56,7 @@ As an organization employee, I want to create a new task in order to be further 
 
 ### 1.6. System Sequence Diagram (SSD)
 
-![System Sequence Diagram](svg/US006-SSD.svg)
+![System Sequence Diagram](svg/US02-SSD.svg)
 
 **_Other alternatives might exist._**
 
