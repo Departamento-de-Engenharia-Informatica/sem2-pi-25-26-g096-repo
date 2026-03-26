@@ -1,0 +1,126 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class ApplicationSession
+{
+    - ApplicationSession()
+    + {static} getInstance()
+    + getCurrentSession()
+}
+
+class UserSession
+{
+    + getUserEmail()
+}
+
+class Employee {
+    - name : String
+    - email : String
+    - position : String
+    - phone : String
+}
+
+class Task {
+    - reference :String
+    - description : String
+    - informalDescription : String
+    - technicalDescription : String
+    - duration : int
+    - cost : double
+
+    + Task(reference, description,\ninformalDescription, technicalDescription,\nduration, cost, taskCategory, createdBy)
+}
+
+class TaskCategory {
+    - description : String
+}
+
+class Organization {
+    - name : String
+    - vatNumber : String
+    - website : String
+    - phone : String
+    - email : String
+
+    + Organization(name, vatNumber, webSite, phone, email, postalAddress, manager)
+    + anyEmployeeHasEmail(email)
+    + getEmployeeByEmail(email)
+    + createTask(reference, description, informalDesccription, technicalDescription, \nduration, cost, taskCategory, employee)
+    - addTask(task)
+    - validateTask(task)
+}
+
+class TaskCategoryRepository {
+    + getTaskCategories()
+    + getTaskCategoryByDescription(taskCategoryDescription)
+}
+
+class OrganizationRepository {
+    + getOrganizationByEmployeeEmail(email)
+}
+
+class Repositories {
+    - Repositories()
+    + {static} getInstance()
+    + getTaskCategoryRepository()
+    + getOrganizationRepository()
+}
+
+class CreateTaskController {
+    + CreateTaskController()
+    + getTaskCategories()
+    + createTask(reference, description, informalDescription, \n   technicalDescription, duration, cost, taskCategoryDescription)
+    - getTaskCategoryByDescription(taskCategoryDescription)
+    - getEmployeeFromSession()
+}
+
+note right of CreateTaskController
+    categoryDescription is retrieved
+    from selected data
+end note
+
+note bottom of TaskCategoryRepository
+    - used for displaying
+    the task category list
+end note
+
+class CreateTaskUI {
+}
+
+CreateTaskUI .> CreateTaskController
+
+CreateTaskController ..> ApplicationSession
+CreateTaskController ..> UserSession
+CreateTaskController ..> TaskCategory
+CreateTaskController ..> TaskCategoryRepository
+CreateTaskController ..> Organization
+CreateTaskController ..> OrganizationRepository
+CreateTaskController .> Repositories
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" OrganizationRepository : organizationRepository
+Repositories -> "1" TaskCategoryRepository : taskCategoryRepository
+
+ApplicationSession -> "1" ApplicationSession : instance
+ApplicationSession ..> UserSession
+
+TaskCategoryRepository --> "*" TaskCategory : taskCategories
+
+OrganizationRepository --> "*" Organization : organizations
+
+Organization --> "*" Task : tasks
+Organization --> "*" Employee : employees
+
+Task --> "1" TaskCategory : taskCategory
+Task --> "1" Employee : createdBy
+
+
+@enduml

@@ -1,0 +1,42 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":CreateTaskController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "taskCategoryRepository:\nTaskCategoryRepository" as TASK_CAT_REPO
+
+autonumber 12
+-> CTRL : getTaskCategoryByDescription(taskCategoryDescription)
+
+autonumber 12.1
+
+activate CTRL
+    ' LIXO - acrescentava Object, coerente com diagrama split
+    group Get Task Category Object
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL: repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getTaskCategoryRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON -> CTRL : taskCategoryRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> TASK_CAT_REPO : getTaskCategoryByDescription(taskCategoryDescription)
+        activate TASK_CAT_REPO
+            TASK_CAT_REPO --> CTRL : taskCategory
+        deactivate TASK_CAT_REPO
+
+    end group
+
+    autonumber 13
+    <-- CTRL : taskCategory
+
+deactivate CTRL
+
+
+@enduml

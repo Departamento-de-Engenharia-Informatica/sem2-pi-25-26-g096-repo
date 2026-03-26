@@ -1,0 +1,36 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Organization\nEmployee" as Employee
+participant ":System" as System
+
+activate Employee
+
+    Employee -> System : asks to create a new task
+    activate System
+
+        System --> Employee : shows task category list and asks to select one
+    deactivate System
+
+    Employee -> System : selects a task category
+    activate System
+
+        System --> Employee : requests data (i.e. reference, designation, informal\ndescription, technical description, duration, cost)
+    deactivate System
+
+    Employee -> System : types requested data
+    activate System
+
+        System --> Employee : shows all data and requests confirmation
+    deactivate System
+
+    Employee -> System : confirms data
+    activate System
+
+        System --> Employee : displays operation success
+    deactivate System
+@enduml
