@@ -1,0 +1,75 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "User" as USER
+participant ":{MenuX}UI" as MENU
+participant ":{NameOfUC}UI" as UC_NAME_UI
+participant ":{NameOfUC}Controller" as CTRL
+participant "ApplicationSession" as APP_SESSION
+participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
+participant "currentSession\n:UserSession" as CURRENT_SESSION
+
+activate USER
+
+    USER -> MENU : selects an option
+    activate MENU
+        MENU --> UC_NAME_UI** : create()
+        activate UC_NAME_UI
+            UC_NAME_UI --> CTRL** : create()
+        deactivate UC_NAME_UI
+
+        activate CTRL
+            CTRL -> APP_SESSION : getinstance()
+            note right
+                static method
+                (Singleton pattern)
+            end note
+            activate APP_SESSION
+                APP_SESSION --> CTRL : appSession
+            deactivate APP_SESSION
+
+            CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
+            activate APP_SESSION_SINGLETON
+                APP_SESSION_SINGLETON --> CTRL : currentSession
+            deactivate APP_SESSION_SINGLETON
+        deactivate CTRL
+
+        MENU -> UC_NAME_UI : run()
+        activate UC_NAME_UI
+    deactivate MENU
+
+            UC_NAME_UI --> USER : requests something
+            |||
+        deactivate UC_NAME_UI
+
+    loop
+        USER -> UC_NAME_UI : does something
+        activate UC_NAME_UI
+            UC_NAME_UI -> CTRL : methodX(...)
+            activate CTRL
+                CTRL -> APP_SESSION : methodY(...)
+
+                activate APP_SESSION
+                    ref over APP_SESSION,APP_SESSION_SINGLETON,CURRENT_SESSION
+
+
+                    end ref
+                    APP_SESSION --> CTRL : answer
+                deactivate APP_SESSION
+
+                CTRL --> UC_NAME_UI : answer
+            deactivate CTRL
+
+            UC_NAME_UI --> USER : answers/requests another thing
+            |||
+        deactivate UC_NAME_UI
+    end loop
+
+deactivate USER
+
+@enduml

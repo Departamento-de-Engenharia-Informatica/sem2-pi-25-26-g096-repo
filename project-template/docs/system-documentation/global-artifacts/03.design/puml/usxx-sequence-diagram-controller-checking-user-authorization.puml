@@ -1,0 +1,49 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+participant ":{NameOfUC}Controller" as CTRL
+participant "ApplicationSession" as APP_SESSION
+participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
+participant "currentSession\n:UserSession" as CURRENT_SESSION
+
+activate CTRL
+[o-> CTRL : create()
+    CTRL -> APP_SESSION : getinstance()
+
+    activate APP_SESSION
+        APP_SESSION --> CTRL : appSession
+    deactivate APP_SESSION
+
+    CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
+    activate APP_SESSION_SINGLETON
+        APP_SESSION_SINGLETON --> CTRL : currentSession
+    deactivate APP_SESSION_SINGLETON
+
+    CTRL -> CURRENT_SESSION : isLoggedInWithRole(USER_ROLE)
+    activate CURRENT_SESSION
+        CURRENT_SESSION --> CTRL : answer
+    deactivate CURRENT_SESSION
+
+    alt answer = true
+        CTRL -> CTRL : doesOtherThing()
+        activate CTRL
+            [o<-- CTRL : ok
+        deactivate CTRL
+
+        autonumber stop
+        CTRL -[#white]> CURRENT_SESSION
+        autonumber resume
+    else
+        |||
+        [o<-- CTRL : illegalStateException("Not Authorized")
+        |||
+    end alt
+
+deactivate CTRL
+
+@enduml
