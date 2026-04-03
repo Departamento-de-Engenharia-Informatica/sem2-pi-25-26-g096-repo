@@ -5,32 +5,35 @@ skinparam shadowing false
 
 autonumber
 
-actor "Organization\nEmployee" as Employee
+actor "Ethics Committee\nMember" as Member
 participant ":System" as System
 
-activate Employee
+activate Member
 
-    Employee -> System : asks to create a new task
+    Member -> System : asks to validate a declaration of interests
     activate System
 
-        System --> Employee : shows task category list and asks to select one
+        System --> Member : shows submitted declaration
     deactivate System
 
-    Employee -> System : selects a task category
+    Member -> System : analyzes declaration
     activate System
 
-        System --> Employee : requests data (i.e. reference, designation, informal\ndescription, technical description, duration, cost)
+        System --> Member : requests validation decision
     deactivate System
 
-    Employee -> System : types requested data
+    Member -> System : validates declaration
     activate System
 
-        System --> Employee : shows all data and requests confirmation
+        System --> Member : displays validation success
     deactivate System
 
-    Employee -> System : confirms data
+    Member -> System : comments inconsistencies
     activate System
 
-        System --> Employee : displays operation success
+        System --> Member : displays operation success
     deactivate System
+
+deactivate Member
+
 @enduml
