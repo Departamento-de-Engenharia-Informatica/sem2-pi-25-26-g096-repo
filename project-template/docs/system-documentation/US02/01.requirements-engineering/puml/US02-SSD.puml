@@ -5,32 +5,35 @@ skinparam shadowing false
 
 autonumber
 
-actor "Organization\nEmployee" as Employee
+actor "Administrator" as Admin
 participant ":System" as System
 
-activate Employee
+activate Admin
 
-    Employee -> System : asks to create a new task
+    Admin -> System : asks to review registration requests
     activate System
 
-        System --> Employee : shows task category list and asks to select one
+        System --> Admin : shows pending registration requests
     deactivate System
 
-    Employee -> System : selects a task category
+    Admin -> System : selects a registration request
     activate System
 
-        System --> Employee : requests data (i.e. reference, designation, informal\ndescription, technical description, duration, cost)
+        System --> Admin : shows request details
     deactivate System
 
-    Employee -> System : types requested data
+    Admin -> System : accepts/rejects the registration request
     activate System
 
-        System --> Employee : shows all data and requests confirmation
+        System --> Admin : asks for confirmation
     deactivate System
 
-    Employee -> System : confirms data
+    Admin -> System : confirms decision
     activate System
 
-        System --> Employee : displays operation success
+        System --> Admin : displays operation success
     deactivate System
+
+deactivate Admin
+
 @enduml
