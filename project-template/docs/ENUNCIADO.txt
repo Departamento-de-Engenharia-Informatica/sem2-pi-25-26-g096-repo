@@ -1,0 +1,238 @@
+Integrative Project Assignment
+pi-sem2-2025-26 - version 1.0
+March 10, 2026
+Crystal Clear
+Abstract
+This document comprises a detailed description of the Integrative
+Project Assignment for the practical work to be developed within
+ESOFT, ESTAT, MDISC, PPROG, and LAPR2 courses. The work
+consists of developing an IT solution that allows the capture, storage,
+and analysis of information related to the income, assets, interests,
+and connections of political actors. This document briefly introduces
+the business domain and sub-areas, the functional and non-functional
+requirements of the solution to be developed, the Integrative Project
+technical details, and the operating mode, i.e., the teamwork framework.
+Table 1: Version register
+Version Description
+1.0 First version
+1
+Contents
+1 Integrative Project 3
+1.1 Team operation framework . . . . . . . . . . . . . . . . . . . . 3
+2 Problem Statement: Description 4
+2.1 Transparency Portal . . . . . . . . . . . . . . . . . . . . . . . 5
+2.2 Asset Declarations . . . . . . . . . . . . . . . . . . . . . . . . 5
+2.3 Analysis Tools . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+2.4 Platform Users and Stakeholders . . . . . . . . . . . . . . . . 6
+3 Minimal Viable Product (MVP) 6
+3.1 Sprint 1 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+3.1.1 Asset Declaration and Analysis Tools . . . . . . . . . . 7
+3.2 Non-functional requirements . . . . . . . . . . . . . . . . . . . 8
+2
+1 Integrative Project
+In this project, students, organised into teams, will analyse, design, and
+develop a computer solution that allows the capture, storage, and analysis
+of information relating to the income, assets, interests, and connections of
+political actors, to promote transparency in the political system and bring
+those who govern closer to those they govern.
+Following the good practices learned throughout the degree and in particular
+in Software Engineering (ESOFT), Programming Paradigms (PPROG),
+Statistics (ESTAT), Discrete Mathematics (MDISC), and Laboratory-Project
+II (LAPR2) courses, this project implies applying an iterative and incremental
+development process. Therefore, the agile SCRUM approach must be
+used to manage teamwork in each four-week SPRINT.
+The software solution to be developed must be composed of a set of Java
+and Python applications that must meet the requirements. To increase the
+solution maintainability and follow good software development practices, the
+implementation must follow a Test-Driven Development (TDD) approach.
+1.1 Team operation framework
+Each team with LAPR2 students must nominate a Scrum Master for each
+Sprint (rotative role) and create a Scrum Board in the Organization Departamento
+de Engenharia Inform´atica, following these guidelines:
+• Only one team member (the assigned scrum master) creates the Project
+Board with the title ”sem2-pi-25-26-gnnn-board in which nnn must be
+replaced by the team number;
+• The board privacy must be ”private”, and the ”Organization Role”
+must be ”no access”;
+• Access (writer) must be given to TP and PL teachers assigned to the
+team’s class;
+• The project board must include the following columns: Backlog, To-
+Do, In Progress/Doing, Testing/To Review, Done, Logbook.
+All teams involved in the integrative project must create the project
+repository on GitHub in the Organization Departamento de Engenharia Inform
+´atica, following these guidelines:
+• Only one team member creates the repository, with the title sem2-pi-
+25-26-gnnn-repo based on the provided example;
+3
+• The repository access must be ”private”;
+• All TP, PL, and OT teachers from the involved class courses who supervise
+the project must be added to the repository with the ”Reader”
+role.
+2 Problem Statement: Description
+In a democracy, the relationship between transparency and political agents
+(such as MPs, ministers, and judges) is centered on the principle that those
+who hold public power must be subject to public scrutiny to prevent the
+abuse of that power for private gain.
+The disclosure of their financial profiles, including salaries, side incomes,
+and assets, serves as a critical mechanism for maintaining democratic
+integrity through several key functions:
+• Preventing Conflicts of Interest and Illicit Enrichment
+– Asset Declarations: These are ”balance sheets” of an official’s
+wealth (homes, stocks, debts) filed before, during, and after their
+term. By comparing these over time, oversight bodies and journalists
+can detect illicit enrichment (wealth that cannot be explained
+by the official salary).
+– Side Incomes: Transparency regarding ”side jobs” (consulting,
+board memberships) reveals potential conflicts of interest. It
+allows voters to see if a politician’s legislative actions are being
+influenced by private companies or lobby groups that pay them.
+• Enhancing Political Accountability and Trust
+– Trust-Building: Research indicates that politicians who transparently
+disclose side incomes (even high ones) are viewed as more
+trustworthy and electable than those who refuse to disclose
+them based on ”privacy concerns.”
+– Public Oversight: Because citizens effectively pay the salaries
+of political agents through taxes, transparency ensures that these
+agents remain accountable to their ”employers” (the public).
+• Strengthening the ”Ballot Box” Mechanism Democracy relies on informed
+choice. Transparency provides the information necessary for
+4
+voters to make judgment calls at the polls. Without knowing a candidate’s
+financial ties, voters cannot judge whether an official is serving
+the public interest or the interests of private donors.
+• International Standards and Best Practices
+– Global Frameworks: The UN Convention against Corruption
+(UNCAC) requires countries to establish legal frameworks for public
+officials to declare assets and outside interests.
+– Digital Transparency: Modern systems involve centralizing disclosures
+in searchable, machine-readable portals to allow for
+automated ”red-flagging” of suspicious wealth increases.
+2.1 Transparency Portal
+The Portal for Transparency, the main deliverable of the current project,
+consists in an IT solution that supports the registration, evaluation, and
+analysis of declarations of interests (Asset Declaration) by political actors
+and the information resulting from their compilation and temporal analysis.
+2.2 Asset Declarations
+Declarations of Interest may be initial, submitted by political agents whenever
+they begin a term of office; regular, submitted regularly (annually)
+while performing a political function; and exceptional, submitted whenever
+there is a significant change in the values mentioned in the declaration,
+when requested by the ethics committee, or for the purpose of correcting
+errors/omissions in previously submitted declarations.
+Declarations of interest must include information regarding:
+• professional positions, public, private, and social positions held (or previously
+held), in which institutions, the nature of these institutions, the
+functions performed, and the payment received;
+• support and subsidies received, from which institutions and the nature
+of the institution;
+• assets (real estate: urban and rural) with their estimated value;
+• quotas, shares, and holdings in companies, with their respective market
+values.
+5
+2.3 Analysis Tools
+These tools are designed to analyse the information in declarations of interest
+from a temporal perspective to detect omissions, inconsistencies, and
+incompatibilities.
+2.4 Platform Users and Stakeholders
+This platform may be used by different users, namely:
+• Political Agent - someone who performs a political function, such as:
+deputy, minister, councillor, mayor, or parish council president;
+• Ordinary Citizen - a person who has an interest in scrutinising political
+agents and who can use the Portal(platform) to report behaviour
+and processes that they consider to be lacking in transparency.;
+• Journalist - a person who is registered with the Journalists’ Union
+and wishes to access the Transparency Portal, on the basis that it is
+a fundamental tool for investigation and public scrutiny, supported by
+specific rights of access to administrative information.;
+• Ethics Committee - normally responsible for: i) managing and supervising
+the Declarations of Interests of political actors; ii) verifying
+incompatibilities and impediments: situations where the professional
+or personal activity of a political actor may conflict with their mandate;
+iii) verifying the Code of Conduct: application and investigation
+of possible violations of the rules of conduct and civility;;
+• System Administrator - person or team who manages the system
+and its access privileges;
+3 Minimal Viable Product (MVP)
+The purpose of this project is to develop a Minimal Viable Product (MVP) iteratively
+and incrementally; therefore, the work is divided into three Sprints:
+• Sprint 1 – Weeks 3 to 6 – from 9/March to 12/April
+• Sprint 2 – Weeks 7 to 10 – from 13/April to 17/May
+• Sprint 3 – Weeks 11 to 14 – from 18/May to 14/June
+6
+A description of the MVP is provided for each sprint. Teams must follow
+the user stories (US) provided and consider their interconnections and
+respective dependencies. At the end of each Sprint, each team must meet
+the specified requirements. Teams must add USs to the backlog, size them
+appropriately, and distribute them among team members1.
+3.1 Sprint 1
+3.1.1 Asset Declaration and Analysis Tools
+This Sprint aims at developing the following User Stories (US) (Requirement
+Engineering and Analysis):
+• US01 - As a future user, I want to request to be registered in the
+platform with the appropriate permissions for a specific role.
+AC1: The role must be selected from a predefined list of available roles.
+• US02 - As an Administrator, I want to accept/reject registration requests
+on the platform.
+• US03 - As a Political Agent, I want to list Institutions (Companies,
+Political Parties, Foundations, Institutes, Associations).
+AC1: The institutions should be grouped by type and then listed alphabetically
+by name.
+• US04 - As an Administrator, I want to register an Institution of a given
+type.
+AC1: The institution type must be selected from a predefined list of
+available types.
+• US05 - As an Administrator, I want to register Functions;
+• US06 - As a Political Agent, I want to submit a declaration of interests
+including income, position/job/ post (public, private, or social), assets,
+and business participations.
+• US07 - As a Political Agent, I want to consult a previously submitted
+Declaration of Interests.
+1These will also be supervised in TP LAPR2 classes
+7
+• US08 - As a member of the Ethics Committee, I want to validate a
+submitted Declaration of Interests.
+AC1: When correct, it is validated.
+AC2: When incorrect, the section/item with inconsistencies must be
+commented.
+• US09 - As a member of the Ethics Committee, I want to consult the
+Integrated Situation of a Political Agent on a given date.
+• US10 - As a journalist, I want to analyse the evolution of a Political
+Agent’s income over a given period of time (between two dates).
+• US11 - As a citizen/journalist, I want to consult the assets of a political
+agent on a specific date.
+AC1: Sensitive data must be partially omitted based on the user’s role.
+• US12 - As a citizen, I want to make a complaint about a political agent
+in a specific role and on a specific date;
+For Sprint 1, regarding the Requirements Engineering activity:
+• teams with 5 or more students enrolled in ESOFT must elaborate all
+user stories;
+• teams with 4 students enrolled in ESOFT don’t need to elaborate on
+the US05 and US07
+• teams with 3 or fewer students enrolled in ESOFT don’t need to elaborate
+on the US03, US04, US05 and US07.
+3.2 Non-functional requirements
+This section describes some non-functional requirements that must be considered
+when implementing the project.
+• Validation of business rules must be respected when recording and updating
+data.
+• The class structure must be designed to allow easy maintenance and
+the addition of new features following the best Object-Oriented (OO)
+practices.
+• The application must be developed in Java language.
+8
+• All those who wish to use the application must be authenticated with
+a password of seven alphanumeric characters, including three capital
+letters and two digits.
+• The information provided varies depending on the type of user.
+• The application documentation must be in English.
+• During system development, the team must: (i) adopt best practices for
+identifying requirements and for OO software analysis and design; (ii)
+adopt recognized coding standards (e.g., CamelCase); (iii) use Javadoc
+to generate useful documentation for Java code.
+• The development team must implement unit tests for all methods, except
+for the methods that implement Input/Output operations. Unit
+tests should be implemented using the JUnit 5 framework. The JaCoCo
+plugin should be used to generate the coverage report.
+• All the images/figures produced during the software development process
+should be recorded in SVG format.
+• The application ought to employ object serialization to guarantee the

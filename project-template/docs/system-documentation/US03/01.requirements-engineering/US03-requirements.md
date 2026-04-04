@@ -60,9 +60,7 @@ As a Political Agent, I want to list Institutions (Companies, Political Parties,
 ---
 
 ### 1.6. System Sequence Diagram (SSD)
-
-![System Sequence Diagram](svg/US03-SSD.svg)
-
+![alt text](image.png)
 ---
 
 ### 1.7 Other Relevant Remarks
