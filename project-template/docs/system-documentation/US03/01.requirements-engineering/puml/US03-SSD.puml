@@ -1,0 +1,25 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Political Agent" as Employee
+participant ":System" as System
+
+activate Employee
+
+    Employee -> System : asks to list Institutions
+    activate System
+
+        System --> Employee : asks which types of institutions (Companies, Political Parties, Foundations, Institutes, Associations) the user wants to see
+    deactivate System
+
+    Employee -> System : selects the type(s) of institutions
+    activate System
+
+        System --> Employee : shows institutions grouped by type, each group listed alphabetically by name
+    deactivate System
+
+@enduml
