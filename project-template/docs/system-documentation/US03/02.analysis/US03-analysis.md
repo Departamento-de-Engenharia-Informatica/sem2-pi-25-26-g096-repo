@@ -1,9 +1,6 @@
 # US03 - List Institutions
 
 ## 2. Analysis
-
-The analysis process for this user story focuses on the domain concepts required to retrieve, group, and display institutions. Since this is a listing operation, no new domain entities are created.
-
 ### 2.1. Relevant Domain Model Excerpt
 
 [PlantUML source](puml/US006-DM.puml)

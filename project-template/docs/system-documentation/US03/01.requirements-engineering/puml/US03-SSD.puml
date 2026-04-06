@@ -13,7 +13,7 @@ activate Employee
     Employee -> System : asks to list Institutions
     activate System
 
-        System --> Employee : asks which types of institutions (Companies, Political Parties, Foundations, Institutes, Associations) the user wants to see
+        System --> Employee : asks which types of institutions (Companies, Associations, etc...) the user wants to see
     deactivate System
 
     Employee -> System : selects the type(s) of institutions

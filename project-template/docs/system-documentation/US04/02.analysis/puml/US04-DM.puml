@@ -1,0 +1,31 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+class Platform {
+}
+
+class Administrator {
+}
+
+class Institution {
+    name
+}
+
+enum InstitutionType {
+    COMPANY
+    POLITICAL_PARTY
+    FOUNDATION
+    INSTITUTE
+    ASSOCIATION
+}
+
+Platform "1" -- "*" Institution : manages
+Administrator "1" -- "0..*" Institution : registers
+Institution "*" -- "1" InstitutionType : typed as
+
+@enduml
