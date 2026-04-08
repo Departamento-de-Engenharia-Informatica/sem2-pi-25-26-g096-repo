@@ -46,7 +46,7 @@ As a Political Agent, I want to list Institutions (Companies, Political Parties,
 **Input Data:**
 
 * Selected data:
-    * institution type(s) to filter the visualization (optional)
+    * institution type(s) to filter the visualization 
 
 * Typed data:
     * none
@@ -60,7 +60,7 @@ As a Political Agent, I want to list Institutions (Companies, Political Parties,
 ---
 
 ### 1.6. System Sequence Diagram (SSD)
-![alt text](image.png)
+![System Sequence Diagram](svg/US03-SSD.svg)
 ---
 
 ### 1.7 Other Relevant Remarks

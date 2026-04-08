@@ -62,7 +62,7 @@ As an Administrator, I want to register an Institution of a given type.
 
 ### 1.6. System Sequence Diagram (SSD)
 
-![alt text](image.png)
+![System Sequence Diagram](svg/US04-SSD.svg)
 
 ### 1.7 Other Relevant Remarks
 

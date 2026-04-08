@@ -2,11 +2,8 @@
 
 ## 2. Analysis
 
-The analysis for this user story identifies the minimum domain concepts needed to register an institution with a predefined type. This operation creates new domain data.
-
 ### 2.1. Relevant Domain Model Excerpt
-
-[PlantUML source](puml/US006-DM.puml)
+![Domain Model](svg/US04-DM.svg)
 
 ### 2.2. Other Remarks
 

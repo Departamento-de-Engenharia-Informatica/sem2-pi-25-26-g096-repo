@@ -2,8 +2,7 @@
 
 ## 2. Analysis
 ### 2.1. Relevant Domain Model Excerpt
-
-[PlantUML source](puml/US006-DM.puml)
+![Domain Model](svg/US03-DM.svg)
 
 ### 2.2. Other Remarks
 

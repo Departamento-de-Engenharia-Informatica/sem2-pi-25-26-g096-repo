@@ -9,6 +9,11 @@ In particular, it has:
 * [Sample documentation](docs/outsourcing-tasks-example) and [source code](src) available as a starting point;
 * General description of how the provided application works (and it is structured).
 
+## Prerequisites
+
+* Java 25 (LTS)
+* Maven 3.9+
+
 
 ## Maven goals
 

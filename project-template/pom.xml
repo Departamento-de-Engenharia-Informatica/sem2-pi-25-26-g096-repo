@@ -10,7 +10,7 @@
 
     <properties>
         <!-- Java Version Configuration -->
-        <java.version>11</java.version>
+        <java.version>25</java.version>
 
         <!-- Maven Version Configuration -->
         <maven-compiler-plugin>3.14.0</maven-compiler-plugin>
@@ -25,7 +25,7 @@
         <junit-jupiter>5.12.0</junit-jupiter>
 
         <!-- Coverage configuration -->
-        <jacoco-maven-plugin>0.8.12</jacoco-maven-plugin>
+        <jacoco-maven-plugin>0.8.13</jacoco-maven-plugin>
 
         <!-- Surefire Version Configuration -->
         <maven-surefire-plugin>3.5.2</maven-surefire-plugin>
@@ -75,8 +75,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <showWarnings>true</showWarnings>   <!-- Needs this -->
                     <compilerArgs>
                         <arg>-Xlint:all</arg>   <!-- recommended -->
