@@ -10,6 +10,7 @@ public class AuthenticationController {
 
     public static final String ROLE_ADMIN = "ADMINISTRATOR";
     public static final String ROLE_EMPLOYEE = "EMPLOYEE";
+    public static final String ROLE_CITIZEN = "CITIZEN";
 
     //private final ApplicationSession applicationSession;
     private final AuthenticationRepository authenticationRepository;

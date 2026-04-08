@@ -6,6 +6,7 @@
 
 [PlantUML source](puml/US12-DM.puml)
 
+
 ### 2.2. Other Remarks
 
 * A `Complaint` is the core domain concept in this user story.
