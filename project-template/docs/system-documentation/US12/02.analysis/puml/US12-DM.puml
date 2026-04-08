@@ -1,0 +1,35 @@
+@startuml
+title US12 - Domain Model Excerpt 
+class Citizen {
+  +citizenId : String
+}
+
+class PoliticalAgent {
+  +agentId : String
+  +name : String
+}
+
+class PoliticalRole {
+  +roleId : String
+  +name : String
+}
+
+class Complaint {
+  +complaintId : String
+  +incidentDate : LocalDate
+  +submissionDate : LocalDate
+  +description : String
+  +status : ComplaintStatus
+}
+
+enum ComplaintStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  CLOSED
+}
+
+Citizen "1" -- "0..*" Complaint : submits >
+Complaint "1" -- "1" PoliticalAgent : reports >
+Complaint "1" -- "1" PoliticalRole : in role >
+
+@enduml
