@@ -1,4 +1,4 @@
-# US006 - Create a Task 
+# US08 - Validate Declaration
 
 [Requirements Engineering](01.requirements-engineering/US08-requirements.md)
 
