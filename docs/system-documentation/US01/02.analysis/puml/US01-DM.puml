@@ -1,0 +1,28 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+class User {
+    name
+    email
+    password
+}
+
+class Role {
+    designation
+}
+
+class RegistrationRequest {
+    requestDate
+    status
+}
+
+User "1" -- "0..1" RegistrationRequest : requests >
+RegistrationRequest "1" -- "1" Role : refers to >
+Role "1" -- "0..*" User : is assigned to >
+
+@enduml

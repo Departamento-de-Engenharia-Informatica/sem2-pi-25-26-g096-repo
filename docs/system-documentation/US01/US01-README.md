@@ -1,4 +1,4 @@
-# US001 — User Registration Request
+# US01 — User Registration Request
 
 [Requirements Engineering](01.requirements-engineering/US01-requirements.md)
 
