@@ -12,28 +12,25 @@ activate Member
 
     Member -> System : asks to validate a declaration of interests
     activate System
-
-        System --> Member : shows submitted declaration
+        System --> Member : presents list of submitted declarations
     deactivate System
 
-    Member -> System : analyzes declaration
+    Member -> System : selects a declaration of interests
     activate System
-
-        System --> Member : requests validation decision
+        System --> Member : shows declaration details
     deactivate System
 
-    Member -> System : validates declaration
-    activate System
-
-        System --> Member : displays validation success
-    deactivate System
-
-    Member -> System : comments inconsistencies
-    activate System
-
-        System --> Member : displays operation success
-    deactivate System
+    alt declaration is correct
+        Member -> System : approves the declaration
+        activate System
+            System --> Member : informs that the declaration was successfully validated
+        deactivate System
+    else declaration has inconsistencies
+        Member -> System : rejects the declaration with comments on inconsistent sections
+        activate System
+            System --> Member : informs that the declaration was rejected and returned for correction
+        deactivate System
+    end
 
 deactivate Member
-
 @enduml

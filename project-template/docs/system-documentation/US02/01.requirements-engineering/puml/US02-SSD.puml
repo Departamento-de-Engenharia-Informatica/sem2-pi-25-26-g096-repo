@@ -10,30 +10,25 @@ participant ":System" as System
 
 activate Admin
 
-    Admin -> System : asks to review registration requests
+    Admin -> System : asks to manage pending registration requests
     activate System
-
-        System --> Admin : shows pending registration requests
+        System --> Admin : presents list of pending registration requests
     deactivate System
 
     Admin -> System : selects a registration request
     activate System
-
-        System --> Admin : shows request details
+        System --> Admin : shows registration request details
     deactivate System
 
-    Admin -> System : accepts/rejects the registration request
+    Admin -> System : accepts or rejects the registration request
     activate System
-
         System --> Admin : asks for confirmation
     deactivate System
 
     Admin -> System : confirms decision
     activate System
-
-        System --> Admin : displays operation success
+        System --> Admin : informs that the operation was carried out successfully
     deactivate System
 
 deactivate Admin
-
 @enduml
