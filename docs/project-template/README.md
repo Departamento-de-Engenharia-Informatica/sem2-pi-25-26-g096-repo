@@ -6,7 +6,7 @@ In particular, it has:
 
 * The [Team Members and Task Distribution](docs/TeamMembersAndTasks.md) during sprints;
 * [Templates](docs/(template-files)) to capture and systematize evidence of proper application of the Software Development Process, namely regarding the activities of Requirements Engineering, OO Analysis and Design;
-* [Sample documentation](docs/outsourcing-tasks-example) and [source code](src) available as a starting point;
+* [Sample documentation](docs/outsourcing-tasks-example) and [source code](../../src) available as a starting point;
 * General description of how the provided application works (and it is structured).
 
 ## Prerequisites
