@@ -1,4 +1,4 @@
-# US006 - Create a Task 
+# US08 - Validate Declaration
 
 ## 2. Analysis
 
