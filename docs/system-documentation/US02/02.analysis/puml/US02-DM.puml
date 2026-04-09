@@ -6,10 +6,20 @@ skinparam classAttributeIconSize 0
 hide circle
 hide methods
 
+class User {
+    name
+    email
+    password
+}
+
 class Administrator {
     name
     email
     password
+}
+
+class Role {
+    designation
 }
 
 class RegistrationRequest {
@@ -17,11 +27,9 @@ class RegistrationRequest {
     status
 }
 
-class Role {
-    designation
-}
-
+User "1" -- "0..1" RegistrationRequest : requests >
 Administrator "1" -- "0..*" RegistrationRequest : reviews >
 RegistrationRequest "1" -- "1" Role : refers to >
+User "0..*" -- "0..1" Role : is assigned to >
 
 @enduml

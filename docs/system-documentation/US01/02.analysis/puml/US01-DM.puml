@@ -23,6 +23,5 @@ class RegistrationRequest {
 
 User "1" -- "0..1" RegistrationRequest : requests >
 RegistrationRequest "1" -- "1" Role : refers to >
-Role "1" -- "0..*" User : is assigned to >
 
 @enduml
