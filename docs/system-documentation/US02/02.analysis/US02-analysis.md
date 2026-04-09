@@ -1,4 +1,4 @@
-# US006 - Create a Task 
+# US02 - Approve/Reject Registration
 
 ## 2. Analysis
 
