@@ -1,4 +1,4 @@
-# US006 - Create a Task 
+# US02 - Approve/Reject Registration
 
 [Requirements Engineering](01.requirements-engineering/US02-requirements.md)
 
