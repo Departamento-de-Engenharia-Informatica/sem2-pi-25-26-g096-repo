@@ -5,32 +5,63 @@ skinparam shadowing false
 
 autonumber
 
-actor "Organization\nEmployee" as Employee
+actor "Political\nAgent" as PoliticalAgent
 participant ":System" as System
 
-activate Employee
+activate PoliticalAgent
 
-    Employee -> System : asks to create a new task
+PoliticalAgent -> System : asks to submit a declaration
+activate System
+
+System --> PoliticalAgent : requests declaration type
+deactivate System
+
+PoliticalAgent -> System : selects declaration type
+activate System
+
+System --> PoliticalAgent : requests positions data
+deactivate System
+
+loop for each position
+    PoliticalAgent -> System : enters position data
     activate System
-
-        System --> Employee : shows task category list and asks to select one
+    System --> PoliticalAgent : validates position
     deactivate System
+end
 
-    Employee -> System : selects a task category
+System --> PoliticalAgent : requests subsidies data
+
+loop for each subsidy
+    PoliticalAgent -> System : enters subsidy data
     activate System
-
-        System --> Employee : requests data (i.e. reference, designation, informal\ndescription, technical description, duration, cost)
+    System --> PoliticalAgent : validates subsidy
     deactivate System
+end
 
-    Employee -> System : types requested data
+System --> PoliticalAgent : requests assets data
+
+loop for each asset
+    PoliticalAgent -> System : enters asset data
     activate System
-
-        System --> Employee : shows all data and requests confirmation
+    System --> PoliticalAgent : validates asset
     deactivate System
+end
 
-    Employee -> System : confirms data
+System --> PoliticalAgent : requests participations data
+
+loop for each participation
+    PoliticalAgent -> System : enters participation data
     activate System
-
-        System --> Employee : displays operation success
+    System --> PoliticalAgent : validates participation
     deactivate System
+end
+
+System --> PoliticalAgent : shows all data and requests confirmation
+
+PoliticalAgent -> System : confirms declaration
+activate System
+
+System --> PoliticalAgent : displays operation success
+deactivate System
+
 @enduml
