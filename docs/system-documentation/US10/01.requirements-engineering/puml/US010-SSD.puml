@@ -1,0 +1,24 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Journalist" as Journalist
+participant ":System" as System
+
+activate Journalist
+
+    Journalist -> System : asks to analyse a political agent's income evolution
+    activate System
+        System --> Journalist : requests political agent and period
+    deactivate System
+
+    Journalist -> System : selects political agent and enters start and end dates
+    activate System
+        System --> Journalist : displays income evolution data in chronological order
+    deactivate System
+
+deactivate Journalist
+@enduml
