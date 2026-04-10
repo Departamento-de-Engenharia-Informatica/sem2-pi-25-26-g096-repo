@@ -1,8 +1,8 @@
-# US006 - Create a Task 
+# US006 - Analyse Income Evolution 
 
-[Requirements Engineering](01.requirements-engineering/US006-requirements.md)
+[Requirements Engineering](01.requirements-engineering/US010-requirements.md)
 
-[Analysis](02.analysis/US006-analysis.md)
+[Analysis](02.analysis/US010-analysis.md)
 
 [Design](03.design/US006-design.md)
 
