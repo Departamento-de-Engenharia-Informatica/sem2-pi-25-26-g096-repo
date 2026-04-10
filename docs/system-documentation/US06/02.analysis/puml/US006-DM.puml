@@ -1,50 +1,55 @@
 @startuml
+top to bottom direction
 skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
-
-'left to right direction
-
 skinparam classAttributeIconSize 0
-
 hide circle
 hide methods
 
-'title Domain Model
-
-class Organization {
-    name
-    vatNumber
-    website
-    phoneNumber
-    email
-}
-
-class Task {
-    reference
-    description
-    informalDescription
-    technicalDescription
-    duration
-    cost
-}
-
-class TaskCategory {
-    description
-}
-
-class Employee {
+class PoliticalAgent {
     name
     email
-    position
-    phone
 }
 
-Organization "1" - "*" Employee : has
-Organization "1" - "*" Task: owns
+class Declaration {
+    submissionDate
+    type
+}
 
-Employee "1" -- "*" Task : creates
+class Position {
+    type
+    function
+    remuneration
+}
 
-Task "*" - "1" TaskCategory: cataloged as
+class Subsidy {
+    amount
+}
+
+class Asset {
+    type
+    estimatedValue
+}
+
+class Participation {
+    type
+    marketValue
+}
+
+class Institution {
+    name
+}
+
+PoliticalAgent "1" -down- "0..*" Declaration : submits
+
+Declaration "1" -down- "0..*" Position : includes
+Declaration "1" -down- "0..*" Subsidy : includes
+Declaration "1" -down- "0..*" Asset : includes
+Declaration "1" -down- "0..*" Participation : includes
+
+Position "0..*" -down- "1" Institution : held at
+Subsidy "0..*" -down- "1" Institution : received from
+Participation "0..*" -down- "1" Institution : held in
 
 @enduml
