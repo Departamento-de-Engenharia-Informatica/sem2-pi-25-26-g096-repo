@@ -10,7 +10,6 @@ As a Political Agent, I want to list Institutions (Companies, Political Parties,
 
 **From the specifications document:**
 
-> Institutions must be categorized by their specific type (Company, Political Party, etc.).
 
 > Each institution has, at minimum, a name and a type.
 

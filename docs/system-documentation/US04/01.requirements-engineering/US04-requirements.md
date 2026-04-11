@@ -10,9 +10,6 @@ As an Administrator, I want to register an Institution of a given type.
 
 **From the specifications document:**
 
-> US04 - As an Administrator, I want to register an Institution of a given type.
-
-> AC1: The institution type must be selected from a predefined list of available types.
 
 > The system must support the capture and storage of information related to political actors and their connections.
 
@@ -65,6 +62,4 @@ As an Administrator, I want to register an Institution of a given type.
 ![System Sequence Diagram](svg/US04-SSD.svg)
 
 ### 1.7 Other Relevant Remarks
-
-* This user story creates data used by US03 (List Institutions).
-* Validation of business rules is mandatory when recording data.
+N/a
