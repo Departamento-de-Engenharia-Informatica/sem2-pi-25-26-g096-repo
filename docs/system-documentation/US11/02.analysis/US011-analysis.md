@@ -8,10 +8,12 @@
 
 ### 2.2. Other Remarks
 
-The consultation is modeled as a date-based snapshot of a Political Agent's assets.
+The assets consultation is grounded on declarations submitted by the selected political agent and on the asset-related declaration section.
 
-The snapshot is derived from declarations of interests and must reflect only the data valid on the selected reference date.
+The relevant core path is Declaration -> AssetSection -> AssetField -> Property, including property type and location.
 
-Access behavior is role-dependent (Citizen/Journalist), and sensitive fields must be partially omitted before presenting results.
+The selected date defines the temporal scope of the consultation, so only data valid on that date should be shown.
 
-This is a read-only operation focused on transparency while preserving confidentiality constraints.
+Visibility is role-dependent for Citizen and Journalist users, and sensitive information must be partially omitted before presentation.
+
+This operation remains strictly read-only.

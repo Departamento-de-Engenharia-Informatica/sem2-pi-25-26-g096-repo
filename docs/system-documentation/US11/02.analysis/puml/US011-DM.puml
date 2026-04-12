@@ -6,43 +6,76 @@ skinparam classAttributeIconSize 0
 hide circle
 hide methods
 
-class User {
+abstract class Person {
     name
+    taxId
     email
-    role
+    password
+}
+
+class Citizen {
+}
+
+class Journalist {
+    pressCardNumber
 }
 
 class PoliticalAgent {
-    name
-    email
 }
 
-class AssetsSnapshot {
-    referenceDate
-}
-
-class DeclarationOfInterests {
+class Declaration {
     submissionDate
-    type
+    declarantName
 }
 
-class Asset {
-    type
-    estimatedValue
+abstract class Section {
 }
 
-class SensitiveDataPolicy {
-    maskingLevel
+class AssetSection {
 }
 
-User "1" -- "0..*" AssetsSnapshot : consults >
-AssetsSnapshot "1" -- "1" PoliticalAgent : refers to >
-AssetsSnapshot "1" -- "0..*" Asset : shows >
+abstract class Field {
+}
 
-PoliticalAgent "1" -- "0..*" DeclarationOfInterests : submits >
-DeclarationOfInterests "1" -- "0..*" Asset : includes >
+class AssetField {
+}
 
-User "1" -- "1" SensitiveDataPolicy : constrained by >
-SensitiveDataPolicy "1" -- "0..*" Asset : masks >
+class Property {
+    acquisitionValue
+    marketValue
+}
+
+enum PropertyType {
+    URBAN
+    RURAL
+}
+
+class Location {
+    parish
+    municipality
+    district
+}
+
+Person <|-- Citizen
+Person <|-- Journalist
+Person <|-- PoliticalAgent
+
+Section <|-- AssetSection
+Field <|-- AssetField
+
+PoliticalAgent "1" -- "0..*" Declaration : submits >
+Declaration *-- "4" Section
+AssetSection *-- "*" AssetField
+AssetField *-- "1" Property
+Property --> "1" PropertyType
+Property "1" -- "1" Location : located in >
+
+Citizen "1" -- "0..*" Declaration : consults >
+Journalist "1" -- "0..*" Declaration : consults >
+
+note right of Citizen
+Displayed asset data is filtered
+according to role visibility rules.
+end note
 
 @enduml
