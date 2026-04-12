@@ -1,0 +1,51 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+class EthicsCommitteeMember {
+    name
+    email
+}
+
+class PoliticalAgent {
+    name
+    email
+}
+
+class IntegratedSituation {
+    referenceDate
+}
+
+class DeclarationOfInterests {
+    submissionDate
+    type
+    status
+}
+
+class Position {
+    remuneration
+}
+
+class Asset {
+    estimatedValue
+}
+
+class BusinessParticipation {
+    marketValue
+}
+
+EthicsCommitteeMember "1" -- "0..*" IntegratedSituation : consults >
+IntegratedSituation "1" -- "1" PoliticalAgent : refers to >
+IntegratedSituation "1" -- "0..*" DeclarationOfInterests : aggregates >
+
+PoliticalAgent "1" -- "0..*" DeclarationOfInterests : submits >
+
+DeclarationOfInterests "1" -- "0..*" Position : includes >
+DeclarationOfInterests "1" -- "0..*" Asset : includes >
+DeclarationOfInterests "1" -- "0..*" BusinessParticipation : includes >
+
+@enduml
