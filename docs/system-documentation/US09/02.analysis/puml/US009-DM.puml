@@ -8,44 +8,67 @@ hide methods
 
 class EthicsCommitteeMember {
     name
+    taxId
     email
 }
 
 class PoliticalAgent {
-    name
-    email
 }
 
-class IntegratedSituation {
-    referenceDate
+class Role {
+    designation
 }
 
-class DeclarationOfInterests {
+class PoliticalMandate {
+    startDate
+    endDate
+}
+
+class Declaration {
     submissionDate
-    type
-    status
+    declarantName
 }
 
-class Position {
-    remuneration
+enum DeclarationType {
+    INITIAL
+    REGULAR
+    EXCEPTIONAL
 }
 
-class Asset {
-    estimatedValue
+enum DeclarationStatus {
+    SUBMITTED
+    VALIDATED
+    REJECTED
 }
 
-class BusinessParticipation {
-    marketValue
+abstract class Section {
 }
 
-EthicsCommitteeMember "1" -- "0..*" IntegratedSituation : consults >
-IntegratedSituation "1" -- "1" PoliticalAgent : refers to >
-IntegratedSituation "1" -- "0..*" DeclarationOfInterests : aggregates >
+class IncomeSection {
+}
 
-PoliticalAgent "1" -- "0..*" DeclarationOfInterests : submits >
+class AssetSection {
+}
 
-DeclarationOfInterests "1" -- "0..*" Position : includes >
-DeclarationOfInterests "1" -- "0..*" Asset : includes >
-DeclarationOfInterests "1" -- "0..*" BusinessParticipation : includes >
+class PositionSection {
+}
+
+class ShareholdingSection {
+}
+
+Section <|-- IncomeSection
+Section <|-- AssetSection
+Section <|-- PositionSection
+Section <|-- ShareholdingSection
+
+PoliticalAgent "1" -- "0..*" PoliticalMandate : holds >
+PoliticalMandate "*" -- "1" Role : associated with >
+
+PoliticalAgent "1" -- "0..*" Declaration : submits >
+Declaration --> "1" DeclarationType
+Declaration --> "1" DeclarationStatus
+Declaration *-- "4" Section
+
+EthicsCommitteeMember "1" -- "0..*" Declaration : consults >
 
 @enduml

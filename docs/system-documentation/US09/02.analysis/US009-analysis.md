@@ -8,8 +8,10 @@
 
 ### 2.2. Other Remarks
 
-The integrated situation is treated as a date-based consultation view over declarations submitted by a political agent.
+The integrated situation is derived from declarations submitted by a political agent and interpreted in the context of the agent's mandate and associated role.
 
-The analysis emphasizes temporal consistency: data shown must correspond to the selected reference date.
+The analysis keeps temporal consistency as a central rule: data presented must correspond to the selected reference date.
 
-The operation is restricted to authenticated users with the Ethics Committee role.
+For this reason, the consultation is centered on Declaration, DeclarationType, DeclarationStatus and declaration sections, while preserving traceability to PoliticalMandate.
+
+Access to this consultation is restricted to authenticated Ethics Committee members.
