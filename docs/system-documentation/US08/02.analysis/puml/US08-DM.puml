@@ -7,29 +7,69 @@ skinparam classAttributeIconSize 0
 hide circle
 hide methods
 
+skinparam class {
+    BackgroundColor<<Abstract>> White
+    BackgroundColor<<Enum>> White
+}
+
+enum DeclarationStatus << Enum >> {
+  SUBMITTED
+  VALIDATED
+  REJECTED
+}
+
+enum ValidationVerdict << Enum >> {
+  APPROVED
+  REJECTED
+}
+
 class EthicsCommitteeMember {
-    name
-    email
-    password
 }
 
-class DeclarationOfInterests {
+class Declaration {
     submissionDate
-    status
 }
 
-class Section {
-    designation
+class Validation {
+    validationDate
 }
 
-class Comment {
+class Annotation {
     text
-    date
+    creationDate
 }
 
-EthicsCommitteeMember "1" -- "0..*" DeclarationOfInterests : validates >
-DeclarationOfInterests "1" -- "1..*" Section : contains >
-Section "0..1" -- "0..*" Comment : has >
-EthicsCommitteeMember "1" -- "0..*" Comment : writes >
+class Subsidy {
+    amount
+    nature
+}
+
+class Asset {
+    acquisitionValue
+    marketValue
+}
+
+class Position {
+    startDate
+    endDate
+    remuneration
+}
+
+class SecurityHolding {
+    title
+    marketValue
+    stake
+    percentage
+}
+
+EthicsCommitteeMember "1" -- "0..*" Validation : performs >
+Validation "1" -- "1" Declaration : evaluates >
+Validation --> "1" ValidationVerdict
+Declaration --> "1" DeclarationStatus
+Validation "1" *-- "0..*" Annotation : contains >
+Annotation "0..*" -- "0..1" Subsidy : comments on >
+Annotation "0..*" -- "0..1" Asset : comments on >
+Annotation "0..*" -- "0..1" Position : comments on >
+Annotation "0..*" -- "0..1" SecurityHolding : comments on >
 
 @enduml
