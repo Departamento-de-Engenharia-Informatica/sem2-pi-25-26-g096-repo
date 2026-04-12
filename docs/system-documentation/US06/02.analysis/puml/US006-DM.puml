@@ -1,5 +1,4 @@
 @startuml
-top to bottom direction
 skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -41,15 +40,15 @@ class Institution {
     name
 }
 
-PoliticalAgent "1" -down- "0..*" Declaration : submits
+PoliticalAgent "1" -- "0..*" Declaration : submits
 
-Declaration "1" -down- "0..*" Position : includes
-Declaration "1" -down- "0..*" Subsidy : includes
-Declaration "1" -down- "0..*" Asset : includes
-Declaration "1" -down- "0..*" Participation : includes
+Declaration "1" -- "0..*" Position : includes
+Declaration "1" -- "0..*" Subsidy : includes
+Declaration "1" -- "0..*" Asset : includes
+Declaration "1" -- "0..*" Participation : includes
 
-Position "0..*" -down- "1" Institution : held at
-Subsidy "0..*" -down- "1" Institution : received from
-Participation "0..*" -down- "1" Institution : held in
+Position "0..*" -- "1" Institution : held at
+Subsidy "0..*" -- "1" Institution : received from
+Participation "0..*" -- "1" Institution : held in
 
 @enduml

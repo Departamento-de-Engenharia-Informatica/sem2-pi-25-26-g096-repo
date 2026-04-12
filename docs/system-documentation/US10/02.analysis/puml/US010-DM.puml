@@ -1,5 +1,4 @@
 @startuml
-top to bottom direction
 skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -25,8 +24,8 @@ class Subsidy {
     amount
 }
 
-PoliticalAgent "1" -down- "0..*" Declaration : submits
-Declaration "1" -down- "0..*" Position : includes
-Declaration "1" -down- "0..*" Subsidy : includes
+PoliticalAgent "1" -- "0..*" Declaration : submits
+Declaration "1" -- "0..*" Position : includes
+Declaration "1" -- "0..*" Subsidy : includes
 
 @enduml
