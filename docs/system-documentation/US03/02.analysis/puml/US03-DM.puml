@@ -7,22 +7,23 @@ skinparam classAttributeIconSize 0
 hide circle
 hide methods
 
-class TransparencyPortal {
-}
-
-class PoliticalAgent {
-}
-
 class Institution {
     name
+    taxId
 }
 
-class InstitutionType {
-    description
+enum InstitutionType << Enum >> {
+  COMPANY
+  POLITICAL_PARTY
+  FOUNDATION
+  INSTITUTE
+  ASSOCIATION
 }
 
-TransparencyPortal "1" -- "*" Institution : holds
-PoliticalAgent "1" -- "1" TransparencyPortal : consults
-Institution "*" -- "1" InstitutionType : classified as
+class Administrator {
+}
+
+Administrator "1" -- "0..*" Institution : registers >
+Institution --> "1" InstitutionType
 
 @enduml
