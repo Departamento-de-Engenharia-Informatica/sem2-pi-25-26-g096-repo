@@ -1,25 +1,33 @@
 @startuml
-title US12 - Submit Complaint
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
 class Citizen {
-  +citizenId : String
+  name
+  taxId
+  email
 }
 
 class PoliticalAgent {
-  +agentId : String
-  +name : String
 }
 
-class PoliticalRole {
-  +roleId : String
-  +name : String
+class Role {
+  designation
+}
+
+class PoliticalMandate {
+  startDate
+  endDate
 }
 
 class Complaint {
-  +complaintId : String
-  +incidentDate : LocalDate
-  +submissionDate : LocalDate
-  +description : String
-  +status : ComplaintStatus
+  incidentDate
+  submissionDate
+  description
 }
 
 enum ComplaintStatus {
@@ -28,8 +36,12 @@ enum ComplaintStatus {
   CLOSED
 }
 
+PoliticalAgent "1" -- "0..*" PoliticalMandate : holds >
+PoliticalMandate "*" -- "1" Role : associated with >
+
 Citizen "1" -- "0..*" Complaint : submits >
-Complaint "1" -- "1" PoliticalAgent : reports >
-Complaint "1" -- "1" PoliticalRole : in role >
+Complaint "*" -- "1" PoliticalAgent : reports on >
+Complaint "*" -- "1" PoliticalMandate : in context of >
+Complaint --> "1" ComplaintStatus
 
 @enduml

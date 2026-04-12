@@ -9,8 +9,8 @@
 
 ### 2.2. Other Remarks
 
-* A `Complaint` is the core domain concept in this user story.
-* Each complaint must reference exactly one `PoliticalAgent` and one `PoliticalRole` valid for the reported context.
-* `Citizen` is the actor authorized to submit complaints.
-* `ComplaintDate` must satisfy the invariant: `complaintDate <= today`.
-* Complaint lifecycle starts with status `SUBMITTED` and can later evolve in future user stories.
+* Complaint is the core domain concept in this user story.
+* Each complaint must reference exactly one PoliticalAgent and one PoliticalMandate that defines the contextual role at the reported time.
+* Citizen is the actor considered in this user story for complaint submission.
+* Incident date must satisfy the invariant: incidentDate <= today.
+* Complaint lifecycle starts with status SUBMITTED and can later evolve in future user stories.
