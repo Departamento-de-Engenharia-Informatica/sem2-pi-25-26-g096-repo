@@ -1,3 +1,10 @@
+# Glossary
+
+**Terms, Expressions and Acronyms (TEA) must be organized alphabetically.**
+
+Column "TEA (PT)" is optional. If the team does not intend to use it, then remove it.
+
+
 | **_TEA_** (EN)                  | **_TEA_** (PT)                         | **_Description_** (EN)                                                                                                                                                                  |
 |:--------------------------------|:---------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Actor**                       | **Ator**                               | Individual or external entity that interacts with the platform, triggering system behaviour through defined use cases.                                                                  |
