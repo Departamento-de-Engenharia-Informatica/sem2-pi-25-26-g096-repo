@@ -1,16 +1,9 @@
-# Glossary
-
-**Terms, Expressions and Acronyms (TEA) must be organized alphabetically.**
-
-Column "TEA (PT)" is optional. If the team does not intend to use it, then remove it.
-
-(Complete according to the provided example)
-
 | **_TEA_** (EN)                  | **_TEA_** (PT)                         | **_Description_** (EN)                                                                                                                                                                  |
 |:--------------------------------|:---------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Actor**                       | **Ator**                               | Individual or external entity that interacts with the platform, triggering system behaviour through defined use cases.                                                                  |
 | **Administrator**               | **Administrador**                      | Platform user responsible for managing access privileges, approving or rejecting registration requests, and registering system entities.                                                |
 | **Agile**                       | **Ágil**                               | Software development approach based on iterative delivery, collaboration and continuous adaptation to change.                                                                           |
+| **Analysis**                    | **Análise**                            | Systematic examination of declaration data over time to identify patterns, inconsistencies or suspicious variations.                                                                    |
 | **Approval**                    | **Aprovação**                          | Outcome of a review process in which submitted data or requests are deemed valid and accepted by the responsible party.                                                                 |
 | **Asset**                       | **Património**                         | Any property or financial resource owned by a political agent, including real estate, vehicles, shares or other holdings.                                                               |
 | **Asset Declaration**           | **Declaração de Bens**                 | Formal document submitted by a political agent detailing their wealth and financial interests at a given point in time, used to detect illicit enrichment by comparison across periods. |
@@ -60,6 +53,7 @@ Column "TEA (PT)" is optional. If the team does not intend to use it, then remov
 | **Input Data**                  | **Dado de Entrada**                    | Information provided by the user to the system in order to trigger or complete an operation.                                                                                            |
 | **Institution**                 | **Instituição**                        | Organisation in which a political agent holds or has held a position, classifiable as a company, political party, foundation, institute or association.                                 |
 | **Institute**                   | **Instituto**                          | Type of institution classified as a public or semi-public body created for a specific administrative or research purpose.                                                               |
+| **Integrated Situation**        | **Situação Integrada**                 | Consolidated view of a political agent's declared positions, assets, income and participations as they stood on a specific date, used by the Ethics Committee for oversight purposes.   |
 | **Integrity**                   | **Integridade**                        | Ethical quality of a political agent characterised by honesty and adherence to moral principles in the exercise of their functions.                                                     |
 | **Interface**                   | **Interface**                          | Contract in object-oriented design that defines a set of methods a class must implement, promoting abstraction and flexibility.                                                         |
 | **JaCoCo**                      | **JaCoCo**                             | Tool used to measure and report code coverage achieved by the project's automated test suite.                                                                                           |
@@ -113,6 +107,7 @@ Column "TEA (PT)" is optional. If the team does not intend to use it, then remov
 | **Subsidy**                     | **Subsídio**                           | Financial support received by a political agent from an institution, which must be declared as part of their declaration of interests.                                                  |
 | **System**                      | **Sistema**                            | The software platform comprising the Transparency Portal, responsible for managing declarations, users and analysis tools.                                                              |
 | **System Administrator**        | **Administrador de Sistema**           | Person or team responsible for managing the system, its access privileges and user accounts.                                                                                            |
+| **Temporal Analysis**           | **Análise Temporal**                   | Comparison of declaration data across multiple time points to identify evolution, inconsistencies or unexplained variations in a political agent's financial profile.                   |
 | **Term of Office**              | **Mandato**                            | Duration of a political agent's appointment to a specific political function, during which declarations must be submitted.                                                              |
 | **Test-Driven Development**     | **Desenvolvimento Orientado a Testes** | Development methodology in which automated tests are written before the corresponding implementation code, ensuring continuous validation of behaviour.                                 |
 | **Transparency**                | **Transparência**                      | Principle that public officials must make their financial and professional activities accessible to public scrutiny.                                                                    |
