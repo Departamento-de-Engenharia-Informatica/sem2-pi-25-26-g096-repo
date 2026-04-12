@@ -1,4 +1,4 @@
-# US10 - OO Analysis
+# US10 - Analyse Income Evolution
 
 ## 2.1. Relevant Domain Model Excerpt
 

@@ -1,5 +1,5 @@
 @startuml
-title US12 - Domain Model Excerpt 
+title US12 - Submit Complaint
 class Citizen {
   +citizenId : String
 }

@@ -1,77 +1,255 @@
 @startuml
+title Domain Model
 skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
-'skinparam linetype ortho
-'left to right direction
 skinparam classAttributeIconSize 0
+
 hide circle
 hide methods
 
-'title Domain Model
-
-class Organization {
-    name
-    vatNumber
-    website
-    phoneNumber
-    email
+skinparam class {
+    BackgroundColor<<Abstract>> White
+    BackgroundColor<<Enum>> White
 }
 
-class Task {
-    reference
-    description
-    informalDescription
-    technicalDescription
-    duration
-    cost
+
+enum DeclarationType << Enum >> {
+  INITIAL
+  REGULAR
+  EXCEPTIONAL
 }
 
-class Category {
-    description
+enum IncomeType << Enum >> {
+  SALARY
+  ALLOWANCE
+  SUBSIDY
 }
 
-class Employee {
-    name
-    email
-    position
-    phone
+enum PropertyType << Enum >> {
+  URBAN
+  RURAL
 }
 
-class TechnicalSkill{
-    shortDescription
-    fullDescription
+enum PositionType << Enum >> {
+  PUBLIC
+  PRIVATE
+  SOCIAL
 }
 
-class ActivityArea{
-    shortDescription
-    fullDescription
+enum InstitutionType << Enum >> {
+  COMPANY
+  POLITICAL_PARTY
+  FOUNDATION
+  INSTITUTE
+  ASSOCIATION
 }
 
-class FeatureTS{
-    mandatory
+enum DeclarationStatus << Enum >> {
+  SUBMITTED
+  VALIDATED
+  REJECTED
 }
 
-'class User {
-'    name
-'    email
-'    password
-'}
-class PostalAddress{
-    street
-    zipCode
-    city
+enum ComplaintStatus << Enum >> {
+  SUBMITTED
+  UNDER_REVIEW
+  CLOSED
 }
 
-Organization "1" - "*" Employee : has >
-Organization "1" - "*" Task: owns >
-Employee "1" -- "*" Task : creates >
-Task "*" - "1" Category: cataloged as >
-TechnicalSkill "*" - "1" ActivityArea: regarding an >
+enum RequestStatus << Enum >> {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
 
-Category "*" - "*" TechnicalSkill :  requires >
-(Category, TechnicalSkill) . FeatureTS
 
-Organization "1" -left "1" PostalAddress : located At >
+abstract class Person << Abstract >> {
+  name
+  taxId
+  email
+  password
+}
+
+abstract class Section << Abstract >> {
+}
+
+abstract class Field << Abstract >> {
+}
+
+
+class PoliticalAgent {
+}
+
+class Journalist {
+  pressCardNumber
+}
+
+class Citizen {
+}
+
+class EthicsCommitteeMember {
+}
+
+class Administrator {
+}
+
+
+class Role {
+  designation
+}
+
+class RegistrationRequest {
+  requestDate
+}
+
+class PoliticalMandate {
+  startDate
+  endDate
+}
+
+
+class Institution {
+  name
+  taxId
+}
+
+class Function {
+  designation
+}
+
+
+class Declaration {
+  submissionDate
+  declarantName
+}
+
+class IncomeSection {
+}
+
+class AssetSection {
+}
+
+class PositionSection {
+}
+
+class ShareholdingSection {
+}
+
+class IncomeField {
+  amount
+}
+
+class AssetField {
+}
+
+class PositionField {
+}
+
+class ShareholdingField {
+}
+
+class Property {
+  acquisitionValue
+  marketValue
+}
+
+class Location {
+  parish
+  municipality
+  district
+}
+
+class Position {
+  startDate
+}
+
+class SecurityHolding {
+  title
+  marketValue
+  stake
+  percentage
+}
+
+class Annotation {
+  text
+  creationDate
+}
+
+
+class Complaint {
+  incidentDate
+  submissionDate
+  description
+}
+
+
+Person <|-- PoliticalAgent
+Person <|-- Journalist
+Person <|-- Citizen
+Person <|-- EthicsCommitteeMember
+Person <|-- Administrator
+
+Section <|-- IncomeSection
+Section <|-- AssetSection
+Section <|-- PositionSection
+Section <|-- ShareholdingSection
+
+Field <|-- IncomeField
+Field <|-- AssetField
+Field <|-- PositionField
+Field <|-- ShareholdingField
+
+
+Person "1" -- "0..1" RegistrationRequest : requests >
+RegistrationRequest --> "1" RequestStatus
+RegistrationRequest "1" -- "1" Role : refers to >
+Person "0..*" -- "0..1" Role : is assigned >
+Administrator "1" -- "0..*" RegistrationRequest : reviews >
+
+
+PoliticalAgent "1" -- "0..*" PoliticalMandate : holds >
+PoliticalMandate "*" -- "1" Role : associated with >
+
+
+Institution "*" -- "1" InstitutionType : classified as >
+Administrator "1" -- "0..*" Institution : registers >
+Administrator "1" -- "0..*" Function : registers >
+
+
+PoliticalAgent "1" -- "0..*" Declaration : submits >
+Declaration --> "1" DeclarationType
+Declaration --> "1" DeclarationStatus
+Declaration *-- "4" Section
+
+IncomeSection *-- "*" IncomeField
+AssetSection *-- "*" AssetField
+PositionSection *-- "*" PositionField
+ShareholdingSection *-- "*" ShareholdingField
+
+IncomeField --> "1" IncomeType
+AssetField *-- "1" Property
+Property --> "1" PropertyType
+Property "1" -- "1" Location : located in >
+
+PositionField *-- "1" Position
+Position --> "1" PositionType
+Position "*" -- "1" Institution : held at >
+Position "*" -- "1" Function : designated as >
+
+ShareholdingField *-- "1" SecurityHolding
+SecurityHolding "*" -- "1" Institution : held in >
+
+
+EthicsCommitteeMember "1" -- "0..*" Declaration : validates >
+EthicsCommitteeMember "1" -- "0..*" Annotation : produces >
+Annotation "*" -- "1" Field : comments on >
+
+
+Citizen "1" -- "0..*" Complaint : submits >
+Journalist "1" -- "0..*" Complaint : submits >
+Complaint "*" -- "1" PoliticalAgent : reports on >
+Complaint "*" -- "1" PoliticalMandate : in context of >
+Complaint --> "1" ComplaintStatus
 
 @enduml

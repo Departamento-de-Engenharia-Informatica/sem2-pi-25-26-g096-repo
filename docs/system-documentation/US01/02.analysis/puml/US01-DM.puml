@@ -1,4 +1,5 @@
 @startuml
+title US01 — User Registration Request
 skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
