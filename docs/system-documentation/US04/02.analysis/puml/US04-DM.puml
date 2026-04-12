@@ -7,17 +7,15 @@ skinparam classAttributeIconSize 0
 hide circle
 hide methods
 
-class Platform {
-}
-
 class Administrator {
 }
 
 class Institution {
     name
+    taxId
 }
 
-enum InstitutionType {
+enum InstitutionType << Enum >> {
     COMPANY
     POLITICAL_PARTY
     FOUNDATION
@@ -25,8 +23,7 @@ enum InstitutionType {
     ASSOCIATION
 }
 
-Platform "1" -- "*" Institution : manages
 Administrator "1" -- "0..*" Institution : registers
-Institution "*" -- "1" InstitutionType : typed as
+Institution --> "1" InstitutionType
 
 @enduml
