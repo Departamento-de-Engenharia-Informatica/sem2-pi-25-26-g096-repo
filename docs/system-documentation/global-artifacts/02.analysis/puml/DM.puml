@@ -142,7 +142,7 @@ class Asset {
 
 class Location {
   parish
-  municipality
+  county
   district
 }
 
