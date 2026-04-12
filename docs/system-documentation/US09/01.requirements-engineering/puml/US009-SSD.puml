@@ -1,0 +1,24 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Ethics Committee\nMember" as EthicsCommitteeMember
+participant ":System" as System
+
+activate EthicsCommitteeMember
+
+    EthicsCommitteeMember -> System : asks to consult integrated situation
+    activate System
+
+        System --> EthicsCommitteeMember : asks for political agent and reference date
+    deactivate System
+
+    EthicsCommitteeMember -> System : provides political agent and reference date
+    activate System
+
+        System --> EthicsCommitteeMember : shows integrated situation on selected date
+    deactivate System
+@enduml
