@@ -1,8 +1,8 @@
 # US06 - Submit Declaration of Interests
 
-[Requirements Engineering](01.requirements-engineering/US006-requirements.md)
+[Requirements Engineering](01.requirements-engineering/US06-requirements.md)
 
-[Analysis](02.analysis/US006-analysis.md)
+[Analysis](02.analysis/US06-analysis.md)
 
 [Design](03.design/US006-design.md)
 

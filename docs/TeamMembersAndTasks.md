@@ -7,7 +7,7 @@ The team is formed by the students identified in the following table.
 | Student Number | Name             |
 |----------------|------------------|
 | **1241129**    | Gustavo Ferreira |
-| **1241138**    | Miguel Correira  |
+| **1241138**    | Miguel Correia   |
 | **1231235**    | Francisco Pinho  |
 | **1231190**    | Eduardo Santos   |
 

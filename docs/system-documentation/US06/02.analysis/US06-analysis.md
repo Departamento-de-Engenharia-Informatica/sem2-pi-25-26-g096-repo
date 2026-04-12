@@ -95,7 +95,7 @@ respectively) and are reused here.
 
 ## 2.5. Domain Model
 
-![Domain Model](svg/US006-DM.svg)
+![Domain Model](svg/US06-DM.svg)
 
 ---
 

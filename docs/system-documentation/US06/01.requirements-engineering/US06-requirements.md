@@ -104,7 +104,7 @@ Declarations of Interest may be:
 
 ### 1.6. System Sequence Diagram (SSD)
 
-![System Sequence Diagram](svg/US006-SSD.svg)
+![System Sequence Diagram](svg/US06-SSD.svg)
 
 ---
 

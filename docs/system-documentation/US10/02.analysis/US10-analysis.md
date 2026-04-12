@@ -55,7 +55,7 @@ income and are therefore not included in this excerpt.
 
 ## 2.5. Domain Model
 
-![Domain Model](svg/US010-DM.svg)
+![Domain Model](svg/US10-DM.svg)
 
 ---
 

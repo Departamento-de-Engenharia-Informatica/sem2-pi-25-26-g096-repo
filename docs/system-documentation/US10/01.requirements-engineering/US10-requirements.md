@@ -84,7 +84,7 @@ creating a temporal record that supports longitudinal analysis.
 
 ### 1.6. System Sequence Diagram (SSD)
 
-![System Sequence Diagram](svg/US010-SSD.svg)
+![System Sequence Diagram](svg/US10-SSD.svg)
 
 ---
 
