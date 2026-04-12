@@ -1,4 +1,5 @@
 @startuml
+top to bottom direction
 skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -6,49 +7,97 @@ skinparam classAttributeIconSize 0
 hide circle
 hide methods
 
+skinparam class {
+    BackgroundColor<<Enum>> White
+}
+
+enum DeclarationType << Enum >> {
+  INITIAL
+  REGULAR
+  EXCEPTIONAL
+}
+
+enum DeclarationStatus << Enum >> {
+  SUBMITTED
+  VALIDATED
+  REJECTED
+}
+
+enum PositionType << Enum >> {
+  PUBLIC
+  PRIVATE
+  SOCIAL
+}
+
+enum PropertyType << Enum >> {
+  URBAN
+  RURAL
+}
+
 class PoliticalAgent {
-    name
-    email
+  name
+  email
 }
 
 class Declaration {
-    submissionDate
-    type
+  submissionDate
 }
 
 class Position {
-    type
-    function
-    remuneration
+  startDate
+  endDate
+  remuneration
 }
 
 class Subsidy {
-    amount
+  amount
+  nature
 }
 
 class Asset {
-    type
-    estimatedValue
+  acquisitionValue
+  marketValue
 }
 
-class Participation {
-    type
-    marketValue
+class SecurityHolding {
+  title
+  marketValue
+  stake
+  percentage
 }
 
 class Institution {
-    name
+  name
+  taxId
 }
 
-PoliticalAgent "1" -- "0..*" Declaration : submits
+class Function {
+  designation
+}
 
-Declaration "1" -- "0..*" Position : includes
-Declaration "1" -- "0..*" Subsidy : includes
-Declaration "1" -- "0..*" Asset : includes
-Declaration "1" -- "0..*" Participation : includes
+class Location {
+  parish
+  county
+  district
+}
 
-Position "0..*" -- "1" Institution : held at
-Subsidy "0..*" -- "1" Institution : received from
-Participation "0..*" -- "1" Institution : held in
+PoliticalAgent "1" -down- "0..*" Declaration : submits >
+Declaration --> "1" DeclarationType
+Declaration --> "1" DeclarationStatus
+Declaration "1" *-down- "0..*" Position : contains >
+Declaration "1" *-down- "0..*" Subsidy : contains >
+Declaration "1" *-down- "0..*" Asset : contains >
+Declaration "1" *-down- "0..*" SecurityHolding : contains >
+
+Position --> "1" PositionType
+Position "0..*" -down- "1" Institution : held at >
+Position "0..*" -- "1" Function : designated as >
+
+Subsidy "0..*" -down- "1" Institution : received from >
+
+Asset --> "1" PropertyType
+Asset "1" -- "1" Location : located in >
+
+SecurityHolding "0..*" -down- "1" Institution : held in >
 
 @enduml

@@ -1,21 +1,22 @@
-# US10 - Analyse Income Evolution
+# US10 - OO Analysis
 
 ## 2.1. Relevant Domain Model Excerpt
 
 This user story introduces no new conceptual classes. It relies entirely
-on concepts already present in the domain model:
+on concepts already present in the global domain model:
 
-- **PoliticalAgent** – the subject of the analysis (introduced in US01/US02).
+- **PoliticalAgent** – the subject of the analysis (introduced in
+  US01/US02).
 - **Declaration** – provides the temporal anchor; each declaration has a
-  submission date that determines whether it falls within the requested
+  submissionDate that determines whether it falls within the requested
   period (introduced in US06).
 - **Position** – provides the `remuneration` attribute that contributes
   to income (introduced in US06).
 - **Subsidy** – provides the `amount` attribute that contributes to
   income (introduced in US06).
 
-**Asset** and **Participation** are not relevant to income and are
-therefore not involved in this use case.
+**Asset**, **SecurityHolding**, and **Location** are not relevant to
+income and are therefore not included in this excerpt.
 
 ---
 
@@ -34,8 +35,8 @@ therefore not involved in this use case.
 | Concept A | Association | Concept B |
 |---|---|---|
 | PoliticalAgent | submits | Declaration |
-| Declaration | includes | Position |
-| Declaration | includes | Subsidy |
+| Declaration | contains | Position |
+| Declaration | contains | Subsidy |
 
 ---
 
@@ -43,7 +44,6 @@ therefore not involved in this use case.
 
 **Declaration**
 - submissionDate *(used to filter by period)*
-- type
 
 **Position**
 - remuneration *(contributes to income)*
@@ -72,9 +72,9 @@ therefore not involved in this use case.
 - **Multiplicity justification:** A PoliticalAgent may have zero or more
   Declarations; a Declaration may have zero or more Positions and zero
   or more Subsidies, consistent with the model established in US06.
-- **Subset of US06 model:** The domain model for this US is a
-  projection of the US06 model, retaining only the concepts and
-  attributes relevant to income analysis.
+- **Subset of global domain model:** The domain model for this US is a
+  projection of the global domain model, retaining only the concepts
+  and attributes relevant to income analysis.
 - **No model changes required:** This use case does not introduce new
   concepts or relationships, confirming the adequacy of the existing
-  domain model from US06.
+  domain model.

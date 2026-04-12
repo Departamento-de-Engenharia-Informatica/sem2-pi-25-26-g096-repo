@@ -7,25 +7,24 @@ hide circle
 hide methods
 
 class PoliticalAgent {
-    name
-    email
+  name
+  email
 }
 
 class Declaration {
-    submissionDate
-    type
+  submissionDate
 }
 
 class Position {
-    remuneration
+  remuneration
 }
 
 class Subsidy {
-    amount
+  amount
 }
 
-PoliticalAgent "1" -- "0..*" Declaration : submits
-Declaration "1" -- "0..*" Position : includes
-Declaration "1" -- "0..*" Subsidy : includes
+PoliticalAgent "1" -- "0..*" Declaration : submits >
+Declaration "1" -- "0..*" Position : contains >
+Declaration "1" -- "0..*" Subsidy : contains >
 
 @enduml
