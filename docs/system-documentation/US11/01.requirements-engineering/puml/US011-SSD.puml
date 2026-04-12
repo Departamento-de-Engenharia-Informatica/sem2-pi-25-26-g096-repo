@@ -1,0 +1,25 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Citizen/\nJournalist" as User
+participant ":System" as System
+
+activate User
+
+    User -> System : asks to consult assets of a political agent
+    activate System
+
+        System --> User : asks for political agent and reference date
+    deactivate System
+
+    User -> System : provides political agent and reference date
+    activate System
+
+        System --> User : shows assets on selected date
+        System --> User : omits sensitive data according to user role
+    deactivate System
+@enduml
