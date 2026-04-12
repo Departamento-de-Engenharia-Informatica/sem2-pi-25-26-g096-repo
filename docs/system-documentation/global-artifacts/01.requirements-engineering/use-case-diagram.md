@@ -18,7 +18,7 @@ However, be aware, this is a pedagogical simplification. On further projects and
 | US02  | [Approve/Reject Registration](../../US02/US02-README.md) |
 | US03  | [List Institutions](../../US03/US03-README.md)           |
 | US04  | [Register Institution](../../US04/US04-README.md)        |
-| US06  | [Submit Declaration](../../US06/US06-README.md)          |
+| US06  | [Submit Declaration of Interests](../../US06/US06-README.md)         |
 | US08  | [Validate Declaration](../../US08/US08-README.md)        |
 | US09  | [View Integrated Situation](../../US09/US09-README.md)   |
 | US10  | [Analyse Income Evolution](../../US10/US10-README.md)    |
