@@ -43,16 +43,17 @@ Declarations of Interest may be:
   approved Political Agent.
 - **AC2:** The Political Agent must select a declaration type (initial,
   regular, or exceptional).
-- **AC3:** At least one entry (position, subsidy, asset, or participation)
-  must be provided.
+- **AC3:** At least one entry (position, subsidy, asset, or security
+  holding) must be provided.
 - **AC4:** Each position must include: institution, type
-  (public/private/social), function performed, and remuneration.
-- **AC5:** Each subsidy must include: the providing institution and
-  the amount.
-- **AC6:** Each asset must include: type (urban or rural real estate)
-  and estimated value.
-- **AC7:** Each business participation must include: the institution
-  (company), type (quota/share/holding), and market value.
+  (public/private/social), function (selected from registered functions),
+  start date, end date (when applicable), and remuneration.
+- **AC5:** Each subsidy must include: the providing institution, its
+  nature, and the amount.
+- **AC6:** Each asset must include: type (urban or rural real estate),
+  acquisition value, market value, and location (parish, county, district).
+- **AC7:** Each security holding must include: the institution (company),
+  title (quota/share/holding), market value, stake, and percentage.
 - **AC8:** The declaration must be stored with a submission date.
 - **AC9:** The system must confirm successful submission.
 
@@ -65,29 +66,35 @@ Declarations of Interest may be:
 - **US02** – The Political Agent registration must have been accepted
   by an Administrator.
 - **US03** – List Institutions: required to select institutions for
-  positions, subsidies, and participations.
+  positions, subsidies, and security holdings.
 - **US04** – Register Institution: institutions must exist before
   being referenced in a declaration.
+- **US05** – Register Functions: functions must exist before being
+  selected when declaring a position.
 
 ---
 
 ### 1.5. Input and Output Data
 
-**Input Data:**
-
 *Typed data:*
+- position start date (per position)
+- position end date (per position, when applicable)
 - remuneration value (per position)
+- subsidy nature (per subsidy)
 - subsidy amount (per subsidy)
-- asset estimated value (per asset)
-- participation market value (per participation)
-- function performed (per position)
+- asset acquisition value (per asset)
+- asset market value (per asset)
+- asset location: parish, county, district (per asset)
+- security holding market value (per security holding)
+- security holding stake and percentage (per security holding)
 
 *Selected data:*
 - declaration type (initial / regular / exceptional)
-- institution (per position, per subsidy, and per participation)
+- institution (per position, per subsidy, and per security holding)
 - position type (public / private / social)
+- function (per position, selected from registered functions)
 - asset type (urban real estate / rural real estate)
-- participation type (quota / share / holding)
+- security holding title (quota / share / holding)
 
 **Output Data:**
 - (In)success of the operation
@@ -104,7 +111,7 @@ Declarations of Interest may be:
 ### 1.7. Other Relevant Remarks
 
 - A Declaration aggregates multiple types of entries: positions,
-  subsidies, assets, and business participations.
+  subsidies, assets, and security holdings.
 - Declarations form the data foundation for later temporal analysis
   (e.g., US09, US10, US11).
 - A Political Agent may have multiple declarations of different types
