@@ -7,6 +7,9 @@ skinparam classAttributeIconSize 0
 hide circle
 hide methods
 
+class PoliticalAgent {
+}
+
 class Institution {
     name
     taxId
@@ -20,10 +23,7 @@ enum InstitutionType << Enum >> {
   ASSOCIATION
 }
 
-class Administrator {
-}
-
-Administrator "1" -- "0..*" Institution : registers >
+PoliticalAgent "1" -- "0..*" Institution : consults >
 Institution --> "1" InstitutionType
 
 @enduml

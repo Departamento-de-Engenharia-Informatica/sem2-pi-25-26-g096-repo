@@ -12,6 +12,6 @@
 
 The alphabetical ordering requirement inside each group is supported by the `name` attribute of `Institution`. Since ordering is a presentation/query concern, no additional domain concept is required beyond the institution identity and classification.
 
-US03 is a read operation over previously registered catalog data. For that reason, the excerpt focuses on the stable catalog structure (`Institution` + `InstitutionType`) and on the fact that institutions are administratively maintained before being listed.
+US03 is a read operation performed by the `PoliticalAgent` over previously registered catalog data. For that reason, the excerpt includes the consultation association between `PoliticalAgent` and `Institution`, together with the stable catalog structure (`Institution` + `InstitutionType`).
 
-This use case depends on US04 for data existence, because institutions only become listable after registration. Access restriction to Political Agent users is an application authorization rule and therefore is enforced at service/interface level rather than by introducing extra domain associations.
+This use case depends on US04 for data existence, because institutions only become listable after registration. The registration act itself is modeled in US04 (Administrator context), while US03 keeps the consultation perspective required by the user story.
