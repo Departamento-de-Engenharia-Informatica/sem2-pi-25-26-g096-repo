@@ -13,17 +13,18 @@ skinparam class {
     BackgroundColor<<Enum>> White
 }
 
+enum PoliticalOffice << Enum >> {
+  DEPUTY
+  MINISTER
+  COUNCILLOR
+  MAYOR
+  PARISH_COUNCIL_PRESIDENT
+}
 
 enum DeclarationType << Enum >> {
   INITIAL
   REGULAR
   EXCEPTIONAL
-}
-
-enum IncomeType << Enum >> {
-  SALARY
-  ALLOWANCE
-  SUBSIDY
 }
 
 enum PropertyType << Enum >> {
@@ -63,20 +64,24 @@ enum RequestStatus << Enum >> {
   REJECTED
 }
 
+enum ValidationVerdict << Enum >> {
+  APPROVED
+  REJECTED
+}
 
-abstract class Person << Abstract >> {
+enum RequestedRole << Enum >> {
+  POLITICAL_AGENT
+  CITIZEN
+  JOURNALIST
+  ETHICS_COMMITTEE_MEMBER
+}
+
+abstract class User << Abstract >> {
   name
   taxId
   email
   password
 }
-
-abstract class Section << Abstract >> {
-}
-
-abstract class Field << Abstract >> {
-}
-
 
 class PoliticalAgent {
 }
@@ -94,11 +99,6 @@ class EthicsCommitteeMember {
 class Administrator {
 }
 
-
-class Role {
-  designation
-}
-
 class RegistrationRequest {
   requestDate
 }
@@ -107,7 +107,6 @@ class PoliticalMandate {
   startDate
   endDate
 }
-
 
 class Institution {
   name
@@ -118,38 +117,25 @@ class Function {
   designation
 }
 
-
 class Declaration {
   submissionDate
-  declarantName
 }
 
-class IncomeSection {
+class Validation {
+  validationDate
 }
 
-class AssetSection {
+class Annotation {
+  text
+  creationDate
 }
 
-class PositionSection {
-}
-
-class ShareholdingSection {
-}
-
-class IncomeField {
+class Subsidy {
   amount
+  nature
 }
 
-class AssetField {
-}
-
-class PositionField {
-}
-
-class ShareholdingField {
-}
-
-class Property {
+class Asset {
   acquisitionValue
   marketValue
 }
@@ -162,6 +148,8 @@ class Location {
 
 class Position {
   startDate
+  endDate
+  remuneration
 }
 
 class SecurityHolding {
@@ -171,84 +159,60 @@ class SecurityHolding {
   percentage
 }
 
-class Annotation {
-  text
-  creationDate
-}
-
-
 class Complaint {
   incidentDate
   submissionDate
   description
 }
 
+User <|-- PoliticalAgent
+User <|-- Journalist
+User <|-- Citizen
+User <|-- EthicsCommitteeMember
+User <|-- Administrator
 
-Person <|-- PoliticalAgent
-Person <|-- Journalist
-Person <|-- Citizen
-Person <|-- EthicsCommitteeMember
-Person <|-- Administrator
-
-Section <|-- IncomeSection
-Section <|-- AssetSection
-Section <|-- PositionSection
-Section <|-- ShareholdingSection
-
-Field <|-- IncomeField
-Field <|-- AssetField
-Field <|-- PositionField
-Field <|-- ShareholdingField
-
-
-Person "1" -- "0..1" RegistrationRequest : requests >
+User "1" -- "0..*" RegistrationRequest : requests >
 RegistrationRequest --> "1" RequestStatus
-RegistrationRequest "1" -- "1" Role : refers to >
-Person "0..*" -- "0..1" Role : is assigned >
+RegistrationRequest --> "1" RequestedRole
 Administrator "1" -- "0..*" RegistrationRequest : reviews >
 
-
 PoliticalAgent "1" -- "0..*" PoliticalMandate : holds >
-PoliticalMandate "*" -- "1" Role : associated with >
+PoliticalMandate --> "1" PoliticalOffice
 
-
-Institution "*" -- "1" InstitutionType : classified as >
+Institution --> "1" InstitutionType
 Administrator "1" -- "0..*" Institution : registers >
 Administrator "1" -- "0..*" Function : registers >
-
 
 PoliticalAgent "1" -- "0..*" Declaration : submits >
 Declaration --> "1" DeclarationType
 Declaration --> "1" DeclarationStatus
-Declaration *-- "4" Section
+Declaration "1" *--- "0..*" Subsidy : contains >
+Declaration "1" *--- "0..*" Asset : contains >
+Declaration "1" *--- "0..*" Position : contains >
+Declaration "1" *--- "0..*" SecurityHolding : contains >
 
-IncomeSection *-- "*" IncomeField
-AssetSection *-- "*" AssetField
-PositionSection *-- "*" PositionField
-ShareholdingSection *-- "*" ShareholdingField
+Subsidy "0..*" -- "1" Institution : received from >
 
-IncomeField --> "1" IncomeType
-AssetField *-- "1" Property
-Property --> "1" PropertyType
-Property "1" -- "1" Location : located in >
+Asset --> "1" PropertyType
+Asset "1" -- "1" Location : located in >
 
-PositionField *-- "1" Position
 Position --> "1" PositionType
 Position "*" -- "1" Institution : held at >
 Position "*" -- "1" Function : designated as >
 
-ShareholdingField *-- "1" SecurityHolding
 SecurityHolding "*" -- "1" Institution : held in >
 
-
-EthicsCommitteeMember "1" -- "0..*" Declaration : validates >
-EthicsCommitteeMember "1" -- "0..*" Annotation : produces >
-Annotation "*" -- "1" Field : comments on >
-
+EthicsCommitteeMember "1" -- "0..*" Validation : performs >
+Validation "1" -- "1" Declaration : evaluates >
+Validation --> "1" ValidationVerdict
+Validation "1" *-- "0..*" Annotation : contains >
+Annotation "0..*" -- "0..1" Subsidy : comments on >
+Annotation "0..*" -- "0..1" Asset : comments on >
+Annotation "0..*" -- "0..1" Position : comments on >
+Annotation "0..*" -- "0..1" SecurityHolding : comments on >
 
 Citizen "1" -- "0..*" Complaint : submits >
 Journalist "1" -- "0..*" Complaint : submits >
-Complaint "*" -- "1" PoliticalAgent : reports on >
 Complaint "*" -- "1" PoliticalMandate : in context of >
 Complaint --> "1" ComplaintStatus
 
