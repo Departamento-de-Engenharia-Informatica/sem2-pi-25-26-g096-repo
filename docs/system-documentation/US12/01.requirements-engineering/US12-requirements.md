@@ -56,7 +56,7 @@ As a citizen, I want to make a complaint about a political agent in a specific r
 
 ### 1.6. System Sequence Diagram (SSD)
 
-[PlantUML source](puml/US12-SSD.puml)
+![PlantUML source](svg/US12-SSD.svg)
 
 ### 1.7 Other Relevant Remarks
 

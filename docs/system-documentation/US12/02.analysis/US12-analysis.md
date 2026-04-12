@@ -4,7 +4,7 @@
 
 ### 2.1. Relevant Domain Model Excerpt
 
-[PlantUML source](puml/US12-DM.puml)
+![PlantUML source](svg/US12-DM.svg)
 
 
 ### 2.2. Other Remarks
