@@ -1,0 +1,48 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+class User {
+    name
+    email
+    role
+}
+
+class PoliticalAgent {
+    name
+    email
+}
+
+class AssetsSnapshot {
+    referenceDate
+}
+
+class DeclarationOfInterests {
+    submissionDate
+    type
+}
+
+class Asset {
+    type
+    estimatedValue
+}
+
+class SensitiveDataPolicy {
+    maskingLevel
+}
+
+User "1" -- "0..*" AssetsSnapshot : consults >
+AssetsSnapshot "1" -- "1" PoliticalAgent : refers to >
+AssetsSnapshot "1" -- "0..*" Asset : shows >
+
+PoliticalAgent "1" -- "0..*" DeclarationOfInterests : submits >
+DeclarationOfInterests "1" -- "0..*" Asset : includes >
+
+User "1" -- "1" SensitiveDataPolicy : constrained by >
+SensitiveDataPolicy "1" -- "0..*" Asset : masks >
+
+@enduml
