@@ -75,7 +75,7 @@ complaints.
 
 **Places**
 
-* Location — the geographic location of a real estate asset, described by parish, municipality and district. It exists 
+* Location — the geographic location of a real estate asset, described by parish, county and district. It exists 
 as a separate concept because is required that assets be locatable by these three administrative 
 levels, and because a location may be consulted independently as part of asset analysis.
 

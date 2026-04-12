@@ -7,30 +7,53 @@ skinparam classAttributeIconSize 0
 hide circle
 hide methods
 
-class User {
+skinparam class {
+    BackgroundColor<<Abstract>> White
+    BackgroundColor<<Enum>> White
+}
+
+enum RequestedRole << Enum >> {
+  POLITICAL_AGENT
+  CITIZEN
+  JOURNALIST
+  ETHICS_COMMITTEE_MEMBER
+}
+
+enum RequestStatus << Enum >> {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+abstract class User << Abstract >> {
     name
+    taxId
     email
     password
 }
 
-class Administrator {
-    name
-    email
-    password
+class PoliticalAgent {}
+class Citizen {}
+class Journalist {
+    pressCardNumber
 }
+class EthicsCommitteeMember {}
 
-class Role {
-    designation
-}
+class Administrator {}
 
 class RegistrationRequest {
     requestDate
-    status
 }
 
-User "1" -- "0..1" RegistrationRequest : requests >
+User <|-- PoliticalAgent
+User <|-- Citizen
+User <|-- Journalist
+User <|-- EthicsCommitteeMember
+User <|-- Administrator
+
+User "1" -- "0..*" RegistrationRequest : requests >
 Administrator "1" -- "0..*" RegistrationRequest : reviews >
-RegistrationRequest "1" -- "1" Role : refers to >
-User "0..*" -- "0..1" Role : is assigned to >
+RegistrationRequest --> "1" RequestStatus
+RegistrationRequest "1" -- "1" RequestedRole : refers to >
 
 @enduml
