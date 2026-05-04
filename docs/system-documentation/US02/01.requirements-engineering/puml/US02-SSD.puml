@@ -1,4 +1,5 @@
 @startuml
+title US02 - Approve/Reject Registration
 skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -20,15 +21,36 @@ activate Admin
         System --> Admin : shows registration request details
     deactivate System
 
-    Admin -> System : accepts or rejects the registration request
-    activate System
-        System --> Admin : asks for confirmation
-    deactivate System
+    alt accepts registration request
 
-    Admin -> System : confirms decision
-    activate System
-        System --> Admin : informs that the operation was carried out successfully
-    deactivate System
+        Admin -> System : accepts the registration request
+        activate System
+            System --> Admin : asks for confirmation
+        deactivate System
+
+        Admin -> System : confirms acceptance
+        activate System
+            System --> Admin : informs that the request was accepted and the user account was created
+        deactivate System
+
+    else rejects registration request
+
+        Admin -> System : rejects the registration request
+        activate System
+            System --> Admin : asks for rejection reason
+        deactivate System
+
+        Admin -> System : provides rejection reason
+        activate System
+            System --> Admin : asks for confirmation
+        deactivate System
+
+        Admin -> System : confirms rejection
+        activate System
+            System --> Admin : informs that the request was rejected
+        deactivate System
+
+    end
 
 deactivate Admin
 @enduml

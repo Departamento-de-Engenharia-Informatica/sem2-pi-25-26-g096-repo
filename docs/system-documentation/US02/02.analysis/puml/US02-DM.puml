@@ -4,8 +4,12 @@ skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam classAttributeIconSize 0
+
 hide circle
 hide methods
+
+show <<Abstract>> circle
+show <<Enum>> circle
 
 skinparam class {
     BackgroundColor<<Abstract>> White
@@ -26,23 +30,47 @@ enum RequestStatus << Enum >> {
 }
 
 abstract class User << Abstract >> {
-    name
-    taxId
-    email
-    password
+  name
+  taxId
+  email
+  password
 }
 
-class PoliticalAgent {}
-class Citizen {}
+class FutureUser {
+}
+
+class PoliticalAgent {
+}
+
+class Citizen {
+}
+
 class Journalist {
-    pressCardNumber
+  pressCardNumber
 }
-class EthicsCommitteeMember {}
 
-class Administrator {}
+class EthicsCommitteeMember {
+}
+
+class Administrator {
+}
 
 class RegistrationRequest {
-    requestDate
+  requestDate
+  decisionDate
+  name
+  taxId
+  email
+  password
+  nationalIdentityCardNumber
+  pressCardNumber
+  requestedPosition
+  requestedInstitution
+}
+
+class Annotation {
+  text
+  creationDate
 }
 
 User <|-- PoliticalAgent
@@ -51,9 +79,13 @@ User <|-- Journalist
 User <|-- EthicsCommitteeMember
 User <|-- Administrator
 
-User "1" -- "0..*" RegistrationRequest : requests >
+FutureUser "1" -- "0..*" RegistrationRequest : requests >
 Administrator "1" -- "0..*" RegistrationRequest : reviews >
+
 RegistrationRequest --> "1" RequestStatus
-RegistrationRequest "1" -- "1" RequestedRole : refers to >
+RegistrationRequest --> "1" RequestedRole
+
+RegistrationRequest "1" -- "0..1" User : creates if accepted >
+Annotation "0..*" -- "0..1" RegistrationRequest : justifies rejection of >
 
 @enduml
