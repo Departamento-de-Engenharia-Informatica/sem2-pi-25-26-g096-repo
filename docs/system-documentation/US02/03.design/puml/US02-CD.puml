@@ -1,0 +1,166 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+enum RequestedRole {
+    POLITICAL_AGENT
+    CITIZEN
+    JOURNALIST
+    ETHICS_COMMITTEE_MEMBER
+}
+
+enum RequestStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+abstract class User {
+    - name : String
+    - taxId : String
+    - email : String
+    - password : String
+}
+
+class PoliticalAgent {
+}
+
+class Citizen {
+}
+
+class Journalist {
+    - pressCardNumber : String
+}
+
+class EthicsCommitteeMember {
+}
+
+class Administrator {
+}
+
+class RegistrationRequest {
+    - requestDate : LocalDate
+    - decisionDate : LocalDateTime
+    - name : String
+    - taxId : String
+    - email : String
+    - password : String
+    - nationalIdentityCardNumber : String
+    - pressCardNumber : String
+    - requestedPosition : String
+    - requestedInstitution : String
+
+    + accept(administrator) : User
+    + reject(administrator, rejectionReason) : Annotation
+    - createUser() : User
+    - registerDecision(administrator)
+}
+
+class Annotation {
+    - text : String
+    - creationDate : LocalDateTime
+
+    + Annotation(text)
+}
+
+class RegistrationRequestRepository {
+    + getPendingRegistrationRequests()
+    + addRegistrationRequest(registrationRequest)
+    + validateRegistrationRequest(registrationRequest)
+}
+
+class UserRepository {
+    + addUser(user)
+    + validateUser(user)
+    + getAdministratorByEmail(email)
+}
+
+class Repositories {
+    - Repositories()
+    + {static} getInstance()
+    + getRegistrationRequestRepository()
+    + getUserRepository()
+}
+
+class ApplicationSession {
+    - ApplicationSession()
+    + {static} getInstance()
+    + getCurrentSession()
+}
+
+class UserSession {
+    + getUserEmail()
+}
+
+class ApproveRejectRegistrationController {
+    - registrationRequest : RegistrationRequest
+
+    + ApproveRejectRegistrationController()
+    + getPendingRegistrationRequests()
+    + selectRegistrationRequest(registrationRequest)
+    + acceptRegistrationRequest()
+    + rejectRegistrationRequest(rejectionReason)
+    - getAdministratorFromSession()
+}
+
+note right of ApproveRejectRegistrationController
+    The selected registration request
+    is temporarily kept by the controller.
+end note
+
+note bottom of RegistrationRequest
+    accept() changes the status to ACCEPTED,
+    records the decision timestamp and administrator,
+    and creates the corresponding User.
+
+    reject() changes the status to REJECTED,
+    records the decision timestamp and administrator,
+    and creates the rejection Annotation.
+end note
+
+note bottom of RegistrationRequestRepository
+    Used to obtain the list of
+    pending registration requests.
+end note
+
+class ApproveRejectRegistrationUI {
+}
+
+User <|-- PoliticalAgent
+User <|-- Citizen
+User <|-- Journalist
+User <|-- EthicsCommitteeMember
+User <|-- Administrator
+
+ApproveRejectRegistrationUI .> ApproveRejectRegistrationController
+
+ApproveRejectRegistrationController .> Repositories
+ApproveRejectRegistrationController ..> RegistrationRequestRepository
+ApproveRejectRegistrationController ..> UserRepository
+ApproveRejectRegistrationController ..> RegistrationRequest
+ApproveRejectRegistrationController ..> Administrator
+ApproveRejectRegistrationController ..> ApplicationSession
+ApproveRejectRegistrationController ..> UserSession
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" RegistrationRequestRepository : registrationRequestRepository
+Repositories --> "1" UserRepository : userRepository
+
+ApplicationSession -> "1" ApplicationSession : instance
+ApplicationSession ..> UserSession
+
+RegistrationRequestRepository --> "*" RegistrationRequest : registrationRequests
+UserRepository --> "*" User : users
+
+RegistrationRequest --> "1" RequestedRole : requestedRole
+RegistrationRequest --> "1" RequestStatus : status
+RegistrationRequest --> "0..1" User : createdUser
+RegistrationRequest --> "0..1" Administrator : reviewedBy
+RegistrationRequest --> "0..1" Annotation : rejectionAnnotation
+
+@enduml

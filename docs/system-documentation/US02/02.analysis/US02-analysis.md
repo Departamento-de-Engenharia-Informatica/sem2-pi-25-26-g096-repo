@@ -31,19 +31,19 @@ The following concepts are relevant in this user story:
 
 ### 2.3. Identified Associations
 
-| Concept A | Association | Concept B |
-|---|---|---|
-| FutureUser | requests | RegistrationRequest |
-| Administrator | reviews | RegistrationRequest |
-| RegistrationRequest | refers to | RequestedRole |
-| RegistrationRequest | has status | RequestStatus |
-| RegistrationRequest | creates if accepted | User |
-| User | is specialised as | PoliticalAgent |
-| User | is specialised as | Citizen |
-| User | is specialised as | Journalist |
-| User | is specialised as | EthicsCommitteeMember |
-| User | is specialised as | Administrator |
-| Annotation | justifies rejection of | RegistrationRequest |
+| Concept A           | Association            | Concept B             |
+|---------------------|------------------------|-----------------------|
+| FutureUser          | requests               | RegistrationRequest   |
+| Administrator       | reviews                | RegistrationRequest   |
+| RegistrationRequest | refers to              | RequestedRole         |
+| RegistrationRequest | has status             | RequestStatus         |
+| RegistrationRequest | creates if accepted    | User                  |
+| User                | is specialised as      | PoliticalAgent        |
+| User                | is specialised as      | Citizen               |
+| User                | is specialised as      | Journalist            |
+| User                | is specialised as      | EthicsCommitteeMember |
+| User                | is specialised as      | Administrator         |
+| Annotation          | justifies rejection of | RegistrationRequest   |
 
 ---
 

@@ -1,0 +1,71 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":ApproveRejectRegistrationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "registrationRequest\n:RegistrationRequest" as REQ
+participant "userRepository\n:UserRepository" as USER_REPO
+participant "user\n:User" as USER
+
+autonumber 15
+-> CTRL : acceptRegistrationRequest()
+
+autonumber 15.1
+activate CTRL
+
+    group Accept Registration Request
+
+        note right of CTRL
+            administrator was obtained
+            through the Get Administrator partial SD
+        end note
+
+        CTRL -> REQ : accept(administrator)
+        activate REQ
+
+            REQ -> REQ : registerDecision(administrator)
+            activate REQ
+                REQ --> REQ : decision recorded
+            deactivate REQ
+
+            REQ -> REQ : createUser()
+            activate REQ
+                REQ --> USER** : create concrete User according to requestedRole
+                REQ --> REQ : user
+            deactivate REQ
+
+            REQ --> CTRL : user
+        deactivate REQ
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getUserRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : userRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> USER_REPO : addUser(user)
+        activate USER_REPO
+
+            USER_REPO -> USER_REPO : validateUser(user)
+            activate USER_REPO
+                USER_REPO --> USER_REPO : true
+            deactivate USER_REPO
+
+            USER_REPO --> CTRL : true
+        deactivate USER_REPO
+
+    end
+
+    autonumber 16
+    <-- CTRL : user
+
+deactivate CTRL
+
+@enduml

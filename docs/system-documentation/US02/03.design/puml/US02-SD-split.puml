@@ -1,0 +1,119 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Administrator" as ADMIN
+
+participant ":ApproveRejectRegistrationUI" as UI
+participant ":ApproveRejectRegistrationController" as CTRL
+participant "registrationRequest\n:RegistrationRequest" as REQ
+
+activate ADMIN
+
+    ADMIN -> UI : asks to manage pending registration requests
+    activate UI
+
+        UI --> CTRL** : create()
+
+        UI -> CTRL : getPendingRegistrationRequests()
+        activate CTRL
+            ref over CTRL
+                Get Pending Registration Requests
+            end ref
+
+            CTRL --> UI : pendingRegistrationRequests
+        deactivate CTRL
+
+        UI --> ADMIN : presents list of pending registration requests
+    deactivate UI
+
+    ADMIN -> UI : selects a registration request
+    activate UI
+
+        UI -> CTRL : selectRegistrationRequest(registrationRequest)
+        activate CTRL
+            CTRL -> CTRL : keep selected registrationRequest
+            CTRL --> UI : registrationRequestDetails
+        deactivate CTRL
+
+        UI --> ADMIN : shows registration request details
+    deactivate UI
+
+    alt accepts registration request
+
+        ADMIN -> UI : accepts the registration request
+        activate UI
+            UI --> ADMIN : asks for confirmation
+        deactivate UI
+
+        ADMIN -> UI : confirms acceptance
+        activate UI
+
+            UI -> CTRL : acceptRegistrationRequest()
+            activate CTRL
+
+                CTRL -> CTRL : getAdministratorFromSession()
+                activate CTRL
+                    ref over CTRL
+                        Get Administrator
+                    end ref
+
+                    CTRL --> CTRL : administrator
+                deactivate CTRL
+
+                ref over CTRL, REQ
+                    Accept Registration Request
+                end ref
+
+                CTRL --> UI : user
+            deactivate CTRL
+
+            UI --> ADMIN : informs that the request was accepted and the user account was created
+        deactivate UI
+
+    else rejects registration request
+
+        ADMIN -> UI : rejects the registration request
+        activate UI
+            UI --> ADMIN : asks for rejection reason
+        deactivate UI
+
+        ADMIN -> UI : provides rejection reason
+        activate UI
+            UI --> ADMIN : asks for confirmation
+        deactivate UI
+
+        ADMIN -> UI : confirms rejection
+        activate UI
+
+            UI -> CTRL : rejectRegistrationRequest(rejectionReason)
+            activate CTRL
+
+                CTRL -> CTRL : getAdministratorFromSession()
+                activate CTRL
+                    ref over CTRL
+                        Get Administrator
+                    end ref
+
+                    CTRL --> CTRL : administrator
+                deactivate CTRL
+
+                ref over CTRL, REQ
+                    Reject Registration Request
+                end ref
+
+                CTRL --> UI : annotation
+            deactivate CTRL
+
+            UI --> ADMIN : informs that the request was rejected
+        deactivate UI
+
+    end
+
+deactivate ADMIN
+
+@enduml

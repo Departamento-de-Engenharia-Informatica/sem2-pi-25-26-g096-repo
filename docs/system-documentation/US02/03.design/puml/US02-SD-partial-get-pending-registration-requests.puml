@@ -1,0 +1,41 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":ApproveRejectRegistrationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "registrationRequestRepository\n:RegistrationRequestRepository" as REQ_REPO
+
+autonumber 3
+-> CTRL : getPendingRegistrationRequests()
+
+autonumber 3.1
+activate CTRL
+
+    group Get Pending Registration Requests
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getRegistrationRequestRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : registrationRequestRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> REQ_REPO : getPendingRegistrationRequests()
+        activate REQ_REPO
+            REQ_REPO --> CTRL : pendingRegistrationRequests
+        deactivate REQ_REPO
+
+    end
+
+    autonumber 4
+    <-- CTRL : pendingRegistrationRequests
+
+deactivate CTRL
+
+@enduml
