@@ -1,4 +1,5 @@
 @startuml
+title US01 — User Registration Request
 skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -12,10 +13,15 @@ activate User
 
     User -> System : asks to register in the platform
     activate System
-        System --> User : presents registration form and available role list
+        System --> User : presents available role list
     deactivate System
 
-    User -> System : submits data and selected role
+    User -> System : selects requested role
+    activate System
+        System --> User : requests personal data and role-specific mandatory details
+    deactivate System
+
+    User -> System : submits requested data
     activate System
         System --> User : displays entered data and requests confirmation
     deactivate System

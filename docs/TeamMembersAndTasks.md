@@ -27,19 +27,19 @@ At last, remember that each User Story does not stand alone... it needs to be in
 
 **This table must be always up-to-date.**
 
-| Task                                                                                                                           | Sprint 1                             | Sprint 2 | Sprint 3 |
-|--------------------------------------------------------------------------------------------------------------------------------|--------------------------------------|----------|----------|
-| [Glossary](system-documentation/global-artifacts/01.requirements-engineering/glossary.md)                                      | all                                  | all      | all      |
-| [Use Case Diagram (UCD)](system-documentation/global-artifacts/01.requirements-engineering/use-case-diagram.md)                | all                                  | all      | all      |
-| [Supplementary Specification](system-documentation/global-artifacts/01.requirements-engineering/suplementary-specification.md) | all                                  | all      | all      |
-| [Domain Model](system-documentation/global-artifacts/01.requirements-engineering/domain-model.md)                              | all                                  | all      | all      |
-| US01 (SDP Activities)                                                                                                          | [1241129](system-documentation/US01) |          |          |
-| US02 (SDP Activities)                                                                                                          | [1241129](system-documentation/US02) |          |          |
-| US03 (SDP Activities)                                                                                                          | [1231190](system-documentation/US03) |          |          |
-| US04 (SDP Activities)                                                                                                          | [1231190](system-documentation/US04) |          |          |
-| US06 (SDP Activities)                                                                                                          | [1241138](system-documentation/US06) |          |          |
-| US08 (SDP Activities)                                                                                                          | [1241129](system-documentation/US08) |          |          |
-| US09 (SDP Activities)                                                                                                          | [1231235](system-documentation/US09) |          |          |
-| US10 (SDP Activities)                                                                                                          | [1241138](system-documentation/US10) |          |          |
-| US11 (SDP Activities)                                                                                                          | [1231235](system-documentation/US11) |          |          |
-| US12 (SDP Activities)                                                                                                          | [1231235](system-documentation/US12) |          |          |
+| Task                                                                                                                           | Sprint 1                             | Sprint 2                             | Sprint 3 |
+|--------------------------------------------------------------------------------------------------------------------------------|--------------------------------------|--------------------------------------|----------|
+| [Glossary](system-documentation/global-artifacts/01.requirements-engineering/glossary.md)                                      | all                                  | all                                  | all      |
+| [Use Case Diagram (UCD)](system-documentation/global-artifacts/01.requirements-engineering/use-case-diagram.md)                | all                                  | all                                  | all      |
+| [Supplementary Specification](system-documentation/global-artifacts/01.requirements-engineering/suplementary-specification.md) | all                                  | all                                  | all      |
+| [Domain Model](system-documentation/global-artifacts/01.requirements-engineering/domain-model.md)                              | all                                  | all                                  | all      |
+| US01 (SDP Activities)                                                                                                          | [1241129](system-documentation/US01) | [1241129](system-documentation/US01) |          |
+| US02 (SDP Activities)                                                                                                          | [1241129](system-documentation/US02) | [1241129](system-documentation/US02) |          |
+| US03 (SDP Activities)                                                                                                          | [1231190](system-documentation/US03) | [1231190](system-documentation/US03) |          |
+| US04 (SDP Activities)                                                                                                          | [1231190](system-documentation/US04) | [1231190](system-documentation/US04) |          |
+| US06 (SDP Activities)                                                                                                          | [1241138](system-documentation/US06) | [1241138](system-documentation/US06) |          |
+| US08 (SDP Activities)                                                                                                          | [1241129](system-documentation/US08) | [1241129](system-documentation/US08) |          |
+| US09 (SDP Activities)                                                                                                          | [1231235](system-documentation/US09) | [1231235](system-documentation/US09) |          |
+| US10 (SDP Activities)                                                                                                          | [1241138](system-documentation/US10) | [1241138](system-documentation/US10) |          |
+| US11 (SDP Activities)                                                                                                          | [1231235](system-documentation/US11) | [1231235](system-documentation/US11) |          |
+| US12 (SDP Activities)                                                                                                          | [1231235](system-documentation/US12) | [1231235](system-documentation/US12) |          |

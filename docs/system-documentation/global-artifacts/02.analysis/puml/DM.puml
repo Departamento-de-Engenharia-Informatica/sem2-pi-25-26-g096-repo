@@ -8,6 +8,9 @@ skinparam classAttributeIconSize 0
 hide circle
 hide methods
 
+show <<Abstract>> circle
+show <<Enum>> circle
+
 skinparam class {
     BackgroundColor<<Abstract>> White
     BackgroundColor<<Enum>> White
@@ -83,6 +86,9 @@ abstract class User << Abstract >> {
   password
 }
 
+class FutureUser {
+}
+
 class PoliticalAgent {
 }
 
@@ -100,7 +106,16 @@ class Administrator {
 }
 
 class RegistrationRequest {
-  requestDate
+    requestDate
+    name
+    taxId
+    email
+    password
+    nationalIdentityCardNumber
+    pressCardNumber
+    requestedPosition
+    requestedInstitution
+
 }
 
 class PoliticalMandate {
@@ -111,10 +126,6 @@ class PoliticalMandate {
 class Institution {
   name
   taxId
-}
-
-class Function {
-  designation
 }
 
 class Declaration {
@@ -171,25 +182,27 @@ User <|-- Citizen
 User <|-- EthicsCommitteeMember
 User <|-- Administrator
 
-User "1" -- "0..*" RegistrationRequest : requests >
-RegistrationRequest --> "1" RequestStatus
-RegistrationRequest --> "1" RequestedRole
+FutureUser "1" -- "0..*" RegistrationRequest : requests >
+RegistrationRequest "1" --> "1" RequestStatus
+RegistrationRequest "1" --> "1" RequestedRole
+RegistrationRequest "1" -- "0..1" User : creates if accepted >
+
 Administrator "1" -- "0..*" RegistrationRequest : reviews >
+Annotation "0..*" -- "0..1" RegistrationRequest : justifies rejection of >
 
 PoliticalAgent "1" -- "0..*" PoliticalMandate : holds >
 PoliticalMandate --> "1" PoliticalOffice
 
 Institution --> "1" InstitutionType
 Administrator "1" -- "0..*" Institution : registers >
-Administrator "1" -- "0..*" Function : registers >
 
 PoliticalAgent "1" -- "0..*" Declaration : submits >
 Declaration --> "1" DeclarationType
 Declaration --> "1" DeclarationStatus
-Declaration "1" *--- "0..*" Subsidy : contains >
-Declaration "1" *--- "0..*" Asset : contains >
-Declaration "1" *--- "0..*" Position : contains >
-Declaration "1" *--- "0..*" SecurityHolding : contains >
+Declaration "1" *-- "0..*" Subsidy : contains >
+Declaration "1" *-- "0..*" Asset : contains >
+Declaration "1" *-- "0..*" Position : contains >
+Declaration "1" *-- "0..*" SecurityHolding : contains >
 
 Subsidy "0..*" -- "1" Institution : received from >
 
@@ -198,7 +211,6 @@ Asset "1" -- "1" Location : located in >
 
 Position --> "1" PositionType
 Position "*" -- "1" Institution : held at >
-Position "*" -- "1" Function : designated as >
 
 SecurityHolding "*" -- "1" Institution : held in >
 
@@ -206,10 +218,7 @@ EthicsCommitteeMember "1" -- "0..*" Validation : performs >
 Validation "1" -- "1" Declaration : evaluates >
 Validation --> "1" ValidationVerdict
 Validation "1" *-- "0..*" Annotation : contains >
-Annotation "0..*" -- "0..1" Subsidy : comments on >
-Annotation "0..*" -- "0..1" Asset : comments on >
-Annotation "0..*" -- "0..1" Position : comments on >
-Annotation "0..*" -- "0..1" SecurityHolding : comments on >
+Annotation "0..*" -- "0..1" Declaration : comments on >
 
 Citizen "1" -- "0..*" Complaint : submits >
 Journalist "1" -- "0..*" Complaint : submits >

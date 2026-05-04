@@ -8,7 +8,6 @@ hide circle
 hide methods
 
 skinparam class {
-    BackgroundColor<<Abstract>> White
     BackgroundColor<<Enum>> White
 }
 
@@ -25,19 +24,23 @@ enum RequestStatus << Enum >> {
   REJECTED
 }
 
-abstract class User << Abstract >> {
-    name
-    taxId
-    email
-    password
+class FutureUser {
 }
 
 class RegistrationRequest {
-    requestDate
+  requestDate
+  name
+  taxId
+  email
+  password
+  nationalIdentityCardNumber
+  pressCardNumber
+  requestedPosition
+  requestedInstitution
 }
 
-User "1" -- "0..*" RegistrationRequest : requests >
+FutureUser "1" -- "0..*" RegistrationRequest : requests >
 RegistrationRequest --> "1" RequestStatus
-RegistrationRequest "1" -- "1" RequestedRole : refers to >
+RegistrationRequest --> "1" RequestedRole
 
 @enduml

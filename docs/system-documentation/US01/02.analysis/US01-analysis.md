@@ -1,27 +1,65 @@
-# US01 — User Registration Request
+# US01 — OO Analysis
 
 ## 2. Analysis
 
-### 2.1. Relevant Domain Model Excerpt 
+### 2.1. Domain Model Update
+
+This user story introduces the following conceptual classes:
+
+- **FutureUser** – represents a person who is not yet registered in the platform but intends to request access with a specific role.
+- **RegistrationRequest** – represents the formal request submitted by a FutureUser to access the platform. It stores the requested role, the request status, the request date, and the data required for the selected role.
+- **RequestedRole** – describes the role requested by the FutureUser. It is selected from a predefined list of available roles.
+- **RequestStatus** – describes the lifecycle state of the registration request: pending, accepted, or rejected.
+
+The concept **User** already exists in the global domain model, but it is not created during US01. A concrete User is only created after the registration request is approved in US02.
+
+---
+
+### 2.2. Identified Conceptual Classes
+
+| Category | Conceptual / Candidate Class |
+|---|---|
+| Business Transactions | RegistrationRequest |
+| Roles of People or Organizations | FutureUser |
+| Descriptions of Things | RequestedRole, RequestStatus |
+
+---
+
+### 2.3. Identified Associations
+
+| Concept A | Association | Concept B |
+|---|---|---|
+| FutureUser | requests | RegistrationRequest |
+| RegistrationRequest | refers to | RequestedRole |
+| RegistrationRequest | has status | RequestStatus |
+
+---
+
+### 2.4. Identified Attributes
+
+**RegistrationRequest**
+- requestDate
+- name
+- taxId
+- email
+- password
+- nationalIdentityCardNumber
+- pressCardNumber
+- requestedPosition
+- requestedInstitution
+
+---
+
+### 2.5. Domain Model
 
 ![Domain Model](svg/US01-DM.svg)
 
-### 2.2. Other Remarks
+---
 
-`User` is modeled as an abstract class because no user exists on the platform without a concrete role — every user is
-a PoliticalAgent, Citizen, Journalist, EthicsCommitteeMember, or Administrator. At the registration stage, however,
-the concrete subclass does not yet exist: the user is only requesting a role, not yet assigned one.
+### 2.6. Remarks
 
-`RequestedRole` is associated with `RegistrationRequest` rather than directly with `User` because at this stage the
-role is only being requested — no assignment has taken place yet. The actual creation of the concrete user subclass
-occurs only upon administrator approval (US02).
-
-`RequestedRole` is modeled as an enumeration because US01 AC1 explicitly states that "the role must be selected from
-a predefined list of available roles". The Administrator role is absent from this enum because administrator accounts
-are not self-registered — they are managed internally.
-
-The multiplicity `0..*` on the `RegistrationRequest` side reflects that a user may submit multiple requests over time
-— for example, after a previous request was rejected. This preserves an auditable history of all registration attempts.
-
-`RequestStatus` tracks the lifecycle of each request (PENDING, ACCEPTED, REJECTED), which is necessary to support the
-administrator's decision workflow in US02.
+- **FutureUser vs User:** `FutureUser` is used because, at this stage, the person is not yet an active platform user. The creation of a concrete `User` only happens after administrator approval in US02.
+- **RequestedRole as enumeration:** `RequestedRole` is modelled as an enumeration because the role must be selected from a predefined list of available roles.
+- **RequestStatus as enumeration:** `RequestStatus` is modelled as an enumeration because each request has a lifecycle state: `PENDING`, `ACCEPTED`, or `REJECTED`.
+- **Role-specific data:** some attributes of `RegistrationRequest` are only applicable to specific requested roles. For example, `pressCardNumber` applies to Journalist requests, while `requestedPosition` and `requestedInstitution` apply to Political Agent requests.
+- **No direct creation of User in US01:** this user story only creates a registration request. The approval or rejection of that request, and the possible creation of the corresponding user account, is handled in US02.
