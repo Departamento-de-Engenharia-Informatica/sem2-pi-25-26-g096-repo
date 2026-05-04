@@ -1,0 +1,107 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+enum RequestedRole {
+    POLITICAL_AGENT
+    CITIZEN
+    JOURNALIST
+    ETHICS_COMMITTEE_MEMBER
+}
+
+enum RequestStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+class RegistrationRequest {
+    - requestDate : LocalDate
+    - name : String
+    - taxId : String
+    - email : String
+    - password : String
+    - nationalIdentityCardNumber : String
+    - pressCardNumber : String
+    - requestedPosition : String
+    - requestedInstitution : String
+
+    + RegistrationRequest(name, taxId, email, password, requestedRole,\n  nationalIdentityCardNumber, pressCardNumber,\n  requestedPosition, requestedInstitution)
+    - validateData()
+    - validateRoleSpecificData()
+}
+
+class Institution {
+    - name : String
+    - taxId : String
+}
+
+class RegistrationRequestRepository {
+    + createRegistrationRequest(name, taxId, email, password, requestedRole,\n  nationalIdentityCardNumber, pressCardNumber,\n  requestedPosition, requestedInstitution)
+    - addRegistrationRequest(registrationRequest)
+    - validateRegistrationRequest(registrationRequest)
+}
+
+class InstitutionRepository {
+    + getInstitutions()
+}
+
+class Repositories {
+    - Repositories()
+    + {static} getInstance()
+    + getRegistrationRequestRepository()
+    + getInstitutionRepository()
+}
+
+class RequestRegistrationController {
+    + RequestRegistrationController()
+    + getRequestedRoles()
+    + getInstitutions()
+    + createRegistrationRequest(name, taxId, email, password, requestedRole,\n  nationalIdentityCardNumber, pressCardNumber,\n  requestedPosition, requestedInstitution)
+}
+
+note right of RequestRegistrationController
+    requestedRole is retrieved
+    from selected data.
+end note
+
+note bottom of InstitutionRepository
+    Used only when the selected
+    role is POLITICAL_AGENT.
+end note
+
+note bottom of RegistrationRequestRepository
+    The request is created with
+    PENDING status.
+    No User account is created
+    in US01.
+end note
+
+class RequestRegistrationUI {
+}
+
+RequestRegistrationUI .> RequestRegistrationController
+
+RequestRegistrationController .> Repositories
+RequestRegistrationController ..> RegistrationRequestRepository
+RequestRegistrationController ..> InstitutionRepository
+RequestRegistrationController ..> RegistrationRequest
+RequestRegistrationController ..> RequestedRole
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" RegistrationRequestRepository : registrationRequestRepository
+Repositories --> "1" InstitutionRepository : institutionRepository
+
+RegistrationRequestRepository --> "*" RegistrationRequest : registrationRequests
+
+InstitutionRepository --> "*" Institution : institutions
+
+RegistrationRequest --> "1" RequestedRole : requestedRole
+RegistrationRequest --> "1" RequestStatus : status
+
+@enduml

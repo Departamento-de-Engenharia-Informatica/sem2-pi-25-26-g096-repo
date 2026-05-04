@@ -1,0 +1,120 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Future User" as FUTURE_USER
+
+participant ":RequestRegistrationUI" as UI
+participant ":RequestRegistrationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+participant "registrationRequestRepository\n:RegistrationRequestRepository" as REQ_REPO
+participant "registrationRequest\n:RegistrationRequest" as REQ
+
+activate FUTURE_USER
+
+    FUTURE_USER -> UI : asks to register in the platform
+    activate UI
+        UI --> CTRL** : create()
+
+        UI -> CTRL : getRequestedRoles()
+        activate CTRL
+            CTRL --> UI : requestedRoleList
+        deactivate CTRL
+
+        UI --> FUTURE_USER : presents available role list
+    deactivate UI
+
+    FUTURE_USER -> UI : selects requested role
+    activate UI
+
+        alt selected role is POLITICAL_AGENT
+
+            UI -> CTRL : getInstitutions()
+            activate CTRL
+                CTRL -> REPOS : getInstance()
+                activate REPOS
+                    REPOS --> CTRL : repositories
+                deactivate REPOS
+
+                CTRL -> REPOS_SINGLETON : getInstitutionRepository()
+                activate REPOS_SINGLETON
+                    REPOS_SINGLETON --> CTRL : institutionRepository
+                deactivate REPOS_SINGLETON
+
+                CTRL -> INST_REPO : getInstitutions()
+                activate INST_REPO
+                    INST_REPO --> CTRL : institutionList
+                deactivate INST_REPO
+
+                CTRL --> UI : institutionList
+            deactivate CTRL
+
+            UI --> FUTURE_USER : requests personal data, Political Agent mandatory details,\nand existing institution selection or new institution input
+
+        else selected role is not POLITICAL_AGENT
+
+            UI --> FUTURE_USER : requests personal data and role-specific mandatory details
+
+        end
+
+    deactivate UI
+
+    FUTURE_USER -> UI : submits requested data
+    activate UI
+        UI --> FUTURE_USER : displays entered data and requests confirmation
+    deactivate UI
+
+    FUTURE_USER -> UI : confirms the registration request
+    activate UI
+        UI -> CTRL : createRegistrationRequest(name, taxId, email, password,\nrequestedRole, nationalIdentityCardNumber,\npressCardNumber, requestedPosition, requestedInstitution)
+        activate CTRL
+
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPOS_SINGLETON : getRegistrationRequestRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : registrationRequestRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> REQ_REPO : createRegistrationRequest(name, taxId, email, password,\nrequestedRole, nationalIdentityCardNumber,\npressCardNumber, requestedPosition, requestedInstitution)
+            activate REQ_REPO
+
+                REQ_REPO --> REQ** : create(name, taxId, email, password,\nrequestedRole, nationalIdentityCardNumber,\npressCardNumber, requestedPosition, requestedInstitution)
+
+                REQ -> REQ : validateData()
+                activate REQ
+                    REQ --> REQ : true
+                deactivate REQ
+
+                REQ -> REQ : validateRoleSpecificData()
+                activate REQ
+                    REQ --> REQ : true
+                deactivate REQ
+
+                REQ_REPO -> REQ_REPO : addRegistrationRequest(registrationRequest)
+                activate REQ_REPO
+                    REQ_REPO --> REQ_REPO : true
+                deactivate REQ_REPO
+
+                REQ_REPO --> CTRL : registrationRequest
+            deactivate REQ_REPO
+
+            CTRL --> UI : registrationRequest
+        deactivate CTRL
+
+        UI --> FUTURE_USER : informs that the request was successfully submitted
+        UI --> FUTURE_USER : notifies that access is pending administrator approval
+    deactivate UI
+
+deactivate FUTURE_USER
+
+@enduml
