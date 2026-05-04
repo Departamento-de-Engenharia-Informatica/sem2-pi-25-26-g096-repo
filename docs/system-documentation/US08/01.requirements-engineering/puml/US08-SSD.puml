@@ -25,10 +25,16 @@ activate Member
         activate System
             System --> Member : informs that the declaration was successfully validated
         deactivate System
+
     else declaration has inconsistencies
-        Member -> System : rejects the declaration with comments on inconsistent sections
+        Member -> System : rejects the declaration
         activate System
-            System --> Member : informs that the declaration was rejected and returned for correction
+            System --> Member : asks for comments on inconsistent sections/items
+        deactivate System
+
+        Member -> System : submits comments on inconsistent sections/items
+        activate System
+            System --> Member : informs that the declaration was rejected
         deactivate System
     end
 

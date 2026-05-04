@@ -66,10 +66,13 @@ EthicsCommitteeMember "1" -- "0..*" Validation : performs >
 Validation "1" -- "1" Declaration : evaluates >
 Validation --> "1" ValidationVerdict
 Declaration --> "1" DeclarationStatus
+
+Declaration "1" *-- "0..*" Subsidy : contains >
+Declaration "1" *-- "0..*" Asset : contains >
+Declaration "1" *-- "0..*" Position : contains >
+Declaration "1" *-- "0..*" SecurityHolding : contains >
+
 Validation "1" *-- "0..*" Annotation : contains >
-Annotation "0..*" -- "0..1" Subsidy : comments on >
-Annotation "0..*" -- "0..1" Asset : comments on >
-Annotation "0..*" -- "0..1" Position : comments on >
-Annotation "0..*" -- "0..1" SecurityHolding : comments on >
+Annotation "0..*" -- "0..1" Declaration : comments on >
 
 @enduml
