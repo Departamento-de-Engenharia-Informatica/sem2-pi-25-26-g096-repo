@@ -1,0 +1,105 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Ethics Committee\nMember" as MEMBER_ACTOR
+
+participant ":ValidateDeclarationUI" as UI
+participant ":ValidateDeclarationController" as CTRL
+participant "declaration\n:Declaration" as DECL
+
+activate MEMBER_ACTOR
+
+    MEMBER_ACTOR -> UI : asks to validate a declaration of interests
+    activate UI
+        UI --> CTRL** : create()
+
+        UI -> CTRL : getSubmittedDeclarations()
+        activate CTRL
+            ref over CTRL
+                Get Submitted Declarations
+            end ref
+
+            CTRL --> UI : submittedDeclarations
+        deactivate CTRL
+
+        UI --> MEMBER_ACTOR : presents list of submitted declarations
+    deactivate UI
+
+    MEMBER_ACTOR -> UI : selects a declaration of interests
+    activate UI
+        UI -> CTRL : selectDeclaration(declaration)
+        activate CTRL
+            CTRL -> CTRL : keep selected declaration
+            CTRL --> UI : declarationDetails
+        deactivate CTRL
+
+        UI --> MEMBER_ACTOR : shows declaration details
+    deactivate UI
+
+    alt declaration is correct
+
+        MEMBER_ACTOR -> UI : approves the declaration
+        activate UI
+            UI -> CTRL : approveDeclaration()
+            activate CTRL
+
+                CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
+                activate CTRL
+                    ref over CTRL
+                        Get Ethics Committee Member
+                    end ref
+
+                    CTRL --> CTRL : member
+                deactivate CTRL
+
+                ref over CTRL, DECL
+                    Approve Declaration
+                end ref
+
+                CTRL --> UI : validation
+            deactivate CTRL
+
+            UI --> MEMBER_ACTOR : informs that the declaration was successfully validated
+        deactivate UI
+
+    else declaration has inconsistencies
+
+        MEMBER_ACTOR -> UI : rejects the declaration
+        activate UI
+            UI --> MEMBER_ACTOR : asks for comments on inconsistent sections/items
+        deactivate UI
+
+        MEMBER_ACTOR -> UI : submits comments on inconsistent sections/items
+        activate UI
+            UI -> CTRL : rejectDeclaration(comments)
+            activate CTRL
+
+                CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
+                activate CTRL
+                    ref over CTRL
+                        Get Ethics Committee Member
+                    end ref
+
+                    CTRL --> CTRL : member
+                deactivate CTRL
+
+                ref over CTRL, DECL
+                    Reject Declaration
+                end ref
+
+                CTRL --> UI : validation
+            deactivate CTRL
+
+            UI --> MEMBER_ACTOR : informs that the declaration was rejected
+        deactivate UI
+
+    end
+
+deactivate MEMBER_ACTOR
+
+@enduml

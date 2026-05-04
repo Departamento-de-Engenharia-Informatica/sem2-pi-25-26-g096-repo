@@ -1,47 +1,57 @@
-# US006 - Create a Task
+# US08 - Validate Declaration
 
 ## 3. Design
 
 ### 3.1. Rationale
 
-| Interaction ID | Question: Which class is responsible for...        | Answer                 | Justification (with patterns)                                                                                                       |
-|:---------------|:---------------------------------------------------|:-----------------------|:------------------------------------------------------------------------------------------------------------------------------------|
-| Step 1         | ... interacting with the actor?                    | CreateTaskUI           | Pure Fabrication: there is no reason to assign this responsibility to any existing class in the Domain Model.                       |
-|                | ... coordinating the US?                           | CreateTaskController   | Controller                                                                                                                          |
-|                | ... knowing the user using the system?             | UserSession            | IE: cf. A&A component documentation.                                                                                                |
-|                |                                                    | Organization           | IE: knows/has its own Employees                                                                                                     |
-|                |                                                    | Employee               | IE: knows its own data (e.g. email)                                                                                                 |
-| Step 2         | ... knowing all existing task categories to show?  | Repositories           | IE: Repositories maintains Task Categories.                                                                                         |
-|                |                                                    | TaskCategoryRepository | By applying High Cohesion (HC) + Low Coupling (LC) on class Repositories, it delegates the responsibility on TaskCategoryContainer. |
-| Step 3         | ... saving the selected category?                  | CreateTaskUI           | IE: is responsible for keeping the selected category.                                                                               |
-| Step 4         | ... requesting data?                               | CreateTaskUI           | IE: is responsible for user interactions.                                                                                           |
-| Step 5         | ... saving the inputted data?                      | CreateTaskUI           | IE: is responsible for keeping the inputted data.                                                                                   |
-| Step 6         | ... showing all data and requesting confirmation?  | CreateTaskUI           | IE: is responsible for user interactions.                                                                                           |              
-| Step 7         | ... instantiating a new Task?                      | Organization           | Creator (Rule 1): in the DM Organization has a Task.                                                                                |
-|                | ... validating all data (local validation)?        | Task                   | IE: owns its data.                                                                                                                  | 
-|                | ... validating all data (global validation)?       | Organization           | IE: knows all its tasks.                                                                                                            | 
-|                | ... saving the created task?                       | Organization           | IE: owns all its tasks.                                                                                                             | 
-| Step 8         | ... informing operation success?                   | CreateTaskUI           | IE: is responsible for user interactions.                                                                                           | 
+| Interaction ID | Question: Which class is responsible for...                                  | Answer                        | Justification (with patterns)                                                                                                                         |
+|:---------------|:-----------------------------------------------------------------------------|:------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Step 1         | ... interacting with the actor?                                              | ValidateDeclarationUI         | Pure Fabrication: there is no reason to assign this responsibility to any existing class in the Domain Model.                                         |
+|                | ... coordinating the US?                                                     | ValidateDeclarationController | Controller: coordinates the flow of this user story and acts as an intermediary between the UI and the domain/repository classes.                     |
+|                | ... knowing all submitted declarations to show?                              | DeclarationRepository         | Information Expert: it keeps and manages Declaration instances.                                                                                       |
+|                | ... providing access to the declaration repository?                          | Repositories                  | Information Expert / Pure Fabrication: it provides access to the system repositories while keeping the controller decoupled from repository creation. |
+| Step 2         | ... saving the selected declaration?                                         | ValidateDeclarationController | Information Expert: the controller keeps the selected declaration during the execution of the user story.                                             |
+|                | ... showing the selected declaration details?                                | ValidateDeclarationUI         | Pure Fabrication: responsible for displaying information and interacting with the actor.                                                              |
+|                | ... knowing the declaration details?                                         | Declaration                   | Information Expert: it owns the declaration data and its declared items.                                                                              |
+| Step 3         | ... obtaining the Ethics Committee Member using the system?                  | ApplicationSession            | Information Expert: it knows the current user session.                                                                                                |
+|                | ... knowing the email of the user using the system?                          | UserSession                   | Information Expert: it knows the authenticated user's email.                                                                                          |
+|                | ... finding the Ethics Committee Member associated with the current session? | UserRepository                | Information Expert: it keeps and manages user instances.                                                                                              |
+| Step 4         | ... validating the selected declaration?                                     | EthicsCommitteeMember         | Information Expert: it is the actor responsible for performing validations.                                                                           |
+|                | ... creating the Validation?                                                 | EthicsCommitteeMember         | Creator: in the Domain Model, an EthicsCommitteeMember performs Validations.                                                                          |
+|                | ... recording the validation verdict?                                        | Validation                    | Information Expert: the verdict belongs to the validation act.                                                                                        |
+|                | ... changing the declaration status when approved?                           | Declaration                   | Information Expert: it owns and manages its own lifecycle status.                                                                                     |
+| Step 5         | ... rejecting the declaration?                                               | Declaration                   | Information Expert: it owns and manages its own lifecycle status.                                                                                     |
+|                | ... creating comments when inconsistencies exist?                            | Validation                    | Creator: annotations exist in the context of a validation.                                                                                            |
+|                | ... storing the comment text and creation date?                              | Annotation                    | Information Expert: it owns the annotation data.                                                                                                      |
+|                | ... keeping the produced validation?                                         | EthicsCommitteeMember         | Information Expert: it performs and keeps its validations.                                                                                            |
+| Step 6         | ... informing operation success?                                             | ValidateDeclarationUI         | Pure Fabrication: responsible for user interaction and feedback.                                                                                      |
 
-### Systematization ##
+### Systematization
 
-According to the taken rationale, the conceptual classes promoted to software classes are: 
+According to the taken rationale, the conceptual classes promoted to software classes are:
 
-* Organization
-* Task
-* TaskCategory
-* Employee
+* EthicsCommitteeMember
+* Declaration
+* Validation
+* Annotation
+* DeclarationStatus
+* ValidationVerdict
+* Subsidy
+* Asset
+* Position
+* SecurityHolding
 
-Other software classes (i.e. Pure Fabrication) identified: 
+Other software classes identified:
 
-* CreateTaskUI  
-* CreateTaskController
+* ValidateDeclarationUI
+* ValidateDeclarationController
 * Repositories
-* TaskCategoryRepository
-* OrganizationRepository
+* DeclarationRepository
+* UserRepository
 * ApplicationSession
 * UserSession
 
+---
 
 ## 3.2. Sequence Diagram (SD)
 
@@ -49,7 +59,7 @@ Other software classes (i.e. Pure Fabrication) identified:
 
 This diagram shows the full sequence of interactions between the classes involved in the realization of this user story.
 
-![Sequence Diagram - Full](svg/US006-SD-full.svg)
+![Sequence Diagram - Full](svg/US08-SD-full.svg)
 
 ### Split Diagrams
 
@@ -57,24 +67,26 @@ The following diagram shows the same sequence of interactions between the classe
 
 It uses Interaction Occurrence (a.k.a. Interaction Use).
 
-![Sequence Diagram - split](svg/US006-SD-split.svg)
+![Sequence Diagram - Split](svg/US08-SD-split.svg)
 
-**Get Task Category List Partial SD**
+**Get Submitted Declarations**
 
-![Sequence Diagram - Partial - Get Task Category List](svg/US006-SD-partial-get-task-category-list.svg)
+![Sequence Diagram - Partial - Get Submitted Declarations](svg/US08-SD-partial-get-submitted-declarations.svg)
 
-**Get Task Category Object**
+**Get Ethics Committee Member**
 
-![Sequence Diagram - Partial - Get Task Category Object](svg/US006-SD-partial-get-task-category.svg)
+![Sequence Diagram - Partial - Get Ethics Committee Member](svg/US08-SD-partial-get-ethics-committee-member.svg)
 
-**Get Employee**
+**Approve Declaration**
 
-![Sequence Diagram - Partial - Get Employee](svg/US006-SD-partial-get-employee.svg)
+![Sequence Diagram - Partial - Approve Declaration](svg/US08-SD-partial-approve-declaration.svg)
 
-**Create Task**
+**Reject Declaration**
 
-![Sequence Diagram - Partial - Create Task](svg/US006-SD-partial-create-task.svg)
+![Sequence Diagram - Partial - Reject Declaration](svg/US08-SD-partial-reject-declaration.svg)
+
+---
 
 ## 3.3. Class Diagram (CD)
 
-![Class Diagram](svg/US006-CD.svg)
+![Class Diagram](svg/US08-CD.svg)

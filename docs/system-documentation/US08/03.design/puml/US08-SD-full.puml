@@ -1,0 +1,210 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Ethics Committee\nMember" as MEMBER_ACTOR
+
+participant ":ValidateDeclarationUI" as UI
+participant ":ValidateDeclarationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
+participant "ApplicationSession" as APP_SESSION
+participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
+participant "currentSession\n:UserSession" as CURRENT_SESSION
+participant "userRepository\n:UserRepository" as USER_REPO
+participant "member\n:EthicsCommitteeMember" as MEMBER
+participant "declaration\n:Declaration" as DECL
+participant "validation\n:Validation" as VALIDATION
+participant "annotation\n:Annotation" as ANNOTATION
+
+activate MEMBER_ACTOR
+
+    MEMBER_ACTOR -> UI : asks to validate a declaration of interests
+    activate UI
+        UI --> CTRL** : create()
+
+        UI -> CTRL : getSubmittedDeclarations()
+        activate CTRL
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : declarationRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> DECL_REPO : getSubmittedDeclarations()
+            activate DECL_REPO
+                DECL_REPO --> CTRL : submittedDeclarations
+            deactivate DECL_REPO
+
+            CTRL --> UI : submittedDeclarations
+        deactivate CTRL
+
+        UI --> MEMBER_ACTOR : presents list of submitted declarations
+    deactivate UI
+
+    MEMBER_ACTOR -> UI : selects a declaration of interests
+    activate UI
+        UI -> CTRL : selectDeclaration(declaration)
+        activate CTRL
+            CTRL -> CTRL : keep selected declaration
+            CTRL --> UI : declarationDetails
+        deactivate CTRL
+
+        UI --> MEMBER_ACTOR : shows declaration details
+    deactivate UI
+
+    alt declaration is correct
+
+        MEMBER_ACTOR -> UI : approves the declaration
+        activate UI
+            UI -> CTRL : approveDeclaration()
+            activate CTRL
+
+                CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
+                activate CTRL
+                    CTRL -> APP_SESSION : getInstance()
+                    activate APP_SESSION
+                        APP_SESSION --> CTRL : appSession
+                    deactivate APP_SESSION
+
+                    CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
+                    activate APP_SESSION_SINGLETON
+                        APP_SESSION_SINGLETON --> CTRL : currentSession
+                    deactivate APP_SESSION_SINGLETON
+
+                    CTRL -> CURRENT_SESSION : getUserEmail()
+                    activate CURRENT_SESSION
+                        CURRENT_SESSION --> CTRL : email
+                    deactivate CURRENT_SESSION
+
+                    CTRL -> REPOS : getInstance()
+                    activate REPOS
+                        REPOS --> CTRL : repositories
+                    deactivate REPOS
+
+                    CTRL -> REPOS_SINGLETON : getUserRepository()
+                    activate REPOS_SINGLETON
+                        REPOS_SINGLETON --> CTRL : userRepository
+                    deactivate REPOS_SINGLETON
+
+                    CTRL -> USER_REPO : getEthicsCommitteeMemberByEmail(email)
+                    activate USER_REPO
+                        USER_REPO --> CTRL : member
+                    deactivate USER_REPO
+
+                    CTRL --> CTRL : member
+                deactivate CTRL
+
+                CTRL -> MEMBER : validateDeclaration(declaration, APPROVED, null)
+                activate MEMBER
+                    MEMBER --> VALIDATION** : create(declaration, APPROVED)
+
+                    MEMBER -> DECL : approve()
+                    activate DECL
+                        DECL --> MEMBER : status updated
+                    deactivate DECL
+
+                    MEMBER -> MEMBER : addValidation(validation)
+                    activate MEMBER
+                        MEMBER --> MEMBER : true
+                    deactivate MEMBER
+
+                    MEMBER --> CTRL : validation
+                deactivate MEMBER
+
+                CTRL --> UI : validation
+            deactivate CTRL
+
+            UI --> MEMBER_ACTOR : informs that the declaration was successfully validated
+        deactivate UI
+
+    else declaration has inconsistencies
+
+        MEMBER_ACTOR -> UI : rejects the declaration
+        activate UI
+            UI --> MEMBER_ACTOR : asks for comments on inconsistent sections/items
+        deactivate UI
+
+        MEMBER_ACTOR -> UI : submits comments on inconsistent sections/items
+        activate UI
+            UI -> CTRL : rejectDeclaration(comments)
+            activate CTRL
+
+                CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
+                activate CTRL
+                    CTRL -> APP_SESSION : getInstance()
+                    activate APP_SESSION
+                        APP_SESSION --> CTRL : appSession
+                    deactivate APP_SESSION
+
+                    CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
+                    activate APP_SESSION_SINGLETON
+                        APP_SESSION_SINGLETON --> CTRL : currentSession
+                    deactivate APP_SESSION_SINGLETON
+
+                    CTRL -> CURRENT_SESSION : getUserEmail()
+                    activate CURRENT_SESSION
+                        CURRENT_SESSION --> CTRL : email
+                    deactivate CURRENT_SESSION
+
+                    CTRL -> REPOS : getInstance()
+                    activate REPOS
+                        REPOS --> CTRL : repositories
+                    deactivate REPOS
+
+                    CTRL -> REPOS_SINGLETON : getUserRepository()
+                    activate REPOS_SINGLETON
+                        REPOS_SINGLETON --> CTRL : userRepository
+                    deactivate REPOS_SINGLETON
+
+                    CTRL -> USER_REPO : getEthicsCommitteeMemberByEmail(email)
+                    activate USER_REPO
+                        USER_REPO --> CTRL : member
+                    deactivate USER_REPO
+
+                    CTRL --> CTRL : member
+                deactivate CTRL
+
+                CTRL -> MEMBER : validateDeclaration(declaration, REJECTED, comments)
+                activate MEMBER
+                    MEMBER --> VALIDATION** : create(declaration, REJECTED)
+
+                    VALIDATION -> VALIDATION : addAnnotation(comments, declaration)
+                    activate VALIDATION
+                        VALIDATION --> ANNOTATION** : create(comments, declaration)
+                        VALIDATION --> VALIDATION : annotation
+                    deactivate VALIDATION
+
+                    MEMBER -> DECL : reject()
+                    activate DECL
+                        DECL --> MEMBER : status updated
+                    deactivate DECL
+
+                    MEMBER -> MEMBER : addValidation(validation)
+                    activate MEMBER
+                        MEMBER --> MEMBER : true
+                    deactivate MEMBER
+
+                    MEMBER --> CTRL : validation
+                deactivate MEMBER
+
+                CTRL --> UI : validation
+            deactivate CTRL
+
+            UI --> MEMBER_ACTOR : informs that the declaration was rejected
+        deactivate UI
+
+    end
+
+deactivate MEMBER_ACTOR
+
+@enduml

@@ -1,0 +1,41 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":ValidateDeclarationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
+
+autonumber 3
+-> CTRL : getSubmittedDeclarations()
+
+autonumber 3.1
+activate CTRL
+
+    group Get Submitted Declarations
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : declarationRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> DECL_REPO : getSubmittedDeclarations()
+        activate DECL_REPO
+            DECL_REPO --> CTRL : submittedDeclarations
+        deactivate DECL_REPO
+
+    end
+
+    autonumber 4
+    <-- CTRL : submittedDeclarations
+
+deactivate CTRL
+
+@enduml

@@ -1,0 +1,163 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+enum DeclarationStatus {
+    SUBMITTED
+    VALIDATED
+    REJECTED
+}
+
+enum ValidationVerdict {
+    APPROVED
+    REJECTED
+}
+
+class ApplicationSession {
+    - ApplicationSession()
+    + {static} getInstance()
+    + getCurrentSession()
+}
+
+class UserSession {
+    + getUserEmail()
+}
+
+class EthicsCommitteeMember {
+    + validateDeclaration(declaration, verdict, comments)
+    - addValidation(validation)
+}
+
+class Declaration {
+    - submissionDate : LocalDate
+
+    + approve()
+    + reject()
+}
+
+class Validation {
+    - validationDate : LocalDate
+
+    + Validation(declaration, verdict)
+    + addAnnotation(text, declaration)
+}
+
+class Annotation {
+    - text : String
+    - creationDate : LocalDateTime
+
+    + Annotation(text, declaration)
+}
+
+class Subsidy {
+    - amount : double
+    - nature : String
+}
+
+class Asset {
+    - acquisitionValue : double
+    - marketValue : double
+}
+
+class Position {
+    - startDate : LocalDate
+    - endDate : LocalDate
+    - remuneration : double
+}
+
+class SecurityHolding {
+    - title : String
+    - marketValue : double
+    - stake : double
+    - percentage : double
+}
+
+class DeclarationRepository {
+    + getSubmittedDeclarations()
+}
+
+class UserRepository {
+    + getEthicsCommitteeMemberByEmail(email)
+}
+
+class Repositories {
+    - Repositories()
+    + {static} getInstance()
+    + getDeclarationRepository()
+    + getUserRepository()
+}
+
+class ValidateDeclarationController {
+    - declaration : Declaration
+
+    + ValidateDeclarationController()
+    + getSubmittedDeclarations()
+    + selectDeclaration(declaration)
+    + approveDeclaration()
+    + rejectDeclaration(comments)
+    - getEthicsCommitteeMemberFromSession()
+}
+
+note right of ValidateDeclarationController
+    The selected Declaration is kept
+    temporarily by the controller.
+end note
+
+note bottom of DeclarationRepository
+    Used to obtain the list of
+    submitted declarations.
+end note
+
+note bottom of Validation
+    If the verdict is APPROVED,
+    no annotations are required.
+
+    If the verdict is REJECTED,
+    at least one annotation/comment
+    must be recorded.
+end note
+
+class ValidateDeclarationUI {
+}
+
+ValidateDeclarationUI .> ValidateDeclarationController
+
+ValidateDeclarationController .> Repositories
+ValidateDeclarationController ..> DeclarationRepository
+ValidateDeclarationController ..> UserRepository
+ValidateDeclarationController ..> ApplicationSession
+ValidateDeclarationController ..> UserSession
+ValidateDeclarationController ..> Declaration
+ValidateDeclarationController ..> EthicsCommitteeMember
+ValidateDeclarationController ..> ValidationVerdict
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" DeclarationRepository : declarationRepository
+Repositories --> "1" UserRepository : userRepository
+
+ApplicationSession -> "1" ApplicationSession : instance
+ApplicationSession ..> UserSession
+
+DeclarationRepository --> "*" Declaration : declarations
+UserRepository --> "*" EthicsCommitteeMember : ethicsCommitteeMembers
+
+EthicsCommitteeMember --> "*" Validation : validations
+
+Validation --> "1" Declaration : declaration
+Validation --> "1" ValidationVerdict : verdict
+Validation --> "*" Annotation : annotations
+
+Annotation --> "0..1" Declaration : commentsOn
+
+Declaration --> "1" DeclarationStatus : status
+Declaration --> "*" Subsidy : subsidies
+Declaration --> "*" Asset : assets
+Declaration --> "*" Position : positions
+Declaration --> "*" SecurityHolding : securityHoldings
+
+@enduml

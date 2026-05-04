@@ -1,0 +1,49 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":ValidateDeclarationController" as CTRL
+participant "member\n:EthicsCommitteeMember" as MEMBER
+participant "declaration\n:Declaration" as DECL
+participant "validation\n:Validation" as VALIDATION
+
+autonumber 15
+-> CTRL : approveDeclaration()
+
+autonumber 15.1
+activate CTRL
+
+    group Approve Declaration
+
+        note right of CTRL
+            member was obtained through
+            the Get Ethics Committee Member
+            partial SD
+        end note
+
+        CTRL -> MEMBER : validateDeclaration(declaration, APPROVED, null)
+        activate MEMBER
+            MEMBER --> VALIDATION** : create(declaration, APPROVED)
+
+            MEMBER -> DECL : approve()
+            activate DECL
+                DECL --> MEMBER : status updated
+            deactivate DECL
+
+            MEMBER -> MEMBER : addValidation(validation)
+            activate MEMBER
+                MEMBER --> MEMBER : true
+            deactivate MEMBER
+
+            MEMBER --> CTRL : validation
+        deactivate MEMBER
+
+    end
+
+    autonumber 16
+    <-- CTRL : validation
+
+deactivate CTRL
+
+@enduml
