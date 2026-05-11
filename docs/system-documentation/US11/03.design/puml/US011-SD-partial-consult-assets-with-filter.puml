@@ -1,0 +1,46 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":ConsultAssetsController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "declarationRepository:\nDeclarationRepository" as DECL_REPO
+participant "assetVisibilityService\n:AssetVisibilityService" as VISIBILITY_SERVICE
+
+autonumber 8
+-> CTRL : consultAssets(politicalAgent, referenceDate)
+autonumber 8.1
+activate CTRL
+    group Consult Assets with Role Filter
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : declarationRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
+        activate DECL_REPO
+            DECL_REPO --> CTRL : declarations
+        deactivate DECL_REPO
+
+        CTRL -> CTRL : extractAssetsFromDeclarations(declarations)
+        activate CTRL
+            CTRL --> CTRL : assetViews
+        deactivate CTRL
+
+        CTRL -> VISIBILITY_SERVICE : applyRoleMasking(user, assetViews)
+        activate VISIBILITY_SERVICE
+            VISIBILITY_SERVICE --> CTRL : filteredAssets
+        deactivate VISIBILITY_SERVICE
+    end
+    autonumber 9
+    <-- CTRL : filteredAssets
+deactivate CTRL
+
+@enduml

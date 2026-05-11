@@ -1,0 +1,156 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+skinparam classAttributeIconSize 0
+
+enum PropertyType {
+    URBAN
+    RURAL
+}
+
+class ApplicationSession {
+    - ApplicationSession()
+    + {static} getInstance()
+    + getCurrentSession()
+}
+
+class UserSession {
+    + getUserEmail()
+}
+
+abstract class Person {
+    - name : String
+    - taxId : String
+    - email : String
+}
+
+class Citizen {
+}
+
+class Journalist {
+    - pressCardNumber : String
+}
+
+class PoliticalAgent {
+    - name : String
+    - taxId : String
+}
+
+abstract class Section {
+}
+
+class AssetSection {
+}
+
+abstract class Field {
+}
+
+class AssetField {
+}
+
+class Property {
+    - acquisitionValue : double
+    - marketValue : double
+}
+
+class Location {
+    - parish : String
+    - municipality : String
+    - district : String
+}
+
+class Declaration {
+    - submissionDate : LocalDate
+    - declarantName : String
+}
+
+class AssetView {
+    - propertyType : String
+    - locationLabel : String
+    - acquisitionValue : String
+    - marketValue : String
+}
+
+class AssetVisibilityService {
+    + applyRoleMasking(user, assetViews)
+}
+
+class PoliticalAgentRepository {
+    + getPoliticalAgents()
+}
+
+class DeclarationRepository {
+    + getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
+}
+
+class UserRepository {
+    + getUserByEmail(email)
+}
+
+class Repositories {
+    - Repositories()
+    + {static} getInstance()
+    + getPoliticalAgentRepository()
+    + getDeclarationRepository()
+    + getUserRepository()
+}
+
+class ConsultAssetsController {
+    + ConsultAssetsController()
+    + getPoliticalAgents()
+    + consultAssets(politicalAgent, referenceDate)
+    - getAuthenticatedUserFromSession()
+}
+
+class ConsultAssetsUI {
+}
+
+note right of AssetVisibilityService
+    Applies role-dependent omission
+    rules before data presentation.
+end note
+
+note right of ConsultAssetsController
+    Consultation flow is read-only:
+    no declaration data is modified.
+end note
+
+Person <|-- Citizen
+Person <|-- Journalist
+Person <|-- PoliticalAgent
+
+Section <|-- AssetSection
+Field <|-- AssetField
+
+ConsultAssetsUI .> ConsultAssetsController
+ConsultAssetsController .> Repositories
+ConsultAssetsController ..> PoliticalAgentRepository
+ConsultAssetsController ..> DeclarationRepository
+ConsultAssetsController ..> UserRepository
+ConsultAssetsController ..> ApplicationSession
+ConsultAssetsController ..> UserSession
+ConsultAssetsController ..> AssetVisibilityService
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" PoliticalAgentRepository : politicalAgentRepository
+Repositories --> "1" DeclarationRepository : declarationRepository
+Repositories --> "1" UserRepository : userRepository
+
+ApplicationSession -> "1" ApplicationSession : instance
+ApplicationSession ..> UserSession
+
+PoliticalAgentRepository --> "*" PoliticalAgent : politicalAgents
+UserRepository --> "*" Person : users
+DeclarationRepository --> "*" Declaration : declarations
+
+PoliticalAgent "1" --> "0..*" Declaration : declarations
+Declaration *-- "4" Section : sections
+AssetSection *-- "*" AssetField : fields
+AssetField *-- "1" Property : property
+Property --> "1" PropertyType : type
+Property --> "1" Location : location
+
+AssetVisibilityService --> "*" AssetView : filteredAssets
+
+@enduml

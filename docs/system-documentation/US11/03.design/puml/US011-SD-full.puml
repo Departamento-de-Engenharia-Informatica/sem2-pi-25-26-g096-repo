@@ -1,0 +1,124 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Citizen/Journalist" as USER_ACTOR
+
+participant ":ConsultAssetsUI" as UI
+participant ":ConsultAssetsController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "politicalAgentRepository\n:PoliticalAgentRepository" as AGENT_REPO
+participant "ApplicationSession" as APP_SESSION
+participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
+participant "currentSession\n:UserSession" as CURRENT_SESSION
+participant "userRepository\n:UserRepository" as USER_REPO
+participant "user\n:Person" as USER
+participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
+participant "assetVisibilityService\n:AssetVisibilityService" as VISIBILITY_SERVICE
+
+activate USER_ACTOR
+
+    USER_ACTOR -> UI : asks to consult assets of political agent
+    activate UI
+        UI --> CTRL** : create()
+
+        UI -> CTRL : getPoliticalAgents()
+        activate CTRL
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPOS_SINGLETON : getPoliticalAgentRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : politicalAgentRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> AGENT_REPO : getPoliticalAgents()
+            activate AGENT_REPO
+                AGENT_REPO --> CTRL : politicalAgentList
+            deactivate AGENT_REPO
+
+            CTRL --> UI : politicalAgentList
+        deactivate CTRL
+
+        UI --> USER_ACTOR : shows political agent list and asks for reference date
+    deactivate UI
+
+    USER_ACTOR -> UI : selects political agent and enters reference date
+    activate UI
+        UI -> CTRL : consultAssets(politicalAgent, referenceDate)
+        activate CTRL
+
+            CTRL -> CTRL : getAuthenticatedUserFromSession()
+            activate CTRL
+                CTRL -> APP_SESSION : getInstance()
+                activate APP_SESSION
+                    APP_SESSION --> CTRL : appSession
+                deactivate APP_SESSION
+
+                CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
+                activate APP_SESSION_SINGLETON
+                    APP_SESSION_SINGLETON --> CTRL : currentSession
+                deactivate APP_SESSION_SINGLETON
+
+                CTRL -> CURRENT_SESSION : getUserEmail()
+                activate CURRENT_SESSION
+                    CURRENT_SESSION --> CTRL : email
+                deactivate CURRENT_SESSION
+
+                CTRL -> REPOS : getInstance()
+                activate REPOS
+                    REPOS --> CTRL : repositories
+                deactivate REPOS
+
+                CTRL -> REPOS_SINGLETON : getUserRepository()
+                activate REPOS_SINGLETON
+                    REPOS_SINGLETON --> CTRL : userRepository
+                deactivate REPOS_SINGLETON
+
+                CTRL -> USER_REPO : getUserByEmail(email)
+                activate USER_REPO
+                    USER_REPO --> CTRL : user
+                deactivate USER_REPO
+
+                CTRL --> CTRL : user
+            deactivate CTRL
+
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : declarationRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
+            activate DECL_REPO
+                DECL_REPO --> CTRL : declarations
+            deactivate DECL_REPO
+
+            CTRL -> CTRL : extractAssetsFromDeclarations(declarations)
+            activate CTRL
+                CTRL --> CTRL : assetViews
+            deactivate CTRL
+
+            CTRL -> VISIBILITY_SERVICE : applyRoleMasking(user, assetViews)
+            activate VISIBILITY_SERVICE
+                VISIBILITY_SERVICE --> CTRL : filteredAssets
+            deactivate VISIBILITY_SERVICE
+
+            CTRL --> UI : filteredAssets
+        deactivate CTRL
+
+        UI --> USER_ACTOR : shows filtered assets for selected date
+    deactivate UI
+
+deactivate USER_ACTOR
+
+@enduml

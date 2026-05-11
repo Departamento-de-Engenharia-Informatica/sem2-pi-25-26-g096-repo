@@ -1,0 +1,56 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Citizen/Journalist" as USER_ACTOR
+
+participant ":ConsultAssetsUI" as UI
+participant ":ConsultAssetsController" as CTRL
+
+activate USER_ACTOR
+
+    USER_ACTOR -> UI : asks to consult assets of political agent
+    activate UI
+        UI --> CTRL** : create()
+        UI -> CTRL : getPoliticalAgents()
+
+        ref over CTRL
+            Get Political Agent List
+        end ref
+
+        activate CTRL
+            CTRL --> UI : politicalAgentList
+        deactivate CTRL
+
+        UI --> USER_ACTOR : shows political agent list and asks for reference date
+    deactivate UI
+
+    USER_ACTOR -> UI : selects political agent and enters reference date
+    activate UI
+        UI -> CTRL : consultAssets(politicalAgent, referenceDate)
+        activate CTRL
+
+            CTRL -> CTRL : getAuthenticatedUserFromSession()
+            activate CTRL
+                ref over CTRL
+                    Get Authenticated User
+                end ref
+                CTRL --> CTRL : user
+            deactivate CTRL
+
+            ref over CTRL
+                Consult Assets with Role Filter
+            end ref
+
+            CTRL --> UI : filteredAssets
+        deactivate CTRL
+
+        UI --> USER_ACTOR : shows filtered assets for selected date
+    deactivate UI
+
+deactivate USER_ACTOR
+
+@enduml
