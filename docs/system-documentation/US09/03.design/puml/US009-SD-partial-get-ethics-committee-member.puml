@@ -1,0 +1,57 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":ConsultIntegratedSituationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "ApplicationSession" as APP_SESSION
+participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
+participant "currentSession\n:UserSession" as CURRENT_SESSION
+participant "userRepository:\nUserRepository" as USER_REPO
+participant "member\n:EthicsCommitteeMember" as MEMBER
+
+autonumber 6
+-> CTRL : getEthicsCommitteeMemberFromSession()
+autonumber 6.1
+activate CTRL
+
+    group Get Ethics Committee Member
+        CTRL -> APP_SESSION : getInstance()
+        activate APP_SESSION
+            APP_SESSION --> CTRL : appSession
+        deactivate APP_SESSION
+
+        CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
+        activate APP_SESSION_SINGLETON
+            APP_SESSION_SINGLETON --> CTRL : currentSession
+        deactivate APP_SESSION_SINGLETON
+
+        CTRL -> CURRENT_SESSION : getUserEmail()
+        activate CURRENT_SESSION
+            CURRENT_SESSION --> CTRL : email
+        deactivate CURRENT_SESSION
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getUserRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : userRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> USER_REPO : getEthicsCommitteeMemberByEmail(email)
+        activate USER_REPO
+            USER_REPO --> CTRL : member
+        deactivate USER_REPO
+    end
+
+    autonumber 7
+    <-- CTRL : member
+
+deactivate CTRL
+
+@enduml

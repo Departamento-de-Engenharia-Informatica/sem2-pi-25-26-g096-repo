@@ -1,0 +1,163 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+enum DeclarationType {
+    INITIAL
+    REGULAR
+    EXCEPTIONAL
+}
+
+enum DeclarationStatus {
+    SUBMITTED
+    VALIDATED
+    REJECTED
+}
+
+class ApplicationSession {
+    - ApplicationSession()
+    + {static} getInstance()
+    + getCurrentSession()
+}
+
+class UserSession {
+    + getUserEmail()
+}
+
+class EthicsCommitteeMember {
+    + buildIntegratedSituation(politicalAgent, declarations, referenceDate)
+}
+
+class PoliticalAgent {
+    - name : String
+    - taxId : String
+}
+
+class PoliticalMandate {
+    - startDate : LocalDate
+    - endDate : LocalDate
+}
+
+class Role {
+    - designation : String
+}
+
+abstract class Section {
+}
+
+class IncomeSection {
+}
+
+class AssetSection {
+}
+
+class PositionSection {
+}
+
+class ShareholdingSection {
+}
+
+class Declaration {
+    - submissionDate : LocalDate
+
+    + isApplicableOn(referenceDate)
+}
+
+class IntegratedSituation {
+    - referenceDate : LocalDate
+    - totalIncome : double
+    - totalAssetsMarketValue : double
+    - activePositions : int
+    - totalShareholdingsValue : double
+
+    + IntegratedSituation(politicalAgent, referenceDate)
+    + aggregateFromDeclarations(declarations)
+}
+
+class DeclarationRepository {
+    + getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
+}
+
+class PoliticalAgentRepository {
+    + getPoliticalAgents()
+}
+
+class UserRepository {
+    + getEthicsCommitteeMemberByEmail(email)
+}
+
+class Repositories {
+    - Repositories()
+    + {static} getInstance()
+    + getDeclarationRepository()
+    + getPoliticalAgentRepository()
+    + getUserRepository()
+}
+
+class ConsultIntegratedSituationController {
+    + ConsultIntegratedSituationController()
+    + getPoliticalAgents()
+    + consultIntegratedSituation(politicalAgent, referenceDate)
+    - getEthicsCommitteeMemberFromSession()
+}
+
+note right of ConsultIntegratedSituationController
+    The controller coordinates retrieval
+    and consolidation for a read-only
+    consultation flow.
+end note
+
+note bottom of DeclarationRepository
+    Returns declarations of the selected
+    political agent with temporal filter
+    up to the reference date.
+end note
+
+class ConsultIntegratedSituationUI {
+}
+
+Section <|-- IncomeSection
+Section <|-- AssetSection
+Section <|-- PositionSection
+Section <|-- ShareholdingSection
+
+ConsultIntegratedSituationUI .> ConsultIntegratedSituationController
+
+ConsultIntegratedSituationController .> Repositories
+ConsultIntegratedSituationController ..> PoliticalAgentRepository
+ConsultIntegratedSituationController ..> DeclarationRepository
+ConsultIntegratedSituationController ..> UserRepository
+ConsultIntegratedSituationController ..> ApplicationSession
+ConsultIntegratedSituationController ..> UserSession
+ConsultIntegratedSituationController ..> EthicsCommitteeMember
+ConsultIntegratedSituationController ..> IntegratedSituation
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" DeclarationRepository : declarationRepository
+Repositories --> "1" PoliticalAgentRepository : politicalAgentRepository
+Repositories --> "1" UserRepository : userRepository
+
+ApplicationSession -> "1" ApplicationSession : instance
+ApplicationSession ..> UserSession
+
+PoliticalAgentRepository --> "*" PoliticalAgent : politicalAgents
+UserRepository --> "*" EthicsCommitteeMember : ethicsCommitteeMembers
+DeclarationRepository --> "*" Declaration : declarations
+
+PoliticalAgent "1" --> "0..*" PoliticalMandate : mandates
+PoliticalMandate "*" --> "1" Role : role
+
+PoliticalAgent "1" --> "0..*" Declaration : declarations
+Declaration --> "1" DeclarationType : type
+Declaration --> "1" DeclarationStatus : status
+Declaration *-- "4" Section : sections
+
+EthicsCommitteeMember --> "*" IntegratedSituation : consultations
+IntegratedSituation --> "1" PoliticalAgent : politicalAgent
+IntegratedSituation ..> "*" Declaration : based on
+
+@enduml

@@ -1,0 +1,40 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+participant ":ConsultIntegratedSituationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "politicalAgentRepository\n:PoliticalAgentRepository" as AGENT_REPO
+
+autonumber 3
+
+ -> CTRL : getPoliticalAgents()
+autonumber 3.1
+activate CTRL
+    group Get Political Agent List
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getPoliticalAgentRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : politicalAgentRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> AGENT_REPO : getPoliticalAgents()
+        activate AGENT_REPO
+            AGENT_REPO --> CTRL : politicalAgentList
+        deactivate AGENT_REPO
+
+    end
+    autonumber 4
+    <-- CTRL : politicalAgentList
+deactivate CTRL
+
+@enduml

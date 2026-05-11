@@ -1,0 +1,58 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Ethics Committee\nMember" as MEMBER_ACTOR
+
+participant ":ConsultIntegratedSituationUI" as UI
+participant ":ConsultIntegratedSituationController" as CTRL
+
+activate MEMBER_ACTOR
+
+    MEMBER_ACTOR -> UI : asks to consult integrated situation
+    activate UI
+
+        UI --> CTRL** : create()
+        UI -> CTRL : getPoliticalAgents()
+
+        ref over CTRL
+            Get Political Agent List
+        end ref
+
+        activate CTRL
+            CTRL --> UI : politicalAgentList
+        deactivate CTRL
+
+        UI --> MEMBER_ACTOR : shows political agent list and asks for reference date
+    deactivate UI
+
+    MEMBER_ACTOR -> UI : selects political agent and enters reference date
+    activate UI
+
+        UI -> CTRL : consultIntegratedSituation(politicalAgent, referenceDate)
+        activate CTRL
+
+            CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
+            activate CTRL
+                ref over CTRL
+                    Get Ethics Committee Member
+                end ref
+                CTRL --> CTRL : member
+            deactivate CTRL
+
+            ref over CTRL
+                Build Integrated Situation
+            end ref
+
+            CTRL --> UI : integratedSituation
+        deactivate CTRL
+
+        UI --> MEMBER_ACTOR : shows integrated situation for selected date
+    deactivate UI
+
+deactivate MEMBER_ACTOR
+
+@enduml

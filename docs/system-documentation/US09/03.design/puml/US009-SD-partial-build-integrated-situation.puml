@@ -1,0 +1,51 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":ConsultIntegratedSituationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "declarationRepository:\nDeclarationRepository" as DECL_REPO
+participant "member\n:EthicsCommitteeMember" as MEMBER
+participant "integratedSituation\n:IntegratedSituation" as INTEGRATED_SITUATION
+
+autonumber 8
+-> CTRL : consultIntegratedSituation(politicalAgent, referenceDate)
+
+autonumber 8.1
+activate CTRL
+    group Build Integrated Situation
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : declarationRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
+        activate DECL_REPO
+            DECL_REPO --> CTRL : declarations
+        deactivate DECL_REPO
+
+        CTRL -> MEMBER : buildIntegratedSituation(politicalAgent, declarations, referenceDate)
+        activate MEMBER
+            MEMBER --> INTEGRATED_SITUATION** : create(politicalAgent, referenceDate)
+            MEMBER -> INTEGRATED_SITUATION : aggregateFromDeclarations(declarations)
+            activate INTEGRATED_SITUATION
+                INTEGRATED_SITUATION --> MEMBER : integratedSituation
+            deactivate INTEGRATED_SITUATION
+
+            MEMBER --> CTRL : integratedSituation
+        deactivate MEMBER
+
+    end
+    autonumber 9
+    <-- CTRL : integratedSituation
+deactivate CTRL
+
+@enduml
