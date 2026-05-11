@@ -4,4 +4,6 @@
 
 [Analysis](02.analysis/US12-analysis.md)
 
-Design and implementation are out of Sprint 1 assessment scope for this project stage.
+[Design](03.design/US12-design.md)
+
+[Tests & Implementation](04.tests-and-implementation/US12-tests-and-implementation.md)

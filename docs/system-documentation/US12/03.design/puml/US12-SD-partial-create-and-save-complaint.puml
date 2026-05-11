@@ -1,0 +1,69 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":SubmitComplaintController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "politicalMandateRepository:\nPoliticalMandateRepository" as MANDATE_REPO
+participant "complaintRepository:\nComplaintRepository" as COMPLAINT_REPO
+participant "citizen\n:Citizen" as CITIZEN
+participant "complaint\n:Complaint" as COMPLAINT
+
+autonumber 8
+-> CTRL : createComplaint(politicalAgent, role, incidentDate, description)
+autonumber 8.1
+activate CTRL
+    group Create and Save Complaint
+        CTRL -> CTRL : validateIncidentDate(incidentDate)
+        activate CTRL
+            CTRL --> CTRL : valid
+        deactivate CTRL
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getPoliticalMandateRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : politicalMandateRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> MANDATE_REPO : getMandateByAgentRoleAndDate(politicalAgent, role, incidentDate)
+        activate MANDATE_REPO
+            MANDATE_REPO --> CTRL : mandate
+        deactivate MANDATE_REPO
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getComplaintRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : complaintRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> COMPLAINT_REPO : nextIdentity()
+        activate COMPLAINT_REPO
+            COMPLAINT_REPO --> CTRL : complaintId
+        deactivate COMPLAINT_REPO
+
+        CTRL -> CITIZEN : submitComplaint(mandate, incidentDate, description, complaintId)
+        activate CITIZEN
+            CITIZEN --> COMPLAINT** : create(complaintId, incidentDate, description, mandate)
+            CITIZEN --> CTRL : complaint
+        deactivate CITIZEN
+
+        CTRL -> COMPLAINT_REPO : save(complaint)
+        activate COMPLAINT_REPO
+            COMPLAINT_REPO --> CTRL : success
+        deactivate COMPLAINT_REPO
+    end
+    autonumber 9
+    <-- CTRL : complaintId, SUBMITTED
+deactivate CTRL
+
+@enduml

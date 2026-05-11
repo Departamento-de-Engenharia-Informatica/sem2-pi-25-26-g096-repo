@@ -1,0 +1,51 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Citizen" as CITIZEN_ACTOR
+
+participant ":SubmitComplaintUI" as UI
+participant ":SubmitComplaintController" as CTRL
+
+activate CITIZEN_ACTOR
+
+    CITIZEN_ACTOR -> UI : asks to submit complaint
+    activate UI
+        UI --> CTRL** : create()
+
+        ref over CTRL
+            Get Reference Data
+        end ref
+
+        UI --> CITIZEN_ACTOR : asks political agent, role, date and description
+    deactivate UI
+
+    CITIZEN_ACTOR -> UI : provides selected data and description
+    activate UI
+        UI -> CTRL : createComplaint(politicalAgent, role, incidentDate, description)
+        activate CTRL
+
+            CTRL -> CTRL : getCitizenFromSession()
+            activate CTRL
+                ref over CTRL
+                    Get Citizen from Session
+                end ref
+                CTRL --> CTRL : citizen
+            deactivate CTRL
+
+            ref over CTRL
+                Create and Save Complaint
+            end ref
+
+            CTRL --> UI : complaintId, SUBMITTED
+        deactivate CTRL
+
+        UI --> CITIZEN_ACTOR : informs operation success with complaint identifier
+    deactivate UI
+
+deactivate CITIZEN_ACTOR
+
+@enduml
