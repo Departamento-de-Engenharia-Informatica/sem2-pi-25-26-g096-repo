@@ -1,157 +1,195 @@
-@startuml
-'skinparam monochrome true
+@startuml US006-SD-full
+skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
 
 autonumber
 
-'hide footbox
-actor "Organization Employee" as ORG_EMPLOYEE
-participant ":CreateTaskUI" as UI
-participant ":CreateTaskController" as CTRL
+actor "Political Agent" as PA
+
+participant ":SubmitDeclarationUI" as UI
+participant ":SubmitDeclarationController" as CTRL
+participant "ApplicationSession" as APP_SESSION
+participant "appSession\n:ApplicationSession" as APP
+participant "userSession\n:UserSession" as SESSION
 participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
-participant "taskCategoryRepository\n:TaskCategoryRepository" as TASK_CAT_REPO
-participant "ApplicationSession" as APP_SESSION
-participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
-participant "currentSession\n:UserSession" as CURRENT_SESSION
-participant "organizationRepository\n:OrganizationRepository" as ORG_REPO
-participant "organization\n:Organization" as ORG
-participant "task\n:Task" as TASK
+participant "politicalAgentRepository\n:PoliticalAgentRepository" as PA_REPO
+participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+participant "functionRepository\n:FunctionRepository" as FUNC_REPO
+participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
+participant "politicalAgent\n:PoliticalAgent" as PAO
+participant "declaration\n:Declaration" as DECL
 
-activate ORG_EMPLOYEE
+activate PA
 
-        ORG_EMPLOYEE -> UI : asks to create a new task
-        activate UI
-            UI --> CTRL** : create()
-
-            UI -> CTRL : getTaskCategories()
-            activate CTRL
-                CTRL -> REPOS : getInstance()
-                activate REPOS
-                    REPOS --> CTRL: repositories
-                deactivate REPOS
-
-                CTRL -> REPOS_SINGLETON : getTaskCategoryRepository()
-                activate REPOS_SINGLETON
-                    REPOS_SINGLETON --> CTRL: taskCategoryRepository
-                deactivate REPOS_SINGLETON
-
-                CTRL -> TASK_CAT_REPO : getTaskCategories()
-                activate TASK_CAT_REPO
-                    TASK_CAT_REPO --> CTRL : taskCategoryList
-                deactivate TASK_CAT_REPO
-
-                CTRL --> UI : taskCategoryList
-            deactivate CTRL
-
-            UI --> ORG_EMPLOYEE : shows task category list and asks to select one
-        deactivate UI
-
-    ORG_EMPLOYEE -> UI : selects a task category
+    PA -> UI : asks to submit a declaration of interests
     activate UI
-        UI --> ORG_EMPLOYEE : requests data (reference, description, \ninformal description, technical description,\nduration, cost)
-    deactivate UI
+        UI --> CTRL** : create()
 
-    ORG_EMPLOYEE -> UI : types requested data
-    activate UI
-        UI --> ORG_EMPLOYEE : shows all data and requests confirmation
-    deactivate UI
-
-    ORG_EMPLOYEE -> UI : confirms data
-    activate UI
-        UI -> CTRL : createTask(reference,\ndescription,\ninformalDescription,\ntechnicalDescription,\nduration, cost,\ntaskCategoryDescription)
+        UI -> CTRL : getDeclarationTypes()
         activate CTRL
-            CTRL -> CTRL : getTaskCategoryByDescription(taskCategoryDescription)
-            activate CTRL
-                CTRL -> REPOS : getInstance()
-                activate REPOS
-                    REPOS --> CTRL: repositories
-                deactivate REPOS
+            CTRL --> UI : declarationTypes
+        deactivate CTRL
 
-                CTRL -> REPOS_SINGLETON : getTaskCategoryRepository()
-                activate REPOS_SINGLETON
-                    REPOS_SINGLETON -> CTRL : taskCategoryRepository
-                deactivate REPOS_SINGLETON
+        UI -> CTRL : getInstitutions()
+        activate CTRL
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
 
-                CTRL -> TASK_CAT_REPO : getTaskCategoryByDescription(taskCategoryDescription)
-                activate TASK_CAT_REPO
-                    TASK_CAT_REPO --> CTRL : taskCategory
-                deactivate TASK_CAT_REPO
-                    CTRL --> CTRL : taskCategory
-            deactivate CTRL
+            CTRL -> REPOS_SINGLETON : getInstitutionRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : institutionRepository
+            deactivate REPOS_SINGLETON
 
-            |||
-            CTRL -> CTRL : getEmployeeFromSession()
-            activate CTRL
-                CTRL -> APP_SESSION: getInstance()
-                activate APP_SESSION
-                    APP_SESSION -> CTRL: appSession
-                deactivate APP_SESSION
+            CTRL -> INST_REPO : getAllInstitutions()
+            activate INST_REPO
+                INST_REPO --> CTRL : institutions
+            deactivate INST_REPO
 
-                CTRL -> APP_SESSION_SINGLETON: getCurrentSession()
-                activate APP_SESSION_SINGLETON
-                    APP_SESSION_SINGLETON --> CTRL: currentSession
-                deactivate APP_SESSION_SINGLETON
+            CTRL --> UI : institutionDTOList
+        deactivate CTRL
 
-                CTRL -> CURRENT_SESSION: getUserEmail()
-                activate CURRENT_SESSION
-                    CURRENT_SESSION --> CTRL: email
-                deactivate CURRENT_SESSION
+        UI -> CTRL : getFunctions()
+        activate CTRL
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
 
-                CTRL -> REPOS : getInstance()
-                activate REPOS
-                    REPOS --> CTRL: repositories
-                deactivate REPOS
+            CTRL -> REPOS_SINGLETON : getFunctionRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : functionRepository
+            deactivate REPOS_SINGLETON
 
-                CTRL -> REPOS_SINGLETON: getOrganizationRepository()
-                activate REPOS_SINGLETON
-                    REPOS_SINGLETON --> CTRL: organizationRepository
-                deactivate REPOS_SINGLETON
+            CTRL -> FUNC_REPO : getAllFunctions()
+            activate FUNC_REPO
+                FUNC_REPO --> CTRL : functions
+            deactivate FUNC_REPO
 
-                CTRL -> ORG_REPO: getOrganizationByEmployeeEmail(email)
-                activate ORG_REPO
+            CTRL --> UI : functionDTOList
+        deactivate CTRL
 
-                    loop [for each organization
-                        ORG_REPO -> ORG : anyEmployeeHasEmail(email)
-                        activate ORG
-                             ORG --> ORG_REPO : true/false
-                        deactivate ORG
-                    end
-                    ORG_REPO --> CTRL : organization
-                deactivate ORG_REPO
-
-                CTRL -> ORG: getEmployeeByEmail(email)
-                activate ORG
-                    ORG --> CTRL : employee
-                deactivate ORG
-
-                CTRL --> CTRL : employee
-            deactivate CTRL
-
-            |||
-            CTRL -> ORG: createTask(reference, description,\ninformalDescription, technicalDescription,\nduration, cost, taskCategory, employee)
-            activate ORG
-                ORG --> TASK**: create(reference, description, informalDescription, \ntechnicalDescription, duration, cost, taskCategory, employee)
-
-                ORG -> ORG: addTask (task)
-                activate ORG
-                    ORG -> ORG: validateTask(task)
-                    activate ORG
-                        ORG --> ORG : true
-                    deactivate ORG
-
-                    ORG --> ORG : true
-                deactivate ORG
-
-                ORG --> CTRL : task
-            deactivate ORG
-
-            CTRL --> UI: task
-            deactivate CTRL
-            UI --> ORG_EMPLOYEE: displays operation success
+        UI --> PA : requests declaration data
     deactivate UI
 
-deactivate ORG_EMPLOYEE
+    PA -> UI : provides declaration data
+    activate UI
+        UI --> PA : shows entered data and requests confirmation
+    deactivate UI
+
+    PA -> UI : confirms declaration submission
+    activate UI
+        UI -> CTRL : submitDeclaration(declarationDTO)
+        activate CTRL
+
+            CTRL -> APP_SESSION : getInstance()
+            activate APP_SESSION
+                APP_SESSION --> CTRL : appSession
+            deactivate APP_SESSION
+
+            CTRL -> APP : getCurrentSession()
+            activate APP
+                APP --> CTRL : userSession
+            deactivate APP
+
+            CTRL -> SESSION : getUserId()
+            activate SESSION
+                SESSION --> CTRL : userId
+            deactivate SESSION
+
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPOS_SINGLETON : getPoliticalAgentRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : politicalAgentRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> PA_REPO : getByUserId(userId)
+            activate PA_REPO
+                PA_REPO --> CTRL : politicalAgent
+            deactivate PA_REPO
+
+            CTRL -> PAO : createDeclaration(declarationDTO.type)
+            activate PAO
+                PAO --> DECL** : create(declarationType, submissionDate)
+                PAO --> CTRL : declaration
+            deactivate PAO
+
+            loop for each positionDTO
+                CTRL -> INST_REPO : getById(positionDTO.institutionId)
+                activate INST_REPO
+                    INST_REPO --> CTRL : institution
+                deactivate INST_REPO
+
+                CTRL -> FUNC_REPO : getById(positionDTO.functionId)
+                activate FUNC_REPO
+                    FUNC_REPO --> CTRL : function
+                deactivate FUNC_REPO
+
+                CTRL -> DECL : addPosition(positionType, startDate, endDate,\nremuneration, function, institution)
+                activate DECL
+                    DECL --> CTRL : position
+                deactivate DECL
+            end
+
+            loop for each subsidyDTO
+                CTRL -> INST_REPO : getById(subsidyDTO.institutionId)
+                activate INST_REPO
+                    INST_REPO --> CTRL : institution
+                deactivate INST_REPO
+
+                CTRL -> DECL : addSubsidy(amount, nature, institution)
+                activate DECL
+                    DECL --> CTRL : subsidy
+                deactivate DECL
+            end
+
+            loop for each assetDTO
+                CTRL -> DECL : addAsset(propertyType, acquisitionValue,\nmarketValue, locationDTO)
+                activate DECL
+                    DECL --> CTRL : asset
+                deactivate DECL
+            end
+
+            loop for each securityHoldingDTO
+                CTRL -> INST_REPO : getById(securityHoldingDTO.institutionId)
+                activate INST_REPO
+                    INST_REPO --> CTRL : institution
+                deactivate INST_REPO
+
+                CTRL -> DECL : addSecurityHolding(title, marketValue,\nstake, percentage, institution)
+                activate DECL
+                    DECL --> CTRL : securityHolding
+                deactivate DECL
+            end
+
+            CTRL -> DECL : validateData()
+            activate DECL
+                DECL --> CTRL : true
+            deactivate DECL
+
+            CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : declarationRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> DECL_REPO : save(declaration)
+            activate DECL_REPO
+                DECL_REPO --> CTRL : declaration
+            deactivate DECL_REPO
+
+            CTRL --> UI : declaration
+        deactivate CTRL
+
+        UI --> PA : informs that the declaration was successfully submitted
+    deactivate UI
+
+deactivate PA
 
 @enduml

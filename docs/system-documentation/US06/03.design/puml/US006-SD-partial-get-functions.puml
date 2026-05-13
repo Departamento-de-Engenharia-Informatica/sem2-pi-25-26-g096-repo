@@ -1,0 +1,41 @@
+@startuml US006-SD-partial-get-functions
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":SubmitDeclarationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "functionRepository\n:FunctionRepository" as FUNC_REPO
+
+autonumber 5
+-> CTRL : getFunctions()
+
+autonumber 5.1
+activate CTRL
+
+    group Get Functions
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getFunctionRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : functionRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> FUNC_REPO : getAllFunctions()
+        activate FUNC_REPO
+            FUNC_REPO --> CTRL : functions
+        deactivate FUNC_REPO
+
+    end
+
+    autonumber 6
+    <-- CTRL : functionDTOList
+
+deactivate CTRL
+
+@enduml

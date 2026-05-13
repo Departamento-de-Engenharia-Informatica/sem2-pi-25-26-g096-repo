@@ -1,0 +1,41 @@
+@startuml US006-SD-partial-get-institutions
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":SubmitDeclarationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+
+autonumber 3
+-> CTRL : getInstitutions()
+
+autonumber 3.1
+activate CTRL
+
+    group Get Institutions
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getInstitutionRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : institutionRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> INST_REPO : getAllInstitutions()
+        activate INST_REPO
+            INST_REPO --> CTRL : institutions
+        deactivate INST_REPO
+
+    end
+
+    autonumber 4
+    <-- CTRL : institutionDTOList
+
+deactivate CTRL
+
+@enduml

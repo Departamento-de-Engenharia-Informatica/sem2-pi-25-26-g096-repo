@@ -1,126 +1,247 @@
-@startuml
-'skinparam monochrome true
+@startuml US006-CD
+skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam linetype polyline
-'skinparam linetype orto
-
 skinparam classAttributeIconSize 0
 
-'left to right direction
+class SubmitDeclarationUI {
+    + run()
+}
 
-class ApplicationSession
-{
+class SubmitDeclarationController {
+    + SubmitDeclarationController()
+    + getDeclarationTypes()
+    + getInstitutions()
+    + getFunctions()
+    + submitDeclaration(declarationDTO)
+    - getPoliticalAgentFromSession()
+}
+
+class ApplicationSession {
     - ApplicationSession()
     + {static} getInstance()
     + getCurrentSession()
 }
 
-class UserSession
-{
-    + getUserEmail()
-}
-
-class Employee {
-    - name : String
-    - email : String
-    - position : String
-    - phone : String
-}
-
-class Task {
-    - reference :String
-    - description : String
-    - informalDescription : String
-    - technicalDescription : String
-    - duration : int
-    - cost : double
-
-    + Task(reference, description,\ninformalDescription, technicalDescription,\nduration, cost, taskCategory, createdBy)
-}
-
-class TaskCategory {
-    - description : String
-}
-
-class Organization {
-    - name : String
-    - vatNumber : String
-    - website : String
-    - phone : String
-    - email : String
-
-    + Organization(name, vatNumber, webSite, phone, email, postalAddress, manager)
-    + anyEmployeeHasEmail(email)
-    + getEmployeeByEmail(email)
-    + createTask(reference, description, informalDesccription, technicalDescription, \nduration, cost, taskCategory, employee)
-    - addTask(task)
-    - validateTask(task)
-}
-
-class TaskCategoryRepository {
-    + getTaskCategories()
-    + getTaskCategoryByDescription(taskCategoryDescription)
-}
-
-class OrganizationRepository {
-    + getOrganizationByEmployeeEmail(email)
+class UserSession {
+    + getUserId()
 }
 
 class Repositories {
     - Repositories()
     + {static} getInstance()
-    + getTaskCategoryRepository()
-    + getOrganizationRepository()
+    + getPoliticalAgentRepository()
+    + getInstitutionRepository()
+    + getFunctionRepository()
+    + getDeclarationRepository()
 }
 
-class CreateTaskController {
-    + CreateTaskController()
-    + getTaskCategories()
-    + createTask(reference, description, informalDescription, \n   technicalDescription, duration, cost, taskCategoryDescription)
-    - getTaskCategoryByDescription(taskCategoryDescription)
-    - getEmployeeFromSession()
+class PoliticalAgentRepository {
+    + getByUserId(userId)
 }
 
-note right of CreateTaskController
-    categoryDescription is retrieved
-    from selected data
-end note
-
-note bottom of TaskCategoryRepository
-    - used for displaying
-    the task category list
-end note
-
-class CreateTaskUI {
+class InstitutionRepository {
+    + getAllInstitutions()
+    + getById(id)
 }
 
-CreateTaskUI .> CreateTaskController
+class FunctionRepository {
+    + getAllFunctions()
+    + getById(id)
+}
 
-CreateTaskController ..> ApplicationSession
-CreateTaskController ..> UserSession
-CreateTaskController ..> TaskCategory
-CreateTaskController ..> TaskCategoryRepository
-CreateTaskController ..> Organization
-CreateTaskController ..> OrganizationRepository
-CreateTaskController .> Repositories
+class DeclarationRepository {
+    + save(declaration)
+}
 
-Repositories -> "1" Repositories : instance
-Repositories --> "1" OrganizationRepository : organizationRepository
-Repositories -> "1" TaskCategoryRepository : taskCategoryRepository
+class PoliticalAgent {
+    - name : String
+    - taxId : String
+    - email : String
+    - password : String
+
+    + createDeclaration(declarationType)
+}
+
+class Declaration {
+    - submissionDate : LocalDate
+
+    + Declaration(declarationType, submissionDate)
+    + addPosition(positionType, startDate, endDate,\nremuneration, function, institution)
+    + addSubsidy(amount, nature, institution)
+    + addAsset(propertyType, acquisitionValue,\nmarketValue, locationDTO)
+    + addSecurityHolding(title, marketValue,\nstake, percentage, institution)
+    + validateData()
+}
+
+class Position {
+    - startDate : LocalDate
+    - endDate : LocalDate
+    - remuneration : double
+}
+
+class Subsidy {
+    - amount : double
+    - nature : String
+}
+
+class Asset {
+    - acquisitionValue : double
+    - marketValue : double
+}
+
+class Location {
+    - parish : String
+    - county : String
+    - district : String
+}
+
+class SecurityHolding {
+    - title : String
+    - marketValue : double
+    - stake : double
+    - percentage : double
+}
+
+class Institution {
+    - name : String
+    - taxId : String
+}
+
+class Function {
+    - designation : String
+}
+
+class DeclarationDTO {
+    + type : DeclarationType
+    + positions : List<PositionDTO>
+    + subsidies : List<SubsidyDTO>
+    + assets : List<AssetDTO>
+    + securityHoldings : List<SecurityHoldingDTO>
+}
+
+class PositionDTO {
+    + positionType : PositionType
+    + startDate : LocalDate
+    + endDate : LocalDate
+    + remuneration : double
+    + functionId : String
+    + institutionId : String
+}
+
+class SubsidyDTO {
+    + amount : double
+    + nature : String
+    + institutionId : String
+}
+
+class AssetDTO {
+    + propertyType : PropertyType
+    + acquisitionValue : double
+    + marketValue : double
+    + location : LocationDTO
+}
+
+class LocationDTO {
+    + parish : String
+    + county : String
+    + district : String
+}
+
+class SecurityHoldingDTO {
+    + title : String
+    + marketValue : double
+    + stake : double
+    + percentage : double
+    + institutionId : String
+}
+
+class InstitutionDTO {
+    + id : String
+    + name : String
+}
+
+class FunctionDTO {
+    + id : String
+    + designation : String
+}
+
+enum DeclarationType {
+    INITIAL
+    REGULAR
+    EXCEPTIONAL
+}
+
+enum DeclarationStatus {
+    SUBMITTED
+    VALIDATED
+    REJECTED
+}
+
+enum PositionType {
+    PUBLIC
+    PRIVATE
+    SOCIAL
+}
+
+enum PropertyType {
+    URBAN
+    RURAL
+}
+
+SubmitDeclarationUI .> SubmitDeclarationController
+
+SubmitDeclarationController .> Repositories
+SubmitDeclarationController ..> ApplicationSession
+SubmitDeclarationController ..> UserSession
+SubmitDeclarationController ..> PoliticalAgentRepository
+SubmitDeclarationController ..> InstitutionRepository
+SubmitDeclarationController ..> FunctionRepository
+SubmitDeclarationController ..> DeclarationRepository
+SubmitDeclarationController ..> DeclarationDTO
+SubmitDeclarationController ..> InstitutionDTO
+SubmitDeclarationController ..> FunctionDTO
+SubmitDeclarationController ..> PoliticalAgent
 
 ApplicationSession -> "1" ApplicationSession : instance
 ApplicationSession ..> UserSession
 
-TaskCategoryRepository --> "*" TaskCategory : taskCategories
+Repositories -> "1" Repositories : instance
+Repositories --> "1" PoliticalAgentRepository : politicalAgentRepository
+Repositories --> "1" InstitutionRepository : institutionRepository
+Repositories --> "1" FunctionRepository : functionRepository
+Repositories --> "1" DeclarationRepository : declarationRepository
 
-OrganizationRepository --> "*" Organization : organizations
+PoliticalAgentRepository --> "*" PoliticalAgent : politicalAgents
+InstitutionRepository --> "*" Institution : institutions
+FunctionRepository --> "*" Function : functions
+DeclarationRepository --> "*" Declaration : declarations
 
-Organization --> "*" Task : tasks
-Organization --> "*" Employee : employees
+PoliticalAgent "1" --> "0..*" Declaration : submits >
+Declaration --> "1" DeclarationType : type
+Declaration --> "1" DeclarationStatus : status
 
-Task --> "1" TaskCategory : taskCategory
-Task --> "1" Employee : createdBy
+Declaration "1" *-- "0..*" Position : contains >
+Declaration "1" *-- "0..*" Subsidy : contains >
+Declaration "1" *-- "0..*" Asset : contains >
+Declaration "1" *-- "0..*" SecurityHolding : contains >
 
+Position --> "1" PositionType : type
+Position "*" --> "1" Institution : held at >
+Position "*" --> "1" Function : designated as >
+
+Subsidy "*" --> "1" Institution : received from >
+
+Asset --> "1" PropertyType : type
+Asset "1" --> "1" Location : located in >
+
+SecurityHolding "*" --> "1" Institution : held in >
+
+DeclarationDTO ..> PositionDTO
+DeclarationDTO ..> SubsidyDTO
+DeclarationDTO ..> AssetDTO
+DeclarationDTO ..> SecurityHoldingDTO
+AssetDTO ..> LocationDTO
 
 @enduml

@@ -1,0 +1,98 @@
+@startuml US006-SD-partial-create-declaration
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":SubmitDeclarationController" as CTRL
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+participant "functionRepository\n:FunctionRepository" as FUNC_REPO
+participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
+participant "politicalAgent\n:PoliticalAgent" as PAO
+participant "declaration\n:Declaration" as DECL
+
+autonumber 15
+-> CTRL : createDeclaration(politicalAgent, declarationDTO)
+
+autonumber 15.1
+activate CTRL
+
+    group Create Declaration
+
+        CTRL -> PAO : createDeclaration(declarationDTO.type)
+        activate PAO
+            PAO --> DECL** : create(declarationType, submissionDate)
+            PAO --> CTRL : declaration
+        deactivate PAO
+
+        loop for each positionDTO
+            CTRL -> INST_REPO : getById(positionDTO.institutionId)
+            activate INST_REPO
+                INST_REPO --> CTRL : institution
+            deactivate INST_REPO
+
+            CTRL -> FUNC_REPO : getById(positionDTO.functionId)
+            activate FUNC_REPO
+                FUNC_REPO --> CTRL : function
+            deactivate FUNC_REPO
+
+            CTRL -> DECL : addPosition(positionType, startDate, endDate,\nremuneration, function, institution)
+            activate DECL
+                DECL --> CTRL : position
+            deactivate DECL
+        end
+
+        loop for each subsidyDTO
+            CTRL -> INST_REPO : getById(subsidyDTO.institutionId)
+            activate INST_REPO
+                INST_REPO --> CTRL : institution
+            deactivate INST_REPO
+
+            CTRL -> DECL : addSubsidy(amount, nature, institution)
+            activate DECL
+                DECL --> CTRL : subsidy
+            deactivate DECL
+        end
+
+        loop for each assetDTO
+            CTRL -> DECL : addAsset(propertyType, acquisitionValue,\nmarketValue, locationDTO)
+            activate DECL
+                DECL --> CTRL : asset
+            deactivate DECL
+        end
+
+        loop for each securityHoldingDTO
+            CTRL -> INST_REPO : getById(securityHoldingDTO.institutionId)
+            activate INST_REPO
+                INST_REPO --> CTRL : institution
+            deactivate INST_REPO
+
+            CTRL -> DECL : addSecurityHolding(title, marketValue,\nstake, percentage, institution)
+            activate DECL
+                DECL --> CTRL : securityHolding
+            deactivate DECL
+        end
+
+        CTRL -> DECL : validateData()
+        activate DECL
+            DECL --> CTRL : true
+        deactivate DECL
+
+        CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : declarationRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> DECL_REPO : save(declaration)
+        activate DECL_REPO
+            DECL_REPO --> CTRL : declaration
+        deactivate DECL_REPO
+
+    end
+
+    autonumber 16
+    <-- CTRL : declaration
+
+deactivate CTRL
+
+@enduml

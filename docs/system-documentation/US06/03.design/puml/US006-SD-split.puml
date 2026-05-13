@@ -1,93 +1,75 @@
-@startuml
+@startuml US006-SD-split
 skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
 
 autonumber
 
-'hide footbox
-actor "Organization Employee" as ORG_EMPLOYEE
+actor "Political Agent" as PA
 
-participant ":CreateTaskUI" as UI
-participant ":CreateTaskController" as CTRL
-participant "organization\n:Organization" as ORG
+participant ":SubmitDeclarationUI" as UI
+participant ":SubmitDeclarationController" as CTRL
+participant "Repositories" as REPOS
+participant "declaration\n:Declaration" as DECL
 
-activate ORG_EMPLOYEE
+activate PA
 
-    ORG_EMPLOYEE -> UI : asks to create a new task
-
+    PA -> UI : asks to submit a declaration of interests
     activate UI
-
         UI --> CTRL** : create()
-        UI -> CTRL : getTaskCategories()
-        ref over CTRL
-            Get Task Category List
 
-        end ref
-
+        UI -> CTRL : getDeclarationTypes()
         activate CTRL
-
-            CTRL --> UI : taskCategoryList
+            CTRL --> UI : declarationTypes
         deactivate CTRL
 
-        UI --> ORG_EMPLOYEE : shows task category list and asks to select one
+        UI -> CTRL : getInstitutions()
+        activate CTRL
+            ref over CTRL, REPOS
+                Get Institutions
+            end ref
+            CTRL --> UI : institutionDTOList
+        deactivate CTRL
+
+        UI -> CTRL : getFunctions()
+        activate CTRL
+            ref over CTRL, REPOS
+                Get Functions
+            end ref
+            CTRL --> UI : functionDTOList
+        deactivate CTRL
+
+        UI --> PA : requests declaration data
     deactivate UI
 
-    ORG_EMPLOYEE -> UI : selects a task category
+    PA -> UI : provides declaration data
     activate UI
-
-        UI --> ORG_EMPLOYEE : requests data (reference, description,\ninformal description, technical description,\nduration, cost)
+        UI --> PA : shows entered data and requests confirmation
     deactivate UI
 
-    ORG_EMPLOYEE -> UI : types requested data
+    PA -> UI : confirms declaration submission
     activate UI
-
-        UI --> ORG_EMPLOYEE : shows all data and requests confirmation
-    deactivate UI
-
-    ORG_EMPLOYEE -> UI : confirms data
-    activate UI
-
-        UI -> CTRL : createTask(reference, description, informalDescription,\ntechnicalDescription, duration, cost, taskCategoryDescription)
+        UI -> CTRL : submitDeclaration(declarationDTO)
         activate CTRL
 
-            CTRL -> CTRL : getTaskCategoryByDescription(taskCategoryDescription)
+            CTRL -> CTRL : getPoliticalAgentFromSession()
             activate CTRL
-
                 ref over CTRL
-                    Get Task Category Object
-
+                    Get Political Agent
                 end ref
-
-                CTRL --> CTRL : taskCategory
+                CTRL --> CTRL : politicalAgent
             deactivate CTRL
 
-            CTRL -> CTRL : getEmployeeFromSession()
-            activate CTRL
+            ref over CTRL, DECL
+                Create Declaration
+            end ref
 
-                ref over CTRL
-                    Get Employee
+            CTRL --> UI : declaration
+        deactivate CTRL
 
-                end ref
-                CTRL --> CTRL : employee
-            deactivate CTRL
-
-            CTRL -> ORG: createTask(reference, description, informalDescription,\ntechnicalDescription, duration, cost, taskCategory, employee)
-            activate ORG
-
-                ref over ORG
-                    Create Task
-
-                end
-
-                ORG --> CTRL : task
-            deactivate ORG
-
-            CTRL --> UI: task
-            deactivate CTRL
-            UI --> ORG_EMPLOYEE: displays operation success
+        UI --> PA : informs that the declaration was successfully submitted
     deactivate UI
 
-deactivate ORG_EMPLOYEE
+deactivate PA
 
 @enduml
