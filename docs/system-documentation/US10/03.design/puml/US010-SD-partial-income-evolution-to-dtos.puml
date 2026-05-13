@@ -1,0 +1,70 @@
+@startuml US010-SD-partial-income-evolution-to-dtos
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":AnalyseIncomeEvolutionController" as CTRL
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
+participant ":IncomeEvolutionMapper" as INC_MAPPER
+participant "declaration\n:Declaration" as DECL
+
+autonumber 15
+-> CTRL : getIncomeEvolution(politicalAgent, startDate, endDate)
+
+autonumber 15.1
+activate CTRL
+
+    group Income Evolution to DTOs
+
+        CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : declarationRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> DECL_REPO : findByPoliticalAgentAndPeriod(politicalAgent, startDate, endDate)
+        activate DECL_REPO
+            DECL_REPO --> CTRL : declarations
+        deactivate DECL_REPO
+
+        CTRL -> INC_MAPPER : toDTOList(declarations)
+        activate INC_MAPPER
+
+            loop for each declaration
+                INC_MAPPER -> DECL : getSubmissionDate()
+                activate DECL
+                    DECL --> INC_MAPPER : submissionDate
+                deactivate DECL
+
+                INC_MAPPER -> DECL : getType()
+                activate DECL
+                    DECL --> INC_MAPPER : declarationType
+                deactivate DECL
+
+                INC_MAPPER -> DECL : getTotalPositionIncome()
+                activate DECL
+                    DECL --> INC_MAPPER : positionIncome
+                deactivate DECL
+
+                INC_MAPPER -> DECL : getTotalSubsidyIncome()
+                activate DECL
+                    DECL --> INC_MAPPER : subsidyIncome
+                deactivate DECL
+
+                INC_MAPPER -> DECL : getTotalIncome()
+                activate DECL
+                    DECL --> INC_MAPPER : totalIncome
+                deactivate DECL
+            end
+
+            INC_MAPPER --> CTRL : incomeEvolutionDTOList
+        deactivate INC_MAPPER
+
+    end
+
+    autonumber 16
+    <-- CTRL : incomeEvolutionDTOList
+
+deactivate CTRL
+
+@enduml

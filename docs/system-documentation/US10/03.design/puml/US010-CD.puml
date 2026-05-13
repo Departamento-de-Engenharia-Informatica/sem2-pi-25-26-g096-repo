@@ -1,0 +1,140 @@
+@startuml US010-CD
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+skinparam classAttributeIconSize 0
+
+class AnalyseIncomeEvolutionUI {
+    + run()
+}
+
+class AnalyseIncomeEvolutionController {
+    + AnalyseIncomeEvolutionController()
+    + getPoliticalAgents()
+    + getIncomeEvolution(politicalAgentId, startDate, endDate)
+    - getPoliticalAgent(politicalAgentId)
+}
+
+class ApplicationSession {
+    - ApplicationSession()
+    + {static} getInstance()
+    + getCurrentSession()
+}
+
+class UserSession {
+    + isLoggedIn()
+}
+
+class Repositories {
+    - Repositories()
+    + {static} getInstance()
+    + getPoliticalAgentRepository()
+    + getDeclarationRepository()
+}
+
+class PoliticalAgentRepository {
+    + getAllPoliticalAgents()
+    + getById(id)
+}
+
+class DeclarationRepository {
+    + findByPoliticalAgentAndPeriod(politicalAgent, startDate, endDate)
+}
+
+class PoliticalAgent {
+    - name : String
+    - taxId : String
+    - email : String
+    - password : String
+}
+
+class Declaration {
+    - submissionDate : LocalDate
+
+    + getSubmissionDate()
+    + getType()
+    + getTotalPositionIncome()
+    + getTotalSubsidyIncome()
+    + getTotalIncome()
+}
+
+class Position {
+    - startDate : LocalDate
+    - endDate : LocalDate
+    - remuneration : double
+
+    + getRemuneration()
+}
+
+class Subsidy {
+    - amount : double
+    - nature : String
+
+    + getAmount()
+}
+
+class PoliticalAgentMapper {
+    + toDTOList(politicalAgents)
+    + toDTO(politicalAgent)
+}
+
+class IncomeEvolutionMapper {
+    + toDTOList(declarations)
+    + toDTO(declaration)
+}
+
+class PoliticalAgentDTO {
+    + id : String
+    + name : String
+}
+
+class IncomeEvolutionDTO {
+    + submissionDate : LocalDate
+    + declarationType : DeclarationType
+    + positionIncome : double
+    + subsidyIncome : double
+    + totalIncome : double
+}
+
+enum DeclarationType {
+    INITIAL
+    REGULAR
+    EXCEPTIONAL
+}
+
+AnalyseIncomeEvolutionUI .> AnalyseIncomeEvolutionController
+
+AnalyseIncomeEvolutionController .> Repositories
+AnalyseIncomeEvolutionController ..> ApplicationSession
+AnalyseIncomeEvolutionController ..> UserSession
+AnalyseIncomeEvolutionController ..> PoliticalAgentRepository
+AnalyseIncomeEvolutionController ..> DeclarationRepository
+AnalyseIncomeEvolutionController ..> PoliticalAgentMapper
+AnalyseIncomeEvolutionController ..> IncomeEvolutionMapper
+AnalyseIncomeEvolutionController ..> PoliticalAgentDTO
+AnalyseIncomeEvolutionController ..> IncomeEvolutionDTO
+
+ApplicationSession -> "1" ApplicationSession : instance
+ApplicationSession ..> UserSession
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" PoliticalAgentRepository : politicalAgentRepository
+Repositories --> "1" DeclarationRepository : declarationRepository
+
+PoliticalAgentRepository --> "*" PoliticalAgent : politicalAgents
+DeclarationRepository --> "*" Declaration : declarations
+
+PoliticalAgent "1" --> "0..*" Declaration : submits >
+
+Declaration --> "1" DeclarationType : type
+Declaration "1" *-- "0..*" Position : contains >
+Declaration "1" *-- "0..*" Subsidy : contains >
+
+PoliticalAgentMapper ..> PoliticalAgent
+PoliticalAgentMapper ..> PoliticalAgentDTO
+
+IncomeEvolutionMapper ..> Declaration
+IncomeEvolutionMapper ..> IncomeEvolutionDTO
+
+@enduml

@@ -1,0 +1,57 @@
+@startuml US010-SD-split
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Journalist" as JOURNALIST
+
+participant ":AnalyseIncomeEvolutionUI" as UI
+participant ":AnalyseIncomeEvolutionController" as CTRL
+participant "Repositories" as REPOS
+participant ":IncomeEvolutionMapper" as INC_MAPPER
+
+activate JOURNALIST
+
+    JOURNALIST -> UI : asks to analyse income evolution
+    activate UI
+        UI --> CTRL** : create()
+
+        UI -> CTRL : getPoliticalAgents()
+        activate CTRL
+            ref over CTRL, REPOS
+                Get Political Agents List
+            end ref
+            CTRL --> UI : politicalAgentDTOList
+        deactivate CTRL
+
+        UI --> JOURNALIST : presents political agents list
+    deactivate UI
+
+    JOURNALIST -> UI : selects political agent and date interval
+    activate UI
+        UI -> CTRL : getIncomeEvolution(politicalAgentId, startDate, endDate)
+        activate CTRL
+
+            CTRL -> CTRL : getPoliticalAgent(politicalAgentId)
+            activate CTRL
+                ref over CTRL, REPOS
+                    Get Political Agent
+                end ref
+                CTRL --> CTRL : politicalAgent
+            deactivate CTRL
+
+            ref over CTRL, INC_MAPPER
+                Income Evolution to DTOs
+            end ref
+
+            CTRL --> UI : incomeEvolutionDTOList
+        deactivate CTRL
+
+        UI --> JOURNALIST : displays income evolution
+    deactivate UI
+
+deactivate JOURNALIST
+
+@enduml

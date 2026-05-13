@@ -1,0 +1,130 @@
+@startuml US010-SD-full
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Journalist" as JOURNALIST
+
+participant ":AnalyseIncomeEvolutionUI" as UI
+participant ":AnalyseIncomeEvolutionController" as CTRL
+participant "ApplicationSession" as APP_SESSION
+participant "appSession\n:ApplicationSession" as APP
+participant "userSession\n:UserSession" as SESSION
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "politicalAgentRepository\n:PoliticalAgentRepository" as PA_REPO
+participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
+participant ":PoliticalAgentMapper" as PA_MAPPER
+participant ":IncomeEvolutionMapper" as INC_MAPPER
+
+activate JOURNALIST
+
+    JOURNALIST -> UI : asks to analyse income evolution
+    activate UI
+        UI --> CTRL** : create()
+
+        UI -> CTRL : getPoliticalAgents()
+        activate CTRL
+
+            CTRL -> APP_SESSION : getInstance()
+            activate APP_SESSION
+                APP_SESSION --> CTRL : appSession
+            deactivate APP_SESSION
+
+            CTRL -> APP : getCurrentSession()
+            activate APP
+                APP --> CTRL : userSession
+            deactivate APP
+
+            CTRL -> SESSION : isLoggedIn()
+            activate SESSION
+                SESSION --> CTRL : true
+            deactivate SESSION
+
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPOS_SINGLETON : getPoliticalAgentRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : politicalAgentRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> PA_REPO : getAllPoliticalAgents()
+            activate PA_REPO
+                PA_REPO --> CTRL : politicalAgents
+            deactivate PA_REPO
+
+            CTRL -> PA_MAPPER : toDTOList(politicalAgents)
+            activate PA_MAPPER
+                PA_MAPPER --> CTRL : politicalAgentDTOList
+            deactivate PA_MAPPER
+
+            CTRL --> UI : politicalAgentDTOList
+        deactivate CTRL
+
+        UI --> JOURNALIST : presents political agents list
+    deactivate UI
+
+    JOURNALIST -> UI : selects political agent and date interval
+    activate UI
+        UI -> CTRL : getIncomeEvolution(politicalAgentId, startDate, endDate)
+        activate CTRL
+
+            CTRL -> APP_SESSION : getInstance()
+            activate APP_SESSION
+                APP_SESSION --> CTRL : appSession
+            deactivate APP_SESSION
+
+            CTRL -> APP : getCurrentSession()
+            activate APP
+                APP --> CTRL : userSession
+            deactivate APP
+
+            CTRL -> SESSION : isLoggedIn()
+            activate SESSION
+                SESSION --> CTRL : true
+            deactivate SESSION
+
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPOS_SINGLETON : getPoliticalAgentRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : politicalAgentRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> PA_REPO : getById(politicalAgentId)
+            activate PA_REPO
+                PA_REPO --> CTRL : politicalAgent
+            deactivate PA_REPO
+
+            CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : declarationRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> DECL_REPO : findByPoliticalAgentAndPeriod(politicalAgent, startDate, endDate)
+            activate DECL_REPO
+                DECL_REPO --> CTRL : declarations
+            deactivate DECL_REPO
+
+            CTRL -> INC_MAPPER : toDTOList(declarations)
+            activate INC_MAPPER
+                INC_MAPPER --> CTRL : incomeEvolutionDTOList
+            deactivate INC_MAPPER
+
+            CTRL --> UI : incomeEvolutionDTOList
+        deactivate CTRL
+
+        UI --> JOURNALIST : displays income evolution
+    deactivate UI
+
+deactivate JOURNALIST
+
+@enduml
