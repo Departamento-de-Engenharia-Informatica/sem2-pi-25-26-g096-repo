@@ -1,47 +1,65 @@
-# US006 - Create a Task
+# US06 - Submit Declaration of Interests
 
 ## 3. Design
 
 ### 3.1. Rationale
 
-| Interaction ID | Question: Which class is responsible for...        | Answer                 | Justification (with patterns)                                                                                                       |
-|:---------------|:---------------------------------------------------|:-----------------------|:------------------------------------------------------------------------------------------------------------------------------------|
-| Step 1         | ... interacting with the actor?                    | CreateTaskUI           | Pure Fabrication: there is no reason to assign this responsibility to any existing class in the Domain Model.                       |
-|                | ... coordinating the US?                           | CreateTaskController   | Controller                                                                                                                          |
-|                | ... knowing the user using the system?             | UserSession            | IE: cf. A&A component documentation.                                                                                                |
-|                |                                                    | Organization           | IE: knows/has its own Employees                                                                                                     |
-|                |                                                    | Employee               | IE: knows its own data (e.g. email)                                                                                                 |
-| Step 2         | ... knowing all existing task categories to show?  | Repositories           | IE: Repositories maintains Task Categories.                                                                                         |
-|                |                                                    | TaskCategoryRepository | By applying High Cohesion (HC) + Low Coupling (LC) on class Repositories, it delegates the responsibility on TaskCategoryContainer. |
-| Step 3         | ... saving the selected category?                  | CreateTaskUI           | IE: is responsible for keeping the selected category.                                                                               |
-| Step 4         | ... requesting data?                               | CreateTaskUI           | IE: is responsible for user interactions.                                                                                           |
-| Step 5         | ... saving the inputted data?                      | CreateTaskUI           | IE: is responsible for keeping the inputted data.                                                                                   |
-| Step 6         | ... showing all data and requesting confirmation?  | CreateTaskUI           | IE: is responsible for user interactions.                                                                                           |              
-| Step 7         | ... instantiating a new Task?                      | Organization           | Creator (Rule 1): in the DM Organization has a Task.                                                                                |
-|                | ... validating all data (local validation)?        | Task                   | IE: owns its data.                                                                                                                  | 
-|                | ... validating all data (global validation)?       | Organization           | IE: knows all its tasks.                                                                                                            | 
-|                | ... saving the created task?                       | Organization           | IE: owns all its tasks.                                                                                                             | 
-| Step 8         | ... informing operation success?                   | CreateTaskUI           | IE: is responsible for user interactions.                                                                                           | 
+| Interaction ID | Question: Which class is responsible for... | Answer | Justification |
+|---|---|---|---|
+| Step 1 | ... interacting with the Political Agent? | SubmitDeclarationUI | Pure Fabrication: there is no reason to assign this responsibility to any existing domain class. |
+| Step 1 | ... coordinating the use case? | SubmitDeclarationController | Controller: coordinates the user story and delegates domain responsibilities. |
+| Step 2 | ... knowing the authenticated user? | ApplicationSession | Information Expert: it provides access to the current user session. |
+| Step 2 | ... knowing the authenticated user's identifier? | UserSession | Information Expert: it owns the authenticated user's session data. |
+| Step 3 | ... providing access to repositories? | Repositories | Pure Fabrication / Singleton: provides a central access point to the required repositories. |
+| Step 4 | ... finding the authenticated Political Agent? | PoliticalAgentRepository | Information Expert: it manages the collection of PoliticalAgent instances. |
+| Step 5 | ... listing available Institutions? | InstitutionRepository | Information Expert: it manages the collection of registered Institution instances. |
+| Step 5 | ... listing available Functions? | FunctionRepository | Information Expert: it manages the collection of registered Function instances. |
+| Step 6 | ... transporting declaration input data from the UI? | DeclarationDTO | DTO: reduces the number of method parameters and decouples UI input from the domain model. |
+| Step 7 | ... creating a Declaration? | PoliticalAgent | Creator: a PoliticalAgent submits and owns its Declarations. |
+| Step 8 | ... creating and adding declared items? | Declaration | Creator / Information Expert: Declaration contains and manages Position, Subsidy, Asset and SecurityHolding items. |
+| Step 9 | ... validating declaration data locally? | Declaration | Information Expert: it owns the declaration data and declared items. |
+| Step 10 | ... saving the submitted Declaration? | DeclarationRepository | Information Expert: it manages Declaration instances. |
+| Step 11 | ... informing operation success? | SubmitDeclarationUI | Pure Fabrication: responsible for user interaction and feedback. |
 
-### Systematization ##
+### Systematization
 
-According to the taken rationale, the conceptual classes promoted to software classes are: 
+According to the taken rationale, the conceptual classes promoted to software classes are:
 
-* Organization
-* Task
-* TaskCategory
-* Employee
+* PoliticalAgent
+* Declaration
+* Position
+* Subsidy
+* Asset
+* Location
+* SecurityHolding
+* Institution
+* Function
+* DeclarationType
+* DeclarationStatus
+* PositionType
+* PropertyType
 
-Other software classes (i.e. Pure Fabrication) identified: 
+Other software classes identified:
 
-* CreateTaskUI  
-* CreateTaskController
-* Repositories
-* TaskCategoryRepository
-* OrganizationRepository
+* SubmitDeclarationUI
+* SubmitDeclarationController
 * ApplicationSession
 * UserSession
+* Repositories
+* PoliticalAgentRepository
+* InstitutionRepository
+* FunctionRepository
+* DeclarationRepository
+* DeclarationDTO
+* PositionDTO
+* SubsidyDTO
+* AssetDTO
+* LocationDTO
+* SecurityHoldingDTO
+* InstitutionDTO
+* FunctionDTO
 
+---
 
 ## 3.2. Sequence Diagram (SD)
 
@@ -55,25 +73,27 @@ This diagram shows the full sequence of interactions between the classes involve
 
 The following diagram shows the same sequence of interactions between the classes involved in the realization of this user story, but it is split in partial diagrams to better illustrate the interactions between the classes.
 
-It uses Interaction Occurrence (a.k.a. Interaction Use).
+It uses Interaction Occurrence.
 
-![Sequence Diagram - split](svg/US006-SD-split.svg)
+![Sequence Diagram - Split](svg/US006-SD-split.svg)
 
-**Get Task Category List Partial SD**
+**Get Political Agent**
 
-![Sequence Diagram - Partial - Get Task Category List](svg/US006-SD-partial-get-task-category-list.svg)
+![Sequence Diagram - Partial - Get Political Agent](svg/US006-SD-partial-get-political-agent.svg)
 
-**Get Task Category Object**
+**Get Institutions**
 
-![Sequence Diagram - Partial - Get Task Category Object](svg/US006-SD-partial-get-task-category.svg)
+![Sequence Diagram - Partial - Get Institutions](svg/US006-SD-partial-get-institutions.svg)
 
-**Get Employee**
+**Get Functions**
 
-![Sequence Diagram - Partial - Get Employee](svg/US006-SD-partial-get-employee.svg)
+![Sequence Diagram - Partial - Get Functions](svg/US006-SD-partial-get-functions.svg)
 
-**Create Task**
+**Create Declaration**
 
-![Sequence Diagram - Partial - Create Task](svg/US006-SD-partial-create-task.svg)
+![Sequence Diagram - Partial - Create Declaration](svg/US006-SD-partial-create-declaration.svg)
+
+---
 
 ## 3.3. Class Diagram (CD)
 
