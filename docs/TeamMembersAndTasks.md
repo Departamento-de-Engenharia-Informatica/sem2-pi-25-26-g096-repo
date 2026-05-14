@@ -4,12 +4,12 @@
 
 The team is formed by the students identified in the following table.
 
-| Student Number | Name             |
-|----------------|------------------|
-| **1241129**    | Gustavo Ferreira |
-| **1241138**    | Miguel Correia   |
-| **1231235**    | Francisco Pinho  |
-| **1231190**    | Eduardo Santos   |
+| Student Number | Name             | UC's       |
+|----------------|------------------|------------|
+| **1241129**    | Gustavo Ferreira | Only ESOFT |
+| **1241138**    | Miguel Correia   | Only ESOFT |
+| **1231235**    | Francisco Pinho  | Only ESOFT |
+| **1231190**    | Eduardo Santos   | Only ESOFT |
 
 # 2. Task Distribution ###
 
