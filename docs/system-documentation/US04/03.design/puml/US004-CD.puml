@@ -1,0 +1,116 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+skinparam classAttributeIconSize 0
+
+title Design Class Diagram - US004
+
+hide circle
+hide methods
+
+'========================
+' Session Layer
+'========================
+
+class ApplicationSession {
+    + getInstance()
+    + getCurrentSession()
+}
+
+class UserSession {
+    + getUserEmail()
+}
+
+ApplicationSession ..> UserSession
+
+
+'========================
+' Domain Layer
+'========================
+
+class Administrator {
+    email
+}
+
+class Institution {
+    name
+    taxIdentificationNumber
+}
+
+class InstitutionType {
+    designation
+}
+
+class Address {
+    address
+    nameCountry
+}
+
+Institution "*" --> "1" InstitutionType
+Institution "1" --> "1..*" Address
+Administrator "1" --> "*" Institution : registers
+
+
+'========================
+' Repository Layer
+'========================
+
+class InstitutionRepository {
+    + save(institution)
+    + getInstitutions()
+}
+
+class InstitutionTypeRepository {
+    + getInstitutionTypes()
+}
+
+class Repositories {
+    + getInstance()
+    + getInstitutionRepository()
+    + getInstitutionTypeRepository()
+}
+
+Repositories --> InstitutionRepository
+Repositories --> InstitutionTypeRepository
+
+
+'========================
+' Controller
+'========================
+
+class RegisterInstitutionController {
+    + RegisterInstitutionController()
+    + getInstitutionTypes()
+    + registerInstitution(name, taxId, type)
+}
+
+RegisterInstitutionController ..> Repositories
+RegisterInstitutionController ..> InstitutionRepository
+RegisterInstitutionController ..> InstitutionTypeRepository
+RegisterInstitutionController ..> InstitutionType
+RegisterInstitutionController ..> Institution
+RegisterInstitutionController ..> Administrator
+RegisterInstitutionController ..> ApplicationSession
+RegisterInstitutionController ..> UserSession
+
+
+'========================
+' UI Layer
+'========================
+
+class RegisterInstitutionUI {
+}
+
+RegisterInstitutionUI --> RegisterInstitutionController
+
+
+'========================
+' Repository Relations
+'========================
+
+InstitutionRepository --> "*" Institution
+InstitutionTypeRepository --> "*" InstitutionType
+
+@enduml

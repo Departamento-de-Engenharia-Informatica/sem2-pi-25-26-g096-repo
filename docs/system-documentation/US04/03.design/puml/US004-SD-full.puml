@@ -1,0 +1,76 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Administrator" as ADMIN
+
+participant ":RegisterInstitutionUI" as UI
+participant ":RegisterInstitutionController" as CTRL
+
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "institutionTypeRepository\n:InstitutionTypeRepository" as TYPE_REPO
+participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+
+activate ADMIN
+
+ADMIN -> UI : asks to register institution
+activate UI
+
+    UI -> CTRL** : create()
+
+    UI -> CTRL : getInstitutionTypes()
+    activate CTRL
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getInstitutionTypeRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : institutionTypeRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> TYPE_REPO : getInstitutionTypes()
+        activate TYPE_REPO
+            TYPE_REPO --> CTRL : institutionTypeList
+        deactivate TYPE_REPO
+
+        CTRL --> UI : institutionTypeList
+    deactivate CTRL
+
+    UI --> ADMIN : displays Institution types
+
+    ADMIN -> UI : selects type and enters name, tax id
+    activate UI
+
+        UI -> CTRL : registerInstitution(name, taxId, type)
+        activate CTRL
+
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPOS_SINGLETON : getInstitutionRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : institutionRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> INST_REPO : save(name, taxId, type)
+            activate INST_REPO
+                INST_REPO --> CTRL : success/failure
+            deactivate INST_REPO
+
+            CTRL --> UI : success/failure
+        deactivate CTRL
+
+    UI --> ADMIN : displays success message
+
+deactivate UI
+deactivate ADMIN
+
+@enduml
