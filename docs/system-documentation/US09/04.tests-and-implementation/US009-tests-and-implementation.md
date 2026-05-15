@@ -1,32 +1,114 @@
 # US009 - Consult Integrated Situation of a Political Agent
 
-## 4. Tests and Implementation
+## 4. Tests
 
-### 4.1. Tests
+**Test 1:** Check that the controller returns the list of Political Agents available for consultation when the repository contains agents.
 
-This user story is a read-only consultation flow.
+```java
+@Test
+public void ensureGetPoliticalAgentsReturnsData() {
+  List<PoliticalAgent> agents = controller.getPoliticalAgents();
 
-Recommended unit tests when implementation starts:
+  assertFalse(agents.isEmpty());
+}
+```
 
-* Controller returns non-empty Political Agent list when repository contains agents.
-* Controller requests declarations using selected Political Agent and reference date.
-* Controller obtains Ethics Committee member from authenticated session before consultation.
-* Integrated situation aggregation only includes data valid on the selected reference date.
-* Access is denied for users without Ethics Committee role.
+**Test 2:** Check that the controller requests the declarations of the selected Political Agent using the provided reference date.
 
-### 4.2. Implementation Notes
+```java
+@Test
+public void ensureConsultIntegratedSituationUsesPoliticalAgentAndReferenceDate() {
+  PoliticalAgent agent = new PoliticalAgent("Agent Name", "123456789");
+  LocalDate referenceDate = LocalDate.of(2026, 5, 15);
 
-Implementation should ensure:
+  controller.consultIntegratedSituation(agent, referenceDate);
 
-* Temporal consistency: the integrated situation must match the selected reference date.
-* Read-only behavior: no declaration or mandate data is changed by the consultation.
-* Clear separation of concerns:
-  * controller orchestrates,
-  * repositories retrieve,
-  * domain role (EthicsCommitteeMember) consolidates.
+  verify(declarationRepository).getDeclarationsByPoliticalAgentUntilDate(agent, referenceDate);
+}
+```
 
-### 4.3. Status
+**Test 3:** Check that the controller obtains the Ethics Committee member from the authenticated session before performing the consultation.
 
-Design artifacts are completed.
+```java
+@Test
+public void ensureEthicsCommitteeMemberIsObtainedFromSession() {
+  controller.consultIntegratedSituation(selectedAgent, referenceDate);
 
-Code implementation and automated tests are pending.
+  verify(userRepository).getEthicsCommitteeMemberByEmail(currentUserEmail);
+}
+```
+
+**Test 4:** Check that the integrated situation only includes declarations valid on the selected reference date.
+
+```java
+@Test
+public void ensureIntegratedSituationUsesOnlyValidDeclarations() {
+  IntegratedSituation situation = controller.consultIntegratedSituation(selectedAgent, referenceDate);
+
+  assertEquals(referenceDate, situation.getReferenceDate());
+}
+```
+
+**Test 5:** Check that access is denied when the authenticated user does not have the Ethics Committee role.
+
+```java
+@Test(expected = IllegalStateException.class)
+public void ensureAccessIsDeniedWithoutEthicsCommitteeRole() {
+  controller.consultIntegratedSituation(selectedAgent, referenceDate);
+}
+```
+
+_It is also recommended to organize this content by subsections._
+
+
+## 5. Construction (Implementation)
+
+### Class ConsultIntegratedSituationController
+
+```java
+public List<PoliticalAgent> getPoliticalAgents() {
+  return getPoliticalAgentRepository().getPoliticalAgents();
+}
+
+public IntegratedSituation consultIntegratedSituation(PoliticalAgent politicalAgent, LocalDate referenceDate) {
+
+  EthicsCommitteeMember member = getEthicsCommitteeMemberFromSession();
+  List<Declaration> declarations = getDeclarationRepository()
+    .getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate);
+
+  return member.buildIntegratedSituation(politicalAgent, declarations, referenceDate);
+}
+
+private EthicsCommitteeMember getEthicsCommitteeMemberFromSession() {
+  UserSession currentSession = ApplicationSession.getInstance().getCurrentSession();
+  String email = currentSession.getUserEmail();
+
+  return getUserRepository().getEthicsCommitteeMemberByEmail(email);
+}
+```
+
+### Class EthicsCommitteeMember
+
+```java
+public IntegratedSituation buildIntegratedSituation(PoliticalAgent politicalAgent,
+                          List<Declaration> declarations,
+                          LocalDate referenceDate) {
+
+  IntegratedSituation integratedSituation = new IntegratedSituation(politicalAgent, referenceDate);
+  integratedSituation.aggregateFromDeclarations(declarations);
+
+  return integratedSituation;
+}
+```
+
+
+## 6. Integration and Demo
+
+* A new option in the Ethics Committee consultation menu should allow the user to select a Political Agent and a reference date.
+
+* For demo purposes, only declarations valid up to the selected reference date should be displayed in the integrated situation.
+
+
+## 7. Observations
+
+n/a

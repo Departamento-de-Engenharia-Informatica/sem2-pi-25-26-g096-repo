@@ -117,7 +117,13 @@ note bottom of DeclarationRepository
     up to the reference date.
 end note
 
+note bottom of IntegratedSituation
+    Represents the consolidated snapshot
+    valid for the selected reference date.
+end note
+
 class ConsultIntegratedSituationUI {
+    + run()
 }
 
 Section <|-- IncomeSection
