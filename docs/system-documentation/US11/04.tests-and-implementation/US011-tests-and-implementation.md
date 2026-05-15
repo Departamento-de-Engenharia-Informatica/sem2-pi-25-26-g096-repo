@@ -1,30 +1,129 @@
 # US011 - Consult Assets of a Political Agent
 
-## 4. Tests and Implementation
+## 4. Tests
 
-### 4.1. Tests
+**Test 1:** Check that the controller returns the available Political Agents for consultation.
 
-This user story is a read-only consultation with role-based visibility filtering.
+```java
+@Test
+public void ensureGetPoliticalAgentsReturnsData() {
+	List<PoliticalAgent> agents = controller.getPoliticalAgents();
 
-Recommended tests when implementation starts:
+	assertFalse(agents.isEmpty());
+}
+```
 
-* Controller returns political agent list ordered according to expected policy.
-* Consultation requests declarations with selected Political Agent and reference date.
-* Assets are extracted only from declaration sections valid on selected date.
-* Citizen view masks sensitive fields according to AC1.
-* Journalist view applies role-specific masking according to AC1.
-* Unauthorized roles cannot access this consultation.
+**Test 2:** Check that the controller requests declarations using the selected Political Agent and the provided reference date.
 
-### 4.2. Implementation Notes
+```java
+@Test
+public void ensureConsultAssetsUsesPoliticalAgentAndReferenceDate() {
+	PoliticalAgent agent = new PoliticalAgent("Agent Name", "123456789");
+	LocalDate referenceDate = LocalDate.of(2026, 5, 15);
 
-Implementation should ensure:
+	controller.consultAssets(agent, referenceDate);
 
-* Temporal consistency for declaration data used in consultation.
-* Strict read-only behavior for consultation operations.
-* Role-based masking logic isolated in a dedicated service/component.
+	verify(declarationRepository).getDeclarationsByPoliticalAgentUntilDate(agent, referenceDate);
+}
+```
 
-### 4.3. Status
+**Test 3:** Check that assets are extracted only from declaration sections valid on the selected date.
 
-Design artifacts are completed.
+```java
+@Test
+public void ensureOnlyValidDeclarationSectionsAreUsed() {
+	List<AssetView> assets = controller.consultAssets(selectedAgent, referenceDate);
 
-Code implementation and automated tests are pending.
+	assertNotNull(assets);
+}
+```
+
+**Test 4:** Check that the Citizen view masks sensitive fields according to the access policy.
+
+```java
+@Test
+public void ensureCitizenViewMasksSensitiveFields() {
+	List<AssetView> assets = assetVisibilityService.applyRoleMasking(citizen, rawAssets);
+
+	assertTrue(assets.stream().anyMatch(AssetView::hasMaskedFields));
+}
+```
+
+**Test 5:** Check that the Journalist view applies the expected role-specific masking.
+
+```java
+@Test
+public void ensureJournalistViewAppliesRoleSpecificMasking() {
+	List<AssetView> assets = assetVisibilityService.applyRoleMasking(journalist, rawAssets);
+
+	assertNotNull(assets);
+}
+```
+
+**Test 6:** Check that unauthorized roles cannot access the consultation.
+
+```java
+@Test(expected = IllegalStateException.class)
+public void ensureUnauthorizedRolesCannotAccessConsultation() {
+	controller.consultAssets(selectedAgent, referenceDate);
+}
+```
+
+_It is also recommended to organize this content by subsections._
+
+
+## 5. Construction (Implementation)
+
+### Class ConsultAssetsController
+
+```java
+public List<PoliticalAgent> getPoliticalAgents() {
+	return getPoliticalAgentRepository().getPoliticalAgents();
+}
+
+public List<AssetView> consultAssets(PoliticalAgent politicalAgent, LocalDate referenceDate) {
+
+	User user = getAuthenticatedUserFromSession();
+	List<Declaration> declarations = getDeclarationRepository()
+		.getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate);
+
+	return assetVisibilityService.applyRoleMasking(user, declarations, referenceDate);
+}
+
+private User getAuthenticatedUserFromSession() {
+	UserSession currentSession = ApplicationSession.getInstance().getCurrentSession();
+	String email = currentSession.getUserEmail();
+
+	return getUserRepository().getUserByEmail(email);
+}
+```
+
+### Class AssetVisibilityService
+
+```java
+public List<AssetView> applyRoleMasking(User user, List<Declaration> declarations, LocalDate referenceDate) {
+	List<AssetView> assets = extractAssets(declarations, referenceDate);
+
+	if (user instanceof Citizen) {
+		return maskForCitizen(assets);
+	}
+
+	if (user instanceof Journalist) {
+		return maskForJournalist(assets);
+	}
+
+	throw new IllegalStateException("Unauthorized role");
+}
+```
+
+
+## 6. Integration and Demo
+
+* A new consultation option should be available for the user to select a Political Agent and a reference date.
+
+* For demo purposes, the consultation should show masked asset data according to the authenticated user's role.
+
+
+## 7. Observations
+
+n/a
