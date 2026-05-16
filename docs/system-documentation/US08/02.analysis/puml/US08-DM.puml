@@ -36,6 +36,7 @@ class Validation {
 
 class Annotation {
     text
+    targetReference
     creationDate
 }
 

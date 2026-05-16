@@ -10,7 +10,7 @@ participant "validation\n:Validation" as VALIDATION
 participant "annotation\n:Annotation" as ANNOTATION
 
 autonumber 15
--> CTRL : rejectDeclaration(comments)
+-> CTRL : rejectDeclaration(targetReference, commentText)
 
 autonumber 15.1
 activate CTRL
@@ -23,13 +23,13 @@ activate CTRL
             partial SD
         end note
 
-        CTRL -> MEMBER : validateDeclaration(declaration, REJECTED, comments)
+        CTRL -> MEMBER : validateDeclaration(declaration, REJECTED, targetReference, commentText)
         activate MEMBER
             MEMBER --> VALIDATION** : create(declaration, REJECTED)
 
-            VALIDATION -> VALIDATION : addAnnotation(comments, declaration)
+            VALIDATION -> VALIDATION : addAnnotation(commentText, targetReference, declaration)
             activate VALIDATION
-                VALIDATION --> ANNOTATION** : create(comments, declaration)
+                VALIDATION --> ANNOTATION** : create(commentText, targetReference, declaration)
                 VALIDATION --> VALIDATION : annotation
             deactivate VALIDATION
 

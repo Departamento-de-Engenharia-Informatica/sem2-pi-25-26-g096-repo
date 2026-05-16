@@ -29,7 +29,7 @@ class UserSession {
 }
 
 class EthicsCommitteeMember {
-    + validateDeclaration(declaration, verdict, comments)
+    + validateDeclaration(declaration, verdict, targetReference, commentText)
     - addValidation(validation)
 }
 
@@ -44,14 +44,15 @@ class Validation {
     - validationDate : LocalDate
 
     + Validation(declaration, verdict)
-    + addAnnotation(text, declaration)
+    + addAnnotation(text, targetReference, declaration)
 }
 
 class Annotation {
     - text : String
+    - targetReference : String
     - creationDate : LocalDateTime
 
-    + Annotation(text, declaration)
+    + Annotation(text, targetReference, declaration)
 }
 
 class Subsidy {
@@ -99,7 +100,7 @@ class ValidateDeclarationController {
     + getSubmittedDeclarations()
     + selectDeclaration(declaration)
     + approveDeclaration()
-    + rejectDeclaration(comments)
+    + rejectDeclaration(targetReference, commentText)
     - getEthicsCommitteeMemberFromSession()
 }
 
@@ -119,6 +120,7 @@ note bottom of Validation
 
     If the verdict is REJECTED,
     at least one annotation/comment
+    with a target section/item
     must be recorded.
 end note
 

@@ -74,9 +74,9 @@ activate MEMBER_ACTOR
             UI --> MEMBER_ACTOR : asks for comments on inconsistent sections/items
         deactivate UI
 
-        MEMBER_ACTOR -> UI : submits comments on inconsistent sections/items
+        MEMBER_ACTOR -> UI : submits target sections/items and inconsistency comments
         activate UI
-            UI -> CTRL : rejectDeclaration(comments)
+            UI -> CTRL : rejectDeclaration(targetReference, commentText)
             activate CTRL
 
                 CTRL -> CTRL : getEthicsCommitteeMemberFromSession()

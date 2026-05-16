@@ -131,12 +131,12 @@ activate MEMBER_ACTOR
 
         MEMBER_ACTOR -> UI : rejects the declaration
         activate UI
-            UI --> MEMBER_ACTOR : asks for comments on inconsistent sections/items
+            UI --> MEMBER_ACTOR : asks for target sections/items and inconsistency comments
         deactivate UI
 
-        MEMBER_ACTOR -> UI : submits comments on inconsistent sections/items
+        MEMBER_ACTOR -> UI : submits target sections/items and inconsistency comments
         activate UI
-            UI -> CTRL : rejectDeclaration(comments)
+            UI -> CTRL : rejectDeclaration(targetReference, commentText)
             activate CTRL
 
                 CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
@@ -174,13 +174,13 @@ activate MEMBER_ACTOR
                     CTRL --> CTRL : member
                 deactivate CTRL
 
-                CTRL -> MEMBER : validateDeclaration(declaration, REJECTED, comments)
+                CTRL -> MEMBER : validateDeclaration(declaration, REJECTED, targetReference, commentText)
                 activate MEMBER
                     MEMBER --> VALIDATION** : create(declaration, REJECTED)
 
-                    VALIDATION -> VALIDATION : addAnnotation(comments, declaration)
+                    VALIDATION -> VALIDATION : addAnnotation(commentText, targetReference, declaration)
                     activate VALIDATION
-                        VALIDATION --> ANNOTATION** : create(comments, declaration)
+                        VALIDATION --> ANNOTATION** : create(commentText, targetReference, declaration)
                         VALIDATION --> VALIDATION : annotation
                     deactivate VALIDATION
 

@@ -52,6 +52,7 @@ The concepts **EthicsCommitteeMember**, **Declaration**, **DeclarationStatus**, 
 
 **Annotation**
 - text
+- targetReference
 - creationDate
 
 **Declaration**
@@ -89,6 +90,6 @@ The concepts **EthicsCommitteeMember**, **Declaration**, **DeclarationStatus**, 
 - **Validation as a concept:** `Validation` is modelled as a conceptual class because it is a recorded act with its own date and verdict, not just a simple association between `EthicsCommitteeMember` and `Declaration`.
 - **ValidationVerdict vs DeclarationStatus:** `ValidationVerdict` records the Ethics Committee Member's decision in the validation act, while `DeclarationStatus` represents the lifecycle state of the declaration.
 - **Annotation as part of Validation:** `Annotation` is contained by `Validation` because comments only exist in the context of a validation act.
-- **Annotation target:** in the current domain model, `Annotation` is associated with `Declaration`. The specific section or item being commented is represented through the annotation text, rather than through separate associations to `Subsidy`, `Asset`, `Position`, or `SecurityHolding`.
+- **Annotation target:** `Annotation` is associated with `Declaration` and includes a `targetReference` to identify the section or item being commented, such as a subsidy, asset, position, or security holding entry.
 - **Declared items:** `Subsidy`, `Asset`, `Position`, and `SecurityHolding` are included because they are the declaration items that may contain inconsistencies during validation.
 - **Approved vs rejected validation:** an approved validation typically contains no annotations, while a rejected validation must contain at least one annotation/comment explaining the inconsistency found.
