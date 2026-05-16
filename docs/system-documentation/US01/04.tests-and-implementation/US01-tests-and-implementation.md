@@ -1,69 +1,143 @@
-# US006 - Create a Task 
+# US01 - User Registration Request
 
-## 4. Tests 
+## 4. Tests
 
-**Test 1:** Check that it is not possible to create an instance of the Task class with null values. 
+The following unit tests are designed from the acceptance criteria, analysis model and design model of US01. They focus on the `RegistrationRequest`, `RequestedRole`, `RequestStatus`, `RequestRegistrationController` and `RegistrationRequestRepository` responsibilities identified in the design.
 
-	@Test(expected = IllegalArgumentException.class)
-		public void ensureNullIsNotAllowed() {
-		Task instance = new Task(null, null, null, null, null, null, null);
-	}
-	
+### Acceptance Criteria Coverage
 
-**Test 2:** Check that it is not possible to create an instance of the Task class with a reference containing less than five chars - AC2. 
+| Acceptance Criterion                                                                                         | Covered by       |
+|--------------------------------------------------------------------------------------------------------------|------------------|
+| AC1 - The role must be selected from a predefined list of available roles.                                   | Test 1           |
+| AC2 - The system must request the mandatory details according to the selected role.                          | Tests 3, 4 and 5 |
+| AC3 - Ordinary Citizen must provide national identity card number.                                           | Test 3           |
+| AC4 - Journalist must provide press card number.                                                             | Test 4           |
+| AC5 - Political Agent must provide national identity card number, elected position and institution.          | Test 5           |
+| AC6 - Political Agent may select existing records or provide new elected position and institution.           | Test 6           |
 
-	@Test(expected = IllegalArgumentException.class)
-		public void ensureReferenceMeetsAC2() {
-		Category cat = new Category(10, "Category 10");
-		
-		Task instance = new Task("Ab1", "Task Description", "Informal Data", "Technical Data", 3, 3780, cat);
-	}
+**Test 1:** Check that the available roles are obtained from the predefined `RequestedRole` list - AC1.
 
-_It is also recommended to organize this content by subsections._ 
+This test confirms that the registration process does not allow free-text roles. The future user must choose one of the roles defined by the system, as required by the requirements and by the `RequestedRole` enumeration in the domain model.
+
+```java
+@Test
+public void ensureOnlyPredefinedRolesAreAvailable() {
+    RequestedRole[] roles = controller.getRequestedRoles();
+
+    assertTrue(Arrays.asList(roles).contains(RequestedRole.CITIZEN));
+    assertTrue(Arrays.asList(roles).contains(RequestedRole.JOURNALIST));
+    assertTrue(Arrays.asList(roles).contains(RequestedRole.POLITICAL_AGENT));
+    assertTrue(Arrays.asList(roles).contains(RequestedRole.ETHICS_COMMITTEE_MEMBER));
+}
+```
+
+**Test 2:** Check that a valid registration request is created with initial status `PENDING`.
+
+This test validates the main outcome of US01: the system creates a registration request, not an active user account. The request must remain pending until an Administrator handles it in US02.
+
+```java
+@Test
+public void ensureRegistrationRequestIsCreatedWithPendingStatus() {
+    RegistrationRequest request = controller.createRegistrationRequest(
+        "Future User", "123456789", "future.user@email.com", "ABC12de",
+        RequestedRole.CITIZEN, "12345678", null, null, null);
+
+    assertNotNull(request);
+    assertEquals(RequestStatus.PENDING, request.getStatus());
+}
+```
+
+**Test 3:** Check that an Ordinary Citizen registration request requires the national identity card number - AC2 and AC3.
+
+This test verifies the role-specific mandatory data for the Ordinary Citizen role. If the national identity card number is missing, the request is invalid and must not be created.
+
+```java
+@Test(expected = IllegalArgumentException.class)
+public void ensureCitizenRequiresNationalIdentityCardNumber() {
+    controller.createRegistrationRequest(
+        "Future Citizen", "123456789", "citizen@email.com", "ABC12de",
+        RequestedRole.CITIZEN, null, null, null, null);
+}
+```
+
+**Test 4:** Check that a Journalist registration request requires the press card number - AC2 and AC4.
+
+This test verifies that the system asks for, and validates, the mandatory detail associated with the Journalist role. A journalist request without press card number must be rejected.
+
+```java
+@Test(expected = IllegalArgumentException.class)
+public void ensureJournalistRequiresPressCardNumber() {
+    controller.createRegistrationRequest(
+        "Future Journalist", "123456789", "journalist@email.com", "ABC12de",
+        RequestedRole.JOURNALIST, null, null, null, null);
+}
+```
+
+**Test 5:** Check that a Political Agent registration request requires national identity card number, elected position and institution - AC2 and AC5.
+
+This test validates the complete mandatory data set for a Political Agent. The request must fail if any of the required political-agent-specific fields is missing.
+
+```java
+@Test(expected = IllegalArgumentException.class)
+public void ensurePoliticalAgentRequiresAllMandatoryDetails() {
+    controller.createRegistrationRequest(
+        "Future Political Agent", "123456789", "agent@email.com", "ABC12de",
+        RequestedRole.POLITICAL_AGENT, "12345678", null, "Councillor", null);
+}
+```
+
+**Test 6:** Check that a Political Agent can use existing or newly provided elected position and institution - AC6.
+
+This test ensures that the request accepts the two alternatives stated by the client: selecting already registered records or providing new values when the records do not yet exist.
+
+```java
+@Test
+public void ensurePoliticalAgentCanUseExistingOrNewPositionAndInstitution() {
+    RegistrationRequest existingDataRequest = controller.createRegistrationRequest(
+        "Political Agent One", "123456789", "agent.one@email.com", "ABC12de",
+        RequestedRole.POLITICAL_AGENT, "12345678", null,
+        "Councillor", "Municipal Council");
+
+    RegistrationRequest newDataRequest = controller.createRegistrationRequest(
+        "Political Agent Two", "987654321", "agent.two@email.com", "ABC12de",
+        RequestedRole.POLITICAL_AGENT, "87654321", null,
+        "New Elected Position", "New Institution");
+
+    assertNotNull(existingDataRequest);
+    assertNotNull(newDataRequest);
+}
+```
+
+**Test 7:** Check that a valid registration request is persisted in the repository.
+
+This test verifies the responsibility assigned to `RegistrationRequestRepository` in the design: after successful validation, the request must be stored so that it can later be reviewed in US02.
+
+```java
+@Test
+public void ensureRegistrationRequestIsPersistedAfterCreation() {
+    RegistrationRequest request = controller.createRegistrationRequest(
+        "Future User", "123456789", "future.user@email.com", "ABC12de",
+        RequestedRole.CITIZEN, "12345678", null, null, null);
+
+    assertTrue(registrationRequestRepository.getRegistrationRequests().contains(request));
+}
+```
 
 
 ## 5. Construction (Implementation)
 
-### Class CreateTaskController 
+The implementation should follow the design responsibilities:
 
-```java
-public Task createTask(String reference, String description, String informalDescription, String technicalDescription,
-                       Integer duration, Double cost, String taskCategoryDescription) {
-
-	TaskCategory taskCategory = getTaskCategoryByDescription(taskCategoryDescription);
-
-	Employee employee = getEmployeeFromSession();
-	Organization organization = getOrganizationRepository().getOrganizationByEmployee(employee);
-
-	newTask = organization.createTask(reference, description, informalDescription, technicalDescription, duration,
-                                      cost,taskCategory, employee);
-    
-	return newTask;
-}
-```
-
-### Class Organization
-
-```java
-public Optional<Task> createTask(String reference, String description, String informalDescription,
-                                 String technicalDescription, Integer duration, Double cost, TaskCategory taskCategory,
-                                 Employee employee) {
-    
-    Task task = new Task(reference, description, informalDescription, technicalDescription, duration, cost,
-                         taskCategory, employee);
-
-    addTask(task);
-        
-    return task;
-}
-```
+* `RequestRegistrationController` coordinates the use case.
+* `RequestedRole` provides the predefined role list.
+* `RegistrationRequest` validates common and role-specific mandatory data.
+* `RegistrationRequestRepository` creates and stores valid requests with status `PENDING`.
+* No active `User` account is created in this user story.
 
 
-## 6. Integration and Demo 
+## 6. Integration and Demo
 
-* A new option on the Employee menu options was added.
-
-* For demo purposes some tasks are bootstrapped while system starts.
+For demonstration, the registration UI should first present the available roles. After the future user selects a role, the UI should request the corresponding mandatory data and submit the request with status `PENDING`.
 
 
 ## 7. Observations
