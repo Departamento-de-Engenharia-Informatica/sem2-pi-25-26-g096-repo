@@ -70,10 +70,19 @@ class Declaration {
     + Declaration(declarationType, submissionDate)
     + addPosition(positionType, startDate, endDate,\nremuneration, function, institution)
     + addSubsidy(amount, nature, institution)
-    + addAsset(propertyType, acquisitionValue,\nmarketValue, locationDTO)
+    + addAsset(propertyType, acquisitionValue,\nmarketValue, parish, county, district)
     + addSecurityHolding(title, marketValue,\nstake, percentage, institution)
     + validateData()
+    + getSubmissionDate()
+    + getStatus()
 }
+
+note bottom of Declaration
+    Each add* operation validates the entry
+    before adding it to the declaration.
+    validateData() performs the final global validation,
+    including the rule that at least one entry must exist.
+end note
 
 class Position {
     - startDate : LocalDate

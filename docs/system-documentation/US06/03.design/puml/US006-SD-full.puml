@@ -132,7 +132,7 @@ activate PA
                     FUNC_REPO --> CTRL : function
                 deactivate FUNC_REPO
 
-                CTRL -> DECL : addPosition(positionType, startDate, endDate,\nremuneration, function, institution)
+                CTRL -> DECL : addPosition(positionDTO.positionType, positionDTO.startDate,\npositionDTO.endDate, positionDTO.remuneration, function, institution)
                 activate DECL
                     DECL --> CTRL : position
                 deactivate DECL
@@ -144,14 +144,14 @@ activate PA
                     INST_REPO --> CTRL : institution
                 deactivate INST_REPO
 
-                CTRL -> DECL : addSubsidy(amount, nature, institution)
+                CTRL -> DECL : addSubsidy(subsidyDTO.amount, subsidyDTO.nature, institution)
                 activate DECL
                     DECL --> CTRL : subsidy
                 deactivate DECL
             end
 
             loop for each assetDTO
-                CTRL -> DECL : addAsset(propertyType, acquisitionValue,\nmarketValue, locationDTO)
+                CTRL -> DECL : addAsset(assetDTO.propertyType, assetDTO.acquisitionValue,\nassetDTO.marketValue, assetDTO.location.parish,\nassetDTO.location.county, assetDTO.location.district)
                 activate DECL
                     DECL --> CTRL : asset
                 deactivate DECL
@@ -163,7 +163,7 @@ activate PA
                     INST_REPO --> CTRL : institution
                 deactivate INST_REPO
 
-                CTRL -> DECL : addSecurityHolding(title, marketValue,\nstake, percentage, institution)
+                CTRL -> DECL : addSecurityHolding(securityHoldingDTO.title, securityHoldingDTO.marketValue,\nsecurityHoldingDTO.stake, securityHoldingDTO.percentage, institution)
                 activate DECL
                     DECL --> CTRL : securityHolding
                 deactivate DECL
