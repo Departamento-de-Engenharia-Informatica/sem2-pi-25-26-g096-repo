@@ -30,7 +30,7 @@ activate CTRL
             APP --> CTRL : userSession
         deactivate APP
 
-        CTRL -> SESSION : isLoggedIn()
+        CTRL -> SESSION : isLoggedInAsJournalist()
         activate SESSION
             SESSION --> CTRL : true
         deactivate SESSION

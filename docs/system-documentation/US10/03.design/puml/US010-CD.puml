@@ -23,7 +23,7 @@ class ApplicationSession {
 }
 
 class UserSession {
-    + isLoggedIn()
+    + isLoggedInAsJournalist()
 }
 
 class Repositories {
@@ -80,8 +80,9 @@ class PoliticalAgentMapper {
 }
 
 class IncomeEvolutionMapper {
-    + toDTOList(declarations)
+    + toChronologicalDTOList(declarations)
     + toDTO(declaration)
+    - sortBySubmissionDate(declarations)
 }
 
 class PoliticalAgentDTO {

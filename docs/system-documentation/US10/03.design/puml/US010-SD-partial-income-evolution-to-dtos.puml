@@ -27,8 +27,13 @@ activate CTRL
             DECL_REPO --> CTRL : declarations
         deactivate DECL_REPO
 
-        CTRL -> INC_MAPPER : toDTOList(declarations)
+        CTRL -> INC_MAPPER : toChronologicalDTOList(declarations)
         activate INC_MAPPER
+
+            INC_MAPPER -> INC_MAPPER : sortBySubmissionDate(declarations)
+            activate INC_MAPPER
+                INC_MAPPER --> INC_MAPPER : sortedDeclarations
+            deactivate INC_MAPPER
 
             loop for each declaration
                 INC_MAPPER -> DECL : getSubmissionDate()
