@@ -44,8 +44,6 @@ platform.
 
 ### 1.3. Acceptance Criteria
 
-### 1.3. Acceptance Criteria
-
 * **AC1:** The Administrator must be able to select a pending registration request and consult its details.
 
 * **AC2:** The Administrator must be able to accept or reject the selected registration request.
