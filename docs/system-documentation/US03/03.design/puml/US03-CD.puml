@@ -1,0 +1,117 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+title Design Class Diagram - US03
+
+hide circle
+
+'========================
+' Session Layer
+'========================
+
+class ApplicationSession {
+    - ApplicationSession()
+    + {static} getInstance() : ApplicationSession
+    + getCurrentSession() : UserSession
+}
+
+class UserSession {
+    + getUserEmail() : String
+}
+
+ApplicationSession -> "1" ApplicationSession : instance
+ApplicationSession ..> UserSession
+
+'========================
+' Domain Layer
+'========================
+
+enum InstitutionType {
+    COMPANY
+    POLITICAL_PARTY
+    FOUNDATION
+    INSTITUTE
+    ASSOCIATION
+}
+
+class Institution {
+    - name : String
+    - taxIdentificationNumber : String
+    + getName() : String
+    + getType() : InstitutionType
+}
+
+class PoliticalAgent {
+    - name : String
+    - email : String
+}
+
+Institution "*" --> "1" InstitutionType : type
+
+'========================
+' Repository Layer
+'========================
+
+class InstitutionRepository {
+    + getInstitutionsByType(type : InstitutionType) : List<Institution>
+    + getAllInstitutions() : List<Institution>
+}
+
+class InstitutionTypeRepository {
+    + getInstitutionTypes() : List<InstitutionType>
+}
+
+class Repositories {
+    - Repositories()
+    + {static} getInstance() : Repositories
+    + getInstitutionRepository() : InstitutionRepository
+    + getInstitutionTypeRepository() : InstitutionTypeRepository
+}
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" InstitutionRepository : institutionRepository
+Repositories --> "1" InstitutionTypeRepository : institutionTypeRepository
+
+InstitutionRepository --> "*" Institution : institutions
+InstitutionTypeRepository --> "*" InstitutionType : institutionTypes
+
+'========================
+' Controller
+'========================
+
+class ListInstitutionsController {
+    + ListInstitutionsController()
+    + getInstitutionTypes() : List<InstitutionType>
+    + getInstitutionsByType(type : InstitutionType) : List<Institution>
+    - getPoliticalAgentFromSession() : PoliticalAgent
+}
+
+note right of ListInstitutionsController
+    getInstitutionsByType() retrieves institutions
+    from the repository and sorts them alphabetically
+    by name before returning to the UI (AC1).
+end note
+
+ListInstitutionsController ..> Repositories
+ListInstitutionsController ..> InstitutionRepository
+ListInstitutionsController ..> InstitutionTypeRepository
+ListInstitutionsController ..> PoliticalAgent
+ListInstitutionsController ..> ApplicationSession
+ListInstitutionsController ..> UserSession
+
+'========================
+' UI Layer
+'========================
+
+class ListInstitutionsUI {
+}
+
+ListInstitutionsUI --> ListInstitutionsController
+
+@enduml
