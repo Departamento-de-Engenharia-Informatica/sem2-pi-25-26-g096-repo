@@ -1,31 +1,596 @@
 @startuml
+title Global Design Class Diagram
+
+top to bottom direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
 skinparam classAttributeIconSize 0
+hide circle
 
-class ApplicationSession
-{
-  +{static} getInstance()
-  +getCurrentSession()
+skinparam class {
+    BackgroundColor<<UI>> White
+    BackgroundColor<<Controller>> White
+    BackgroundColor<<Repository>> White
+    BackgroundColor<<Service>> White
+    BackgroundColor<<Mapper>> White
+    BackgroundColor<<DTO>> White
 }
 
-class UserSession
-{
-  +isLoggedInWithRole(USER_ROLE)
+package "Enums" {
+    enum PoliticalOffice {
+        DEPUTY
+        MINISTER
+        COUNCILLOR
+        MAYOR
+        PARISH_COUNCIL_PRESIDENT
+    }
+
+    enum DeclarationType {
+        INITIAL
+        REGULAR
+        EXCEPTIONAL
+    }
+
+    enum PropertyType {
+        URBAN
+        RURAL
+    }
+
+    enum PositionType {
+        PUBLIC
+        PRIVATE
+        SOCIAL
+    }
+
+    enum InstitutionType {
+        COMPANY
+        POLITICAL_PARTY
+        FOUNDATION
+        INSTITUTE
+        ASSOCIATION
+    }
+
+    enum DeclarationStatus {
+        SUBMITTED
+        VALIDATED
+        REJECTED
+    }
+
+    enum ComplaintStatus {
+        SUBMITTED
+        UNDER_REVIEW
+        CLOSED
+    }
+
+    enum RequestStatus {
+        PENDING
+        ACCEPTED
+        REJECTED
+    }
+
+    enum ValidationVerdict {
+        APPROVED
+        REJECTED
+    }
+
+    enum RequestedRole {
+        POLITICAL_AGENT
+        CITIZEN
+        JOURNALIST
+        ETHICS_COMMITTEE_MEMBER
+    }
 }
 
-class "{NameOfUC}Controller" {
-    + {NameOfUC}Controller()
-    + methodX(...)
+package "Session" {
+    class ApplicationSession {
+        - ApplicationSession()
+        + {static} getInstance() : ApplicationSession
+        + getCurrentSession() : UserSession
+    }
+
+    class UserSession {
+        + getUserEmail() : String
+        + getUserId() : String
+        + isLoggedInAsJournalist() : boolean
+        + isLoggedInWithRole(role) : boolean
+    }
 }
 
-class "{NameOfUC}UI" {
+package "Domain" {
+    abstract class User {
+        - name : String
+        - taxId : String
+        - email : String
+        - password : String
+    }
+
+    class FutureUser
+
+    class PoliticalAgent {
+        + createDeclaration(declarationType) : Declaration
+    }
+
+    class Citizen {
+        + submitComplaint(politicalMandate, incidentDate, description, complaintId) : Complaint
+        - addComplaint(complaint)
+    }
+
+    class Journalist {
+        - pressCardNumber : String
+    }
+
+    class EthicsCommitteeMember {
+        + validateDeclaration(declaration, verdict, targetReference, commentText) : Validation
+        + buildIntegratedSituation(politicalAgent, declarations, referenceDate) : IntegratedSituation
+        - addValidation(validation)
+    }
+
+    class Administrator
+
+    class RegistrationRequest {
+        - requestDate : LocalDate
+        - decisionDate : LocalDateTime
+        - name : String
+        - taxId : String
+        - email : String
+        - password : String
+        - nationalIdentityCardNumber : String
+        - pressCardNumber : String
+        - requestedPosition : String
+        - requestedInstitution : String
+        + accept(administrator) : User
+        + reject(administrator, rejectionReason) : Annotation
+        - createUser() : User
+        - registerDecision(administrator)
+        - validateData()
+        - validateRoleSpecificData()
+    }
+
+    class Institution {
+        - name : String
+        - taxId : String
+        + getName() : String
+        + getType() : InstitutionType
+    }
+
+    class Address {
+        - address : String
+        - nameCountry : String
+    }
+
+    class Role {
+        - designation : String
+    }
+
+    class PoliticalMandate {
+        - startDate : LocalDate
+        - endDate : LocalDate
+    }
+
+    class Declaration {
+        - submissionDate : LocalDate
+        - declarantName : String
+        + addPosition(positionType, startDate, endDate, remuneration, institution)
+        + addSubsidy(amount, nature, institution)
+        + addAsset(propertyType, acquisitionValue, marketValue, parish, county, district)
+        + addSecurityHolding(title, marketValue, stake, percentage, institution)
+        + approve()
+        + reject()
+        + isApplicableOn(referenceDate) : boolean
+        + validateData()
+        + getStatus() : DeclarationStatus
+        + getType() : DeclarationType
+        + getTotalIncome() : double
+    }
+
+    class Position {
+        - startDate : LocalDate
+        - endDate : LocalDate
+        - remuneration : double
+        + getRemuneration() : double
+    }
+
+    class Subsidy {
+        - amount : double
+        - nature : String
+        + getAmount() : double
+    }
+
+    class Asset {
+        - acquisitionValue : double
+        - marketValue : double
+    }
+
+    class SecurityHolding {
+        - title : String
+        - marketValue : double
+        - stake : double
+        - percentage : double
+    }
+
+    class Location {
+        - parish : String
+        - county : String
+        - municipality : String
+        - district : String
+    }
+
+    class Validation {
+        - validationDate : LocalDate
+        + addAnnotation(commentText, targetReference, declaration)
+    }
+
+    class Annotation {
+        - text : String
+        - targetReference : String
+        - creationDate : LocalDateTime
+    }
+
+    class IntegratedSituation {
+        - referenceDate : LocalDate
+        - totalIncome : double
+        - totalAssetsMarketValue : double
+        - activePositions : int
+        - totalShareholdingsValue : double
+        + aggregateFromDeclarations(declarations)
+    }
+
+    class Complaint {
+        - id : String
+        - incidentDate : LocalDate
+        - submissionDate : LocalDate
+        - description : String
+    }
 }
 
-"{NameOfUC}UI" ..> "{NameOfUC}Controller"
-"{NameOfUC}Controller" ..> ApplicationSession
-"{NameOfUC}Controller" ..> UserSession
+package "DTOs / Mappers / Services" {
+    class DeclarationDTO <<DTO>> {
+        + type : DeclarationType
+        + positions : List<PositionDTO>
+        + subsidies : List<SubsidyDTO>
+        + assets : List<AssetDTO>
+        + securityHoldings : List<SecurityHoldingDTO>
+    }
 
-ApplicationSession --> "1" ApplicationSession : instance
+    class PositionDTO <<DTO>> {
+        + positionType : PositionType
+        + startDate : LocalDate
+        + endDate : LocalDate
+        + remuneration : double
+        + institutionId : String
+    }
 
-ApplicationSession ..> UserSession
+    class SubsidyDTO <<DTO>> {
+        + amount : double
+        + nature : String
+        + institutionId : String
+    }
+
+    class AssetDTO <<DTO>> {
+        + propertyType : PropertyType
+        + acquisitionValue : double
+        + marketValue : double
+        + location : LocationDTO
+    }
+
+    class LocationDTO <<DTO>> {
+        + parish : String
+        + county : String
+        + district : String
+    }
+
+    class SecurityHoldingDTO <<DTO>> {
+        + title : String
+        + marketValue : double
+        + stake : double
+        + percentage : double
+        + institutionId : String
+    }
+
+    class InstitutionDTO <<DTO>> {
+        + id : String
+        + name : String
+    }
+
+    class PoliticalAgentDTO <<DTO>> {
+        + id : String
+        + name : String
+    }
+
+    class IncomeEvolutionDTO <<DTO>> {
+        + submissionDate : LocalDate
+        + declarationType : DeclarationType
+        + positionIncome : double
+        + subsidyIncome : double
+        + totalIncome : double
+    }
+
+    class AssetView <<DTO>> {
+        - propertyType : String
+        - locationLabel : String
+        - acquisitionValue : String
+        - marketValue : String
+    }
+
+    class PoliticalAgentMapper <<Mapper>> {
+        + toDTOList(politicalAgents)
+        + toDTO(politicalAgent)
+    }
+
+    class IncomeEvolutionMapper <<Mapper>> {
+        + toChronologicalDTOList(declarations)
+        + toDTO(declaration)
+        - sortBySubmissionDate(declarations)
+    }
+
+    class AssetVisibilityService <<Service>> {
+        + applyRoleMasking(user, assetViews)
+    }
+}
+
+package "Repositories" {
+    class Repositories {
+        - Repositories()
+        + {static} getInstance() : Repositories
+        + getRegistrationRequestRepository() : RegistrationRequestRepository
+        + getUserRepository() : UserRepository
+        + getInstitutionRepository() : InstitutionRepository
+        + getInstitutionTypeRepository() : InstitutionTypeRepository
+        + getPoliticalAgentRepository() : PoliticalAgentRepository
+        + getDeclarationRepository() : DeclarationRepository
+        + getRoleRepository() : RoleRepository
+        + getPoliticalMandateRepository() : PoliticalMandateRepository
+        + getComplaintRepository() : ComplaintRepository
+    }
+
+    class RegistrationRequestRepository <<Repository>> {
+        + createRegistrationRequest(...) : RegistrationRequest
+        + getPendingRegistrationRequests() : List<RegistrationRequest>
+        + addRegistrationRequest(registrationRequest)
+    }
+
+    class UserRepository <<Repository>> {
+        + addUser(user)
+        + getAdministratorByEmail(email) : Administrator
+        + getEthicsCommitteeMemberByEmail(email) : EthicsCommitteeMember
+        + getCitizenByEmail(email) : Citizen
+        + getUserByEmail(email) : User
+    }
+
+    class InstitutionRepository <<Repository>> {
+        + save(institution)
+        + getInstitutions() : List<Institution>
+        + getAllInstitutions() : List<Institution>
+        + getInstitutionsByType(type) : List<Institution>
+    }
+
+    class InstitutionTypeRepository <<Repository>> {
+        + getInstitutionTypes() : List<InstitutionType>
+    }
+
+    class PoliticalAgentRepository <<Repository>> {
+        + getPoliticalAgents() : List<PoliticalAgent>
+        + getAllPoliticalAgents() : List<PoliticalAgent>
+        + getById(id) : PoliticalAgent
+        + getByUserId(userId) : PoliticalAgent
+    }
+
+    class DeclarationRepository <<Repository>> {
+        + save(declaration)
+        + getSubmittedDeclarations() : List<Declaration>
+        + getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate) : List<Declaration>
+        + findByPoliticalAgentAndPeriod(politicalAgent, startDate, endDate) : List<Declaration>
+    }
+
+    class RoleRepository <<Repository>> {
+        + getRoles() : List<Role>
+    }
+
+    class PoliticalMandateRepository <<Repository>> {
+        + getMandateByAgentRoleAndDate(politicalAgent, role, incidentDate) : PoliticalMandate
+    }
+
+    class ComplaintRepository <<Repository>> {
+        + nextIdentity() : String
+        + save(complaint)
+    }
+}
+
+package "Controllers (C)" {
+    class RequestRegistrationController <<Controller>> {
+        + getRequestedRoles() : RequestedRole[]
+        + getInstitutions() : List<Institution>
+        + createRegistrationRequest(...) : RegistrationRequest
+    }
+
+    class ApproveRejectRegistrationController <<Controller>> {
+        - registrationRequest : RegistrationRequest
+        + getPendingRegistrationRequests() : List<RegistrationRequest>
+        + selectRegistrationRequest(registrationRequest)
+        + acceptRegistrationRequest() : User
+        + rejectRegistrationRequest(rejectionReason) : Annotation
+    }
+
+    class ListInstitutionsController <<Controller>> {
+        + getInstitutionTypes() : List<InstitutionType>
+        + getInstitutionsByType(type) : List<Institution>
+    }
+
+    class RegisterInstitutionController <<Controller>> {
+        + getInstitutionTypes() : List<InstitutionType>
+        + registerInstitution(name, taxId, type) : Institution
+    }
+
+    class SubmitDeclarationController <<Controller>> {
+        + getDeclarationTypes() : List<DeclarationType>
+        + getInstitutions() : List<Institution>
+        + submitDeclaration(declarationDTO) : Declaration
+    }
+
+    class ValidateDeclarationController <<Controller>> {
+        - declaration : Declaration
+        + getSubmittedDeclarations() : List<Declaration>
+        + selectDeclaration(declaration)
+        + approveDeclaration() : Validation
+        + rejectDeclaration(targetReference, commentText) : Validation
+    }
+
+    class ConsultIntegratedSituationController <<Controller>> {
+        + getPoliticalAgents() : List<PoliticalAgent>
+        + consultIntegratedSituation(politicalAgent, referenceDate) : IntegratedSituation
+    }
+
+    class AnalyseIncomeEvolutionController <<Controller>> {
+        + getPoliticalAgents() : List<PoliticalAgentDTO>
+        + getIncomeEvolution(politicalAgentId, startDate, endDate) : List<IncomeEvolutionDTO>
+    }
+
+    class ConsultAssetsController <<Controller>> {
+        + getPoliticalAgents() : List<PoliticalAgent>
+        + consultAssets(politicalAgent, referenceDate) : List<AssetView>
+    }
+
+    class SubmitComplaintController <<Controller>> {
+        + getPoliticalAgents() : List<PoliticalAgent>
+        + getRoles() : List<Role>
+        + createComplaint(politicalAgent, role, incidentDate, description) : Complaint
+    }
+}
+
+package "UI" {
+    class RequestRegistrationUI <<UI>>
+    class ApproveRejectRegistrationUI <<UI>>
+    class ListInstitutionsUI <<UI>>
+    class RegisterInstitutionUI <<UI>>
+    class SubmitDeclarationUI <<UI>>
+    class ValidateDeclarationUI <<UI>>
+    class ConsultIntegratedSituationUI <<UI>>
+    class AnalyseIncomeEvolutionUI <<UI>>
+    class ConsultAssetsUI <<UI>>
+    class SubmitComplaintUI <<UI>>
+}
+
+' =========================================================
+' Core domain relations, aligned with the Domain Model
+' =========================================================
+
+User <|-- PoliticalAgent
+User <|-- Citizen
+User <|-- Journalist
+User <|-- EthicsCommitteeMember
+User <|-- Administrator
+
+FutureUser "1" -- "0..*" RegistrationRequest : requests >
+RegistrationRequest --> "1" RequestedRole : requestedRole
+RegistrationRequest --> "1" RequestStatus : status
+RegistrationRequest --> "0..1" User : createdUser
+RegistrationRequest --> "0..1" Administrator : reviewedBy
+
+Administrator "1" -- "0..*" Institution : registers >
+Institution --> "1" InstitutionType : type
+Institution "1" --> "1..*" Address : address
+
+PoliticalAgent "1" --> "0..*" PoliticalMandate : holds >
+PoliticalMandate "*" --> "1" Role : role
+PoliticalMandate --> "0..1" PoliticalOffice : office
+
+PoliticalAgent "1" --> "0..*" Declaration : submits >
+Declaration --> "1" DeclarationType : type
+Declaration --> "1" DeclarationStatus : status
+Declaration "1" *-- "0..*" Position : positions
+Declaration "1" *-- "0..*" Subsidy : subsidies
+Declaration "1" *-- "0..*" Asset : assets
+Declaration "1" *-- "0..*" SecurityHolding : securityHoldings
+
+Position --> "1" PositionType : type
+Position "*" --> "1" Institution : held at >
+Subsidy "*" --> "1" Institution : received from >
+Asset --> "1" PropertyType : type
+Asset "1" --> "1" Location : located in >
+SecurityHolding "*" --> "1" Institution : held in >
+
+EthicsCommitteeMember "1" --> "0..*" Validation : performs >
+Validation --> "1" Declaration : declaration
+Validation --> "1" ValidationVerdict : verdict
+Validation *-- "0..*" Annotation : annotations
+Annotation --> "0..1" Declaration : commentsOn
+Annotation --> "0..1" RegistrationRequest : justifies rejection of >
+
+EthicsCommitteeMember --> "*" IntegratedSituation : consultations
+IntegratedSituation --> "1" PoliticalAgent : politicalAgent
+IntegratedSituation ..> "*" Declaration : based on >
+
+Citizen "1" --> "0..*" Complaint : submits >
+Journalist "1" --> "0..*" Complaint : submits >
+Complaint --> "1" ComplaintStatus : status
+Complaint --> "1" PoliticalMandate : context
+Complaint --> "0..1" PoliticalAgent : reports on >
+
+' =========================================================
+' Layer dependencies, intentionally simplified for readability
+' =========================================================
+
+RequestRegistrationUI --> RequestRegistrationController
+ApproveRejectRegistrationUI --> ApproveRejectRegistrationController
+ListInstitutionsUI --> ListInstitutionsController
+RegisterInstitutionUI --> RegisterInstitutionController
+SubmitDeclarationUI --> SubmitDeclarationController
+ValidateDeclarationUI --> ValidateDeclarationController
+ConsultIntegratedSituationUI --> ConsultIntegratedSituationController
+AnalyseIncomeEvolutionUI --> AnalyseIncomeEvolutionController
+ConsultAssetsUI --> ConsultAssetsController
+SubmitComplaintUI --> SubmitComplaintController
+
+RequestRegistrationController ..> Repositories
+ApproveRejectRegistrationController ..> Repositories
+ListInstitutionsController ..> Repositories
+RegisterInstitutionController ..> Repositories
+SubmitDeclarationController ..> Repositories
+ValidateDeclarationController ..> Repositories
+ConsultIntegratedSituationController ..> Repositories
+AnalyseIncomeEvolutionController ..> Repositories
+ConsultAssetsController ..> Repositories
+SubmitComplaintController ..> Repositories
+
+ApproveRejectRegistrationController ..> ApplicationSession
+ListInstitutionsController ..> ApplicationSession
+RegisterInstitutionController ..> ApplicationSession
+SubmitDeclarationController ..> ApplicationSession
+ValidateDeclarationController ..> ApplicationSession
+ConsultIntegratedSituationController ..> ApplicationSession
+AnalyseIncomeEvolutionController ..> ApplicationSession
+ConsultAssetsController ..> ApplicationSession
+SubmitComplaintController ..> ApplicationSession
+ApplicationSession --> UserSession
+
+Repositories --> RegistrationRequestRepository
+Repositories --> UserRepository
+Repositories --> InstitutionRepository
+Repositories --> InstitutionTypeRepository
+Repositories --> PoliticalAgentRepository
+Repositories --> DeclarationRepository
+Repositories --> RoleRepository
+Repositories --> PoliticalMandateRepository
+Repositories --> ComplaintRepository
+
+RegistrationRequestRepository --> RegistrationRequest
+UserRepository --> User
+InstitutionRepository --> Institution
+InstitutionTypeRepository --> InstitutionType
+PoliticalAgentRepository --> PoliticalAgent
+DeclarationRepository --> Declaration
+RoleRepository --> Role
+PoliticalMandateRepository --> PoliticalMandate
+ComplaintRepository --> Complaint
+
+DeclarationDTO ..> PositionDTO
+DeclarationDTO ..> SubsidyDTO
+DeclarationDTO ..> AssetDTO
+DeclarationDTO ..> SecurityHoldingDTO
+AssetDTO ..> LocationDTO
+PoliticalAgentMapper ..> PoliticalAgentDTO
+IncomeEvolutionMapper ..> IncomeEvolutionDTO
+AssetVisibilityService ..> AssetView
 
 @enduml
