@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="1600px" preserveAspectRatio="none" style="width:100%;height:100%;" version="1.1" viewBox="0 0 1400 1600" width="1400px" zoomAndPan="magnify">
+  <defs>
+    <style type="text/css">
+      <![CDATA[
+        line, polyline, polygon, path, rect, circle {
+          fill: none;
+          stroke: #000000;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          stroke-width: 1;
+        }
+        text {
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 11px;
+        }
+        .title {
+          font-weight: bold;
+          font-size: 16px;
+        }
+        .participant {
+          fill: #FFFFCC;
+          stroke: #000000;
+        }
+        .actor {
+          fill: #FFFFDD;
+          stroke: #000000;
+        }
+        .sequence-number {
+          font-weight: bold;
+          fill: #000000;
+        }
+      ]]>
+    </style>
+  </defs>
+  <rect fill="white" height="1600" width="1400" x="0" y="0"/>
+  <text x="700" y="30" text-anchor="middle" class="title">US004 - Register Institution - Full Sequence Diagram</text>
+  
+  <!-- Participants/Actors Header -->
+  <text x="50" y="80" font-size="12" font-weight="bold">Key Participants:</text>
+  <rect x="50" y="100" width="100" height="50" class="actor" rx="3"/>
+  <text x="100" y="130" text-anchor="middle" font-size="11">Administrator</text>
+  
+  <rect x="250" y="100" width="140" height="50" class="participant" rx="3"/>
+  <text x="320" y="130" text-anchor="middle" font-size="11">RegisterInstitutionUI</text>
+  
+  <rect x="500" y="100" width="160" height="50" class="participant" rx="3"/>
+  <text x="580" y="130" text-anchor="middle" font-size="11">RegisterInstitutionController</text>
+  
+  <rect x="800" y="100" width="130" height="50" class="participant" rx="3"/>
+  <text x="865" y="130" text-anchor="middle" font-size="11">Repositories</text>
+  
+  <rect x="1050" y="100" width="150" height="50" class="participant" rx="3"/>
+  <text x="1125" y="130" text-anchor="middle" font-size="11">InstitutionRepository</text>
+  
+  <!-- Timeline -->
+  <line x1="100" y1="160" x2="100" y2="1450" stroke="#000000" stroke-dasharray="5,5"/>
+  <line x1="320" y1="160" x2="320" y2="1450" stroke="#000000" stroke-dasharray="5,5"/>
+  <line x1="580" y1="160" x2="580" y2="1450" stroke="#000000" stroke-dasharray="5,5"/>
+  <line x1="865" y1="160" x2="865" y2="1450" stroke="#000000" stroke-dasharray="5,5"/>
+  <line x1="1125" y1="160" x2="1125" y2="1450" stroke="#000000" stroke-dasharray="5,5"/>
+  
+  <!-- Sequence Steps -->
+  <!-- Step 1 -->
+  <text x="50" y="210" class="sequence-number">1</text>
+  <line x1="100" y1="200" x2="320" y2="200" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="190" y="190" font-size="10">asks to register institution</text>
+  
+  <!-- Step 2 -->
+  <text x="50" y="270" class="sequence-number">2</text>
+  <line x1="320" y1="260" x2="580" y2="260" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="420" y="250" font-size="10">getInstitutionTypes()</text>
+  
+  <!-- Step 3 -->
+  <text x="50" y="330" class="sequence-number">3</text>
+  <line x1="580" y1="320" x2="865" y2="320" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="700" y="310" font-size="10">getInstance()</text>
+  
+  <!-- Step 4 -->
+  <text x="50" y="390" class="sequence-number">4</text>
+  <line x1="580" y1="380" x2="1125" y2="380" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="820" y="370" font-size="10">getInstitutionTypeRepository()</text>
+  
+  <!-- Step 5 -->
+  <text x="50" y="450" class="sequence-number">5</text>
+  <line x1="580" y1="440" x2="1125" y2="440" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="820" y="430" font-size="10">getInstitutionTypes()</text>
+  
+  <!-- Step 6 - Return -->
+  <text x="50" y="510" class="sequence-number">6</text>
+  <line x1="1125" y1="500" x2="580" y2="500" stroke="#000000" stroke-dasharray="3,3" marker-end="url(#arrowhead-return)"/>
+  <text x="820" y="490" font-size="10">institutionTypeList</text>
+  
+  <!-- Step 7 - Return -->
+  <text x="50" y="570" class="sequence-number">7</text>
+  <line x1="580" y1="560" x2="320" y2="560" stroke="#000000" stroke-dasharray="3,3" marker-end="url(#arrowhead-return)"/>
+  <text x="420" y="550" font-size="10">institutionTypeList</text>
+  
+  <!-- Step 8 -->
+  <text x="50" y="630" class="sequence-number">8</text>
+  <line x1="320" y1="620" x2="100" y2="620" stroke="#000000" stroke-dasharray="3,3"/>
+  <text x="190" y="610" font-size="10">displays Institution types</text>
+  
+  <!-- Step 9 -->
+  <text x="50" y="690" class="sequence-number">9</text>
+  <line x1="100" y1="680" x2="320" y2="680" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="180" y="670" font-size="10">selects type and enters data</text>
+  
+  <!-- Step 10 -->
+  <text x="50" y="750" class="sequence-number">10</text>
+  <line x1="320" y1="740" x2="580" y2="740" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="420" y="730" font-size="10">registerInstitution(...)</text>
+  
+  <!-- Step 11 -->
+  <text x="50" y="810" class="sequence-number">11</text>
+  <line x1="580" y1="800" x2="865" y2="800" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="700" y="790" font-size="10">getInstance()</text>
+  
+  <!-- Step 12 -->
+  <text x="50" y="870" class="sequence-number">12</text>
+  <line x1="580" y1="860" x2="1125" y2="860" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="820" y="850" font-size="10">getInstitutionRepository()</text>
+  
+  <!-- Step 13 -->
+  <text x="50" y="930" class="sequence-number">13</text>
+  <line x1="580" y1="920" x2="1125" y2="920" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <text x="820" y="910" font-size="10">save(name, taxId, type)</text>
+  
+  <!-- Step 14 - Return -->
+  <text x="50" y="990" class="sequence-number">14</text>
+  <line x1="1125" y1="980" x2="580" y2="980" stroke="#000000" stroke-dasharray="3,3" marker-end="url(#arrowhead-return)"/>
+  <text x="820" y="970" font-size="10">success/failure</text>
+  
+  <!-- Step 15 - Return -->
+  <text x="50" y="1050" class="sequence-number">15</text>
+  <line x1="580" y1="1040" x2="320" y2="1040" stroke="#000000" stroke-dasharray="3,3" marker-end="url(#arrowhead-return)"/>
+  <text x="420" y="1030" font-size="10">success/failure</text>
+  
+  <!-- Step 16 -->
+  <text x="50" y="1110" class="sequence-number">16</text>
+  <line x1="320" y1="1100" x2="100" y2="1100" stroke="#000000" stroke-dasharray="3,3"/>
+  <text x="180" y="1090" font-size="10">displays success message</text>
+  
+  <!-- Notes -->
+  <rect x="50" y="1200" width="1200" height="200" fill="#F5F5F5" stroke="#000000"/>
+  <text x="70" y="1220" font-weight="bold">Sequence Flow Summary:</text>
+  <text x="70" y="1240" font-size="10">1. Administrator requests to register a new institution</text>
+  <text x="70" y="1258" font-size="10">2. UI requests available institution types from the controller</text>
+  <text x="70" y="1276" font-size="10">3. Controller queries repositories to get institution types</text>
+  <text x="70" y="1294" font-size="10">4. Institution types are displayed to the administrator</text>
+  <text x="70" y="1312" font-size="10">5. Administrator selects an institution type and enters institution data</text>
+  <text x="70" y="1330" font-size="10">6. UI sends registration request to controller with institution details</text>
+  <text x="70" y="1348" font-size="10">7. Controller saves the institution via repository and returns success/failure</text>
+  <text x="70" y="1366" font-size="10">8. UI displays the operation result to the administrator</text>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#000000"/>
+    </marker>
+    <marker id="arrowhead-return" markerWidth="10" markerHeight="10" refX="1" refY="3" orient="auto">
+      <polygon points="10 0, 0 3, 10 6" fill="#000000"/>
+    </marker>
+  </defs>
+</svg>

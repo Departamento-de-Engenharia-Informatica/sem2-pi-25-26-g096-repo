@@ -49,4 +49,4 @@ Other software classes (i.e. Pure Fabrication) identified:
 
 ## 3.3. Class Diagram (CD)
 
-![US003-CD.svg](svg/US003-CD.svg)
+![Class Diagram](svg/US003-CD.svg)

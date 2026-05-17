@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="1400px" preserveAspectRatio="none" style="width:100%;height:100%;" version="1.1" viewBox="0 0 1400 1400" width="1400px" zoomAndPan="magnify">
+  <defs>
+    <style type="text/css">
+      <![CDATA[
+        .class-box {
+          fill: #FFFFCC;
+          stroke: #000000;
+          stroke-width: 1;
+        }
+        .enum-box {
+          fill: #FFCCCC;
+          stroke: #000000;
+          stroke-width: 1;
+        }
+        text {
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 11px;
+        }
+        .title {
+          font-weight: bold;
+          font-size: 18px;
+        }
+        .class-name {
+          font-weight: bold;
+          font-size: 12px;
+        }
+        line {
+          stroke: #000000;
+          stroke-width: 1;
+        }
+      ]]>
+    </style>
+  </defs>
+  <rect fill="white" height="1400" width="1400" x="0" y="0"/>
+  <text x="700" y="30" text-anchor="middle" class="title">US004 - Design Class Diagram</text>
+  
+  <!-- Session Layer -->
+  <text x="50" y="80" font-weight="bold">== Session Layer ==</text>
+  
+  <!-- ApplicationSession Class -->
+  <rect x="50" y="100" width="200" height="100" class="class-box"/>
+  <text x="150" y="120" text-anchor="middle" class="class-name">ApplicationSession</text>
+  <line x1="50" y1="135" x2="250" y2="135" stroke="#000000"/>
+  <line x1="50" y1="145" x2="250" y2="145" stroke="#000000"/>
+  <text x="60" y="165" font-size="10">+ getInstance()</text>
+  <text x="60" y="180" font-size="10">+ getCurrentSession()</text>
+  
+  <!-- UserSession Class -->
+  <rect x="350" y="100" width="200" height="80" class="class-box"/>
+  <text x="450" y="120" text-anchor="middle" class="class-name">UserSession</text>
+  <line x1="350" y1="135" x2="550" y2="135" stroke="#000000"/>
+  <line x1="350" y1="145" x2="550" y2="145" stroke="#000000"/>
+  <text x="360" y="165" font-size="10">+ getUserEmail()</text>
+  
+  <!-- Connection between ApplicationSession and UserSession -->
+  <line x1="250" y1="135" x2="350" y2="125" stroke="#000000" marker-end="url(#arrowhead)"/>
+  
+  <!-- Domain Layer -->
+  <text x="50" y="280" font-weight="bold">== Domain Layer ==</text>
+  
+  <!-- Administrator Class -->
+  <rect x="50" y="300" width="150" height="90" class="class-box"/>
+  <text x="125" y="320" text-anchor="middle" class="class-name">Administrator</text>
+  <line x1="50" y1="335" x2="200" y2="335" stroke="#000000"/>
+  <text x="60" y="355" font-size="10">- email: String</text>
+  <line x1="50" y1="365" x2="200" y2="365" stroke="#000000"/>
+  <text x="60" y="380" font-size="10">+ getEmail()</text>
+  
+  <!-- Institution Class -->
+  <rect x="300" y="300" width="200" height="130" class="class-box"/>
+  <text x="400" y="320" text-anchor="middle" class="class-name">Institution</text>
+  <line x1="300" y1="335" x2="500" y2="335" stroke="#000000"/>
+  <text x="310" y="355" font-size="10">- name: String</text>
+  <text x="310" y="370" font-size="10">- taxId: String</text>
+  <line x1="300" y1="380" x2="500" y2="380" stroke="#000000"/>
+  <text x="310" y="400" font-size="10">+ getName()</text>
+  <text x="310" y="415" font-size="10">+ getTaxId()</text>
+  
+  <!-- InstitutionType Enum -->
+  <rect x="600" y="300" width="150" height="90" class="enum-box"/>
+  <text x="675" y="320" text-anchor="middle" class="class-name">&lt;&lt;enum&gt;&gt;</text>
+  <text x="675" y="340" text-anchor="middle" class="class-name">InstitutionType</text>
+  <line x1="600" y1="355" x2="750" y2="355" stroke="#000000"/>
+  <text x="610" y="375" font-size="10">COMPANY</text>
+  <text x="610" y="390" font-size="10">POLITICAL_PARTY</text>
+  
+  <!-- Address Class -->
+  <rect x="850" y="300" width="150" height="90" class="class-box"/>
+  <text x="925" y="320" text-anchor="middle" class="class-name">Address</text>
+  <line x1="850" y1="335" x2="1000" y2="335" stroke="#000000"/>
+  <text x="860" y="355" font-size="10">- address: String</text>
+  <text x="860" y="370" font-size="10">- country: String</text>
+  <line x1="850" y1="380" x2="1000" y2="380" stroke="#000000"/>
+  
+  <!-- Connections in Domain Layer -->
+  <line x1="500" y1="350" x2="600" y2="350" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <line x1="500" y1="360" x2="850" y2="360" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <line x1="200" y1="330" x2="300" y2="330" stroke="#000000" stroke-dasharray="3,3" marker-end="url(#arrowhead)"/>
+  <text x="235" y="320" font-size="9">registers</text>
+  
+  <!-- Repository Layer -->
+  <text x="50" y="520" font-weight="bold">== Repository Layer ==</text>
+  
+  <!-- InstitutionTypeRepository Class -->
+  <rect x="50" y="540" width="220" height="100" class="class-box"/>
+  <text x="160" y="560" text-anchor="middle" class="class-name">InstitutionTypeRepository</text>
+  <line x1="50" y1="575" x2="270" y2="575" stroke="#000000"/>
+  <line x1="50" y1="585" x2="270" y2="585" stroke="#000000"/>
+  <text x="60" y="605" font-size="10">+ getInstitutionTypes()</text>
+  <text x="60" y="620" font-size="10">  : List&lt;InstitutionType&gt;</text>
+  
+  <!-- InstitutionRepository Class -->
+  <rect x="350" y="540" width="220" height="120" class="class-box"/>
+  <text x="460" y="560" text-anchor="middle" class="class-name">InstitutionRepository</text>
+  <line x1="350" y1="575" x2="570" y2="575" stroke="#000000"/>
+  <line x1="350" y1="585" x2="570" y2="585" stroke="#000000"/>
+  <text x="360" y="605" font-size="10">+ save(institution)</text>
+  <text x="360" y="620" font-size="10">+ getInstitutions()</text>
+  <text x="360" y="635" font-size="10">  : List&lt;Institution&gt;</text>
+  
+  <!-- Repositories Singleton Class -->
+  <rect x="700" y="540" width="200" height="140" class="class-box"/>
+  <text x="800" y="560" text-anchor="middle" class="class-name">Repositories</text>
+  <line x1="700" y1="575" x2="900" y2="575" stroke="#000000"/>
+  <text x="710" y="595" font-size="10">- instance: Repositories</text>
+  <line x1="700" y1="605" x2="900" y2="605" stroke="#000000"/>
+  <text x="710" y="625" font-size="10">+ getInstance()</text>
+  <text x="710" y="640" font-size="10">+ getInstitutionRepo()</text>
+  <text x="710" y="655" font-size="10">+ getInstitutionTypeRepo()</text>
+  
+  <!-- Connections to Repositories -->
+  <line x1="270" y1="590" x2="700" y2="590" stroke="#000000" marker-end="url(#arrowhead)"/>
+  <line x1="570" y1="590" x2="700" y2="590" stroke="#000000" marker-end="url(#arrowhead)"/>
+  
+  <!-- Controller Layer -->
+  <text x="50" y="760" font-weight="bold">== Controller Layer ==</text>
+  
+  <!-- RegisterInstitutionController Class -->
+  <rect x="50" y="780" width="250" height="150" class="class-box"/>
+  <text x="175" y="800" text-anchor="middle" class="class-name">RegisterInstitutionController</text>
+  <line x1="50" y1="815" x2="300" y2="815" stroke="#000000"/>
+  <line x1="50" y1="825" x2="300" y2="825" stroke="#000000"/>
+  <text x="60" y="845" font-size="10">+ RegisterInstitutionController()</text>
+  <text x="60" y="860" font-size="10">+ getInstitutionTypes()</text>
+  <text x="60" y="875" font-size="10">+ registerInstitution(name, taxId, type)</text>
+  <text x="60" y="890" font-size="10">  : boolean</text>
+  
+  <!-- Connection to Repositories -->
+  <line x1="175" y1="780" x2="800" y2="680" stroke="#000000" stroke-dasharray="3,3" marker-end="url(#arrowhead)"/>
+  
+  <!-- UI Layer -->
+  <text x="50" y="1000" font-weight="bold">== UI Layer ==</text>
+  
+  <!-- RegisterInstitutionUI Class -->
+  <rect x="50" y="1020" width="150" height="60" class="class-box"/>
+  <text x="125" y="1040" text-anchor="middle" class="class-name">RegisterInstitutionUI</text>
+  <line x1="50" y1="1055" x2="200" y2="1055" stroke="#000000"/>
+  <line x1="50" y1="1065" x2="200" y2="1065" stroke="#000000"/>
+  
+  <!-- Connection UI -> Controller -->
+  <line x1="125" y1="1020" x2="175" y2="930" stroke="#000000" marker-end="url(#arrowhead)"/>
+  
+  <!-- Legend -->
+  <text x="50" y="1150" font-weight="bold">Legend:</text>
+  <text x="60" y="1170" font-size="10">→ Dependency (uses)</text>
+  <text x="60" y="1190" font-size="10">⟶ Association</text>
+  <text x="60" y="1210" font-size="10">⟵ Aggregation</text>
+  <text x="60" y="1230" font-size="10">Yellow = Class, Pink = Enum</text>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#000000"/>
+    </marker>
+  </defs>
+</svg>
