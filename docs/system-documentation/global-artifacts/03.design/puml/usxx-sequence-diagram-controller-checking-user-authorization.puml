@@ -13,7 +13,7 @@ participant "currentSession\n:UserSession" as CURRENT_SESSION
 
 activate CTRL
 [o-> CTRL : create()
-    CTRL -> APP_SESSION : getinstance()
+    CTRL -> APP_SESSION : getInstance()
 
     activate APP_SESSION
         APP_SESSION --> CTRL : appSession
@@ -24,15 +24,15 @@ activate CTRL
         APP_SESSION_SINGLETON --> CTRL : currentSession
     deactivate APP_SESSION_SINGLETON
 
-    CTRL -> CURRENT_SESSION : isLoggedInWithRole(USER_ROLE)
+    CTRL -> CURRENT_SESSION : isLoggedInWithRole(REQUIRED_ROLE)
     activate CURRENT_SESSION
-        CURRENT_SESSION --> CTRL : answer
+        CURRENT_SESSION --> CTRL : boolean
     deactivate CURRENT_SESSION
 
-    alt answer = true
-        CTRL -> CTRL : doesOtherThing()
+    alt boolean = true
+        CTRL -> CTRL : performBusinessLogic()
         activate CTRL
-            [o<-- CTRL : ok
+            [o<-- CTRL : operation succeeds
         deactivate CTRL
 
         autonumber stop
@@ -40,7 +40,7 @@ activate CTRL
         autonumber resume
     else
         |||
-        [o<-- CTRL : illegalStateException("Not Authorized")
+        [o<-- CTRL : throw IllegalStateException("Not Authorized")
         |||
     end alt
 

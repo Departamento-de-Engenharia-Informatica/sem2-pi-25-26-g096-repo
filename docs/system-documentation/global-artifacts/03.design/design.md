@@ -22,7 +22,7 @@ This verification can be carried out as follows:
 ![CheckingUserAuthorization](svg/usxx-sequence-diagram-controller-checking-user-authorization.svg)
 
 Users' authentication and authorization processes are reutilizing an external component called **_AuthLib_**.
-Documentation regarding this component is available [here](../../../auth/Readme.md).
+Documentation regarding this component is available [here](../../../auth/README.md).
 
 
 ## Class Diagram

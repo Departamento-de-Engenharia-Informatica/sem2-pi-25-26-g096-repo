@@ -7,7 +7,7 @@ autonumber
 
 'hide footbox
 actor "User" as USER
-participant ":{MenuX}UI" as MENU
+participant ":MenuUI" as MENU
 participant ":{NameOfUC}UI" as UC_NAME_UI
 participant ":{NameOfUC}Controller" as CTRL
 participant "ApplicationSession" as APP_SESSION
@@ -21,51 +21,49 @@ activate USER
         MENU --> UC_NAME_UI** : create()
         activate UC_NAME_UI
             UC_NAME_UI --> CTRL** : create()
+            activate CTRL
+                CTRL -> APP_SESSION : getInstance()
+                note right
+                    static method
+                    (Singleton pattern)
+                end note
+                activate APP_SESSION
+                    APP_SESSION --> CTRL : appSession
+                deactivate APP_SESSION
+
+                CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
+                activate APP_SESSION_SINGLETON
+                    APP_SESSION_SINGLETON --> CTRL : currentSession
+                deactivate APP_SESSION_SINGLETON
+            deactivate CTRL
         deactivate UC_NAME_UI
-
-        activate CTRL
-            CTRL -> APP_SESSION : getinstance()
-            note right
-                static method
-                (Singleton pattern)
-            end note
-            activate APP_SESSION
-                APP_SESSION --> CTRL : appSession
-            deactivate APP_SESSION
-
-            CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
-            activate APP_SESSION_SINGLETON
-                APP_SESSION_SINGLETON --> CTRL : currentSession
-            deactivate APP_SESSION_SINGLETON
-        deactivate CTRL
 
         MENU -> UC_NAME_UI : run()
         activate UC_NAME_UI
     deactivate MENU
 
-            UC_NAME_UI --> USER : requests something
+            UC_NAME_UI --> USER : displays/requests data
             |||
         deactivate UC_NAME_UI
 
-    loop
-        USER -> UC_NAME_UI : does something
+    loop User interaction
+        USER -> UC_NAME_UI : provides input/performs action
         activate UC_NAME_UI
-            UC_NAME_UI -> CTRL : methodX(...)
+            UC_NAME_UI -> CTRL : operation(parameters)
             activate CTRL
-                CTRL -> APP_SESSION : methodY(...)
+                CTRL -> APP_SESSION : performOperation(...)
 
                 activate APP_SESSION
                     ref over APP_SESSION,APP_SESSION_SINGLETON,CURRENT_SESSION
-
-
+                        Authorization Check and Business Logic
                     end ref
-                    APP_SESSION --> CTRL : answer
+                    APP_SESSION --> CTRL : result
                 deactivate APP_SESSION
 
-                CTRL --> UC_NAME_UI : answer
+                CTRL --> UC_NAME_UI : result/status
             deactivate CTRL
 
-            UC_NAME_UI --> USER : answers/requests another thing
+            UC_NAME_UI --> USER : displays result/requests more data
             |||
         deactivate UC_NAME_UI
     end loop
