@@ -37,18 +37,6 @@ class PoliticalAgent {
     - taxId : String
 }
 
-abstract class Section {
-}
-
-class AssetSection {
-}
-
-abstract class Field {
-}
-
-class AssetField {
-}
-
 class Property {
     - acquisitionValue : double
     - marketValue : double
@@ -120,9 +108,6 @@ Person <|-- Citizen
 Person <|-- Journalist
 Person <|-- PoliticalAgent
 
-Section <|-- AssetSection
-Field <|-- AssetField
-
 ConsultAssetsUI .> ConsultAssetsController
 ConsultAssetsController .> Repositories
 ConsultAssetsController ..> PoliticalAgentRepository
@@ -145,9 +130,6 @@ UserRepository --> "*" Person : users
 DeclarationRepository --> "*" Declaration : declarations
 
 PoliticalAgent "1" --> "0..*" Declaration : declarations
-Declaration *-- "4" Section : sections
-AssetSection *-- "*" AssetField : fields
-AssetField *-- "1" Property : property
 Property --> "1" PropertyType : type
 Property --> "1" Location : location
 

@@ -46,21 +46,6 @@ class Role {
     - designation : String
 }
 
-abstract class Section {
-}
-
-class IncomeSection {
-}
-
-class AssetSection {
-}
-
-class PositionSection {
-}
-
-class ShareholdingSection {
-}
-
 class Declaration {
     - submissionDate : LocalDate
 
@@ -126,11 +111,6 @@ class ConsultIntegratedSituationUI {
     + run()
 }
 
-Section <|-- IncomeSection
-Section <|-- AssetSection
-Section <|-- PositionSection
-Section <|-- ShareholdingSection
-
 ConsultIntegratedSituationUI .> ConsultIntegratedSituationController
 
 ConsultIntegratedSituationController .> Repositories
@@ -160,7 +140,6 @@ PoliticalMandate "*" --> "1" Role : role
 PoliticalAgent "1" --> "0..*" Declaration : declarations
 Declaration --> "1" DeclarationType : type
 Declaration --> "1" DeclarationStatus : status
-Declaration *-- "4" Section : sections
 
 EthicsCommitteeMember --> "*" IntegratedSituation : consultations
 IntegratedSituation --> "1" PoliticalAgent : politicalAgent
