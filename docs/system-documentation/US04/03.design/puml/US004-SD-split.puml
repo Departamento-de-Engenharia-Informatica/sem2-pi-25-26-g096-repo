@@ -7,6 +7,11 @@ autonumber
 actor "Administrator" as ADMIN
 participant ":RegisterInstitutionUI" as UI
 participant ":RegisterInstitutionController" as CTRL
+participant ":Institution" as INST
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "institutionTypeRepository\n:InstitutionTypeRepository" as TYPE_REPO
+participant "institutionRepository\n:InstitutionRepository" as INST_REPO
 
 activate ADMIN
 
@@ -17,31 +22,7 @@ activate UI
 
     UI -> CTRL : getInstitutionTypes()
     activate CTRL
-        CTRL --> UI : institutionTypeList
-    deactivate CTRL
 
-    UI --> ADMIN : displays Institution types
-
-    ADMIN -> UI : selects type and enters name, tax id
-    activate UI
-
-        UI -> CTRL : registerInstitution(name, taxId, type)
-        activate CTRL
-            CTRL --> UI : success/failure
-        deactivate CTRL
-
-    UI --> ADMIN : displays success message
-
-deactivate UI
-deactivate ADMIN
-
-ref over CTRL : Get Institution Types
-    participant ":RegisterInstitutionController" as CTRL
-    participant "Repositories" as REPOS
-    participant "repositories\n:Repositories" as REPOS_SINGLETON
-    participant "institutionTypeRepository\n:InstitutionTypeRepository" as TYPE_REPO
-    
-    activate CTRL
         CTRL -> REPOS : getInstance()
         activate REPOS
             REPOS --> CTRL : repositories
@@ -57,34 +38,51 @@ ref over CTRL : Get Institution Types
             TYPE_REPO --> CTRL : institutionTypeList
         deactivate TYPE_REPO
 
-        CTRL --> CTRL : return institutionTypeList
+        CTRL --> UI : institutionTypeList
     deactivate CTRL
-end ref
 
-ref over CTRL : Register Institution
-    participant ":RegisterInstitutionController" as CTRL
-    participant "Repositories" as REPOS
-    participant "repositories\n:Repositories" as REPOS_SINGLETON
-    participant "institutionRepository\n:InstitutionRepository" as INST_REPO
-    
-    activate CTRL
-        CTRL -> REPOS : getInstance()
-        activate REPOS
-            REPOS --> CTRL : repositories
-        deactivate REPOS
+    UI --> ADMIN : displays Institution types
 
-        CTRL -> REPOS_SINGLETON : getInstitutionRepository()
-        activate REPOS_SINGLETON
-            REPOS_SINGLETON --> CTRL : institutionRepository
-        deactivate REPOS_SINGLETON
+    ADMIN -> UI : selects type and enters name
 
-        CTRL -> INST_REPO : save(name, taxId, type)
-        activate INST_REPO
-            INST_REPO --> CTRL : success/failure
-        deactivate INST_REPO
+        UI -> CTRL : registerInstitution(name, type)
+        activate CTRL
 
-        CTRL --> CTRL : return success/failure
-    deactivate CTRL
-end ref
+            CTRL -> INST** : create(name, type)
+            activate INST
+            deactivate INST
+
+            CTRL -> INST : validate()
+            activate INST
+                INST --> CTRL : validation result
+            deactivate INST
+
+            alt validation successful
+                CTRL -> REPOS : getInstance()
+                activate REPOS
+                    REPOS --> CTRL : repositories
+                deactivate REPOS
+
+                CTRL -> REPOS_SINGLETON : getInstitutionRepository()
+                activate REPOS_SINGLETON
+                    REPOS_SINGLETON --> CTRL : institutionRepository
+                deactivate REPOS_SINGLETON
+
+                CTRL -> INST_REPO : save(institution)
+                activate INST_REPO
+                    INST_REPO --> CTRL : success
+                deactivate INST_REPO
+
+                CTRL --> UI : success
+            else validation failed
+                CTRL --> UI : failure/error message
+            end
+
+        deactivate CTRL
+
+    UI --> ADMIN : displays result message
+
+deactivate UI
+deactivate ADMIN
 
 @enduml
