@@ -29,7 +29,7 @@ class UserSession {
 }
 
 class EthicsCommitteeMember {
-    + buildIntegratedSituation(politicalAgent, declarations, referenceDate)
+    + buildIntegratedSituation(agentId, declarations, referenceDate)
 }
 
 class PoliticalAgent {
@@ -63,6 +63,28 @@ class IntegratedSituation {
     + aggregateFromDeclarations(declarations)
 }
 
+class PoliticalAgentDTO {
+    - agentId : String
+    - name : String
+}
+
+class PoliticalAgentMapper {
+    + toDTOList(politicalAgentList : List<PoliticalAgent>) : List<PoliticalAgentDTO>
+    + toDTO(politicalAgent : PoliticalAgent) : PoliticalAgentDTO
+}
+
+class IntegratedSituationDTO {
+    - referenceDate : LocalDate
+    - totalIncome : double
+    - totalAssetsMarketValue : double
+    - activePositions : int
+    - totalShareholdingsValue : double
+}
+
+class IntegratedSituationMapper {
+    + toDTO(integratedSituation : IntegratedSituation) : IntegratedSituationDTO
+}
+
 class DeclarationRepository {
     + getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
 }
@@ -85,8 +107,8 @@ class Repositories {
 
 class ConsultIntegratedSituationController {
     + ConsultIntegratedSituationController()
-    + getPoliticalAgents()
-    + consultIntegratedSituation(politicalAgent, referenceDate)
+    + getPoliticalAgents() : List<PoliticalAgentDTO>
+    + consultIntegratedSituation(politicalAgentDTO : PoliticalAgentDTO, referenceDate : LocalDate) : IntegratedSituationDTO
     - getEthicsCommitteeMemberFromSession()
 }
 
@@ -112,6 +134,8 @@ class ConsultIntegratedSituationUI {
 }
 
 ConsultIntegratedSituationUI .> ConsultIntegratedSituationController
+ConsultIntegratedSituationUI ..> PoliticalAgentDTO
+ConsultIntegratedSituationUI ..> IntegratedSituationDTO
 
 ConsultIntegratedSituationController .> Repositories
 ConsultIntegratedSituationController ..> PoliticalAgentRepository
@@ -120,7 +144,16 @@ ConsultIntegratedSituationController ..> UserRepository
 ConsultIntegratedSituationController ..> ApplicationSession
 ConsultIntegratedSituationController ..> UserSession
 ConsultIntegratedSituationController ..> EthicsCommitteeMember
-ConsultIntegratedSituationController ..> IntegratedSituation
+ConsultIntegratedSituationController ..> PoliticalAgentMapper
+ConsultIntegratedSituationController ..> IntegratedSituationMapper
+ConsultIntegratedSituationController ..> PoliticalAgentDTO
+ConsultIntegratedSituationController ..> IntegratedSituationDTO
+
+PoliticalAgentMapper ..> PoliticalAgent
+PoliticalAgentMapper ..> PoliticalAgentDTO
+
+IntegratedSituationMapper ..> IntegratedSituation
+IntegratedSituationMapper ..> IntegratedSituationDTO
 
 Repositories -> "1" Repositories : instance
 Repositories --> "1" DeclarationRepository : declarationRepository

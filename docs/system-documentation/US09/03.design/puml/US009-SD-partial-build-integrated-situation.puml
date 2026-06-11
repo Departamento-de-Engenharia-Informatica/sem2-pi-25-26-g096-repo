@@ -9,9 +9,10 @@ participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "declarationRepository:\nDeclarationRepository" as DECL_REPO
 participant "member\n:EthicsCommitteeMember" as MEMBER
 participant "integratedSituation\n:IntegratedSituation" as INTEGRATED_SITUATION
+participant "IntegratedSituationMapper" as INTEG_MAPPER
 
 autonumber 8
--> CTRL : consultIntegratedSituation(politicalAgent, referenceDate)
+-> CTRL : consultIntegratedSituation(politicalAgentDTO, referenceDate)
 
 autonumber 8.1
 activate CTRL
@@ -27,14 +28,14 @@ activate CTRL
             REPOS_SINGLETON --> CTRL : declarationRepository
         deactivate REPOS_SINGLETON
 
-        CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
+        CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgentDTO.agentId, referenceDate)
         activate DECL_REPO
             DECL_REPO --> CTRL : declarations
         deactivate DECL_REPO
 
-        CTRL -> MEMBER : buildIntegratedSituation(politicalAgent, declarations, referenceDate)
+        CTRL -> MEMBER : buildIntegratedSituation(politicalAgentDTO.agentId, declarations, referenceDate)
         activate MEMBER
-            MEMBER --> INTEGRATED_SITUATION** : create(politicalAgent, referenceDate)
+            MEMBER --> INTEGRATED_SITUATION** : create(agentId, referenceDate)
             MEMBER -> INTEGRATED_SITUATION : aggregateFromDeclarations(declarations)
             activate INTEGRATED_SITUATION
                 INTEGRATED_SITUATION --> MEMBER : integratedSituation
@@ -43,9 +44,14 @@ activate CTRL
             MEMBER --> CTRL : integratedSituation
         deactivate MEMBER
 
+        CTRL -> INTEG_MAPPER : toDTO(integratedSituation)
+        activate INTEG_MAPPER
+            INTEG_MAPPER --> CTRL : integratedSituationDTO
+        deactivate INTEG_MAPPER
+
     end
     autonumber 9
-    <-- CTRL : integratedSituation
+    <-- CTRL : integratedSituationDTO
 deactivate CTRL
 
 @enduml

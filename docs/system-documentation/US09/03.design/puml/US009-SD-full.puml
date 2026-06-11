@@ -12,6 +12,7 @@ participant ":ConsultIntegratedSituationController" as CTRL
 participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "politicalAgentRepository\n:PoliticalAgentRepository" as AGENT_REPO
+participant "PoliticalAgentMapper" as AGENT_MAPPER
 participant "ApplicationSession" as APP_SESSION
 participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
 participant "currentSession\n:UserSession" as CURRENT_SESSION
@@ -19,6 +20,7 @@ participant "userRepository\n:UserRepository" as USER_REPO
 participant "member\n:EthicsCommitteeMember" as MEMBER
 participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
 participant "integratedSituation\n:IntegratedSituation" as INTEGRATED_SITUATION
+participant "IntegratedSituationMapper" as INTEG_MAPPER
 
 activate MEMBER_ACTOR
 
@@ -43,7 +45,12 @@ activate MEMBER_ACTOR
                 AGENT_REPO --> CTRL : politicalAgentList
             deactivate AGENT_REPO
 
-            CTRL --> UI : politicalAgentList
+            CTRL -> AGENT_MAPPER : toDTOList(politicalAgentList)
+            activate AGENT_MAPPER
+                AGENT_MAPPER --> CTRL : politicalAgentDTOList
+            deactivate AGENT_MAPPER
+
+            CTRL --> UI : politicalAgentDTOList
         deactivate CTRL
 
         UI --> MEMBER_ACTOR : shows political agent list and asks for reference date
@@ -51,7 +58,7 @@ activate MEMBER_ACTOR
 
     MEMBER_ACTOR -> UI : selects political agent and enters reference date
     activate UI
-        UI -> CTRL : consultIntegratedSituation(politicalAgent, referenceDate)
+        UI -> CTRL : consultIntegratedSituation(politicalAgentDTO, referenceDate)
         activate CTRL
 
             CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
@@ -99,14 +106,14 @@ activate MEMBER_ACTOR
                 REPOS_SINGLETON --> CTRL : declarationRepository
             deactivate REPOS_SINGLETON
 
-            CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
+            CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgentDTO.agentId, referenceDate)
             activate DECL_REPO
                 DECL_REPO --> CTRL : declarations
             deactivate DECL_REPO
 
-            CTRL -> MEMBER : buildIntegratedSituation(politicalAgent, declarations, referenceDate)
+            CTRL -> MEMBER : buildIntegratedSituation(politicalAgentDTO.agentId, declarations, referenceDate)
             activate MEMBER
-                MEMBER --> INTEGRATED_SITUATION** : create(politicalAgent, referenceDate)
+                MEMBER --> INTEGRATED_SITUATION** : create(agentId, referenceDate)
                 MEMBER -> INTEGRATED_SITUATION : aggregateFromDeclarations(declarations)
                 activate INTEGRATED_SITUATION
                     INTEGRATED_SITUATION --> MEMBER : integratedSituation
@@ -115,7 +122,12 @@ activate MEMBER_ACTOR
                 MEMBER --> CTRL : integratedSituation
             deactivate MEMBER
 
-            CTRL --> UI : integratedSituation
+            CTRL -> INTEG_MAPPER : toDTO(integratedSituation)
+            activate INTEG_MAPPER
+                INTEG_MAPPER --> CTRL : integratedSituationDTO
+            deactivate INTEG_MAPPER
+
+            CTRL --> UI : integratedSituationDTO
         deactivate CTRL
 
         UI --> MEMBER_ACTOR : shows integrated situation for selected date

@@ -23,7 +23,7 @@ activate MEMBER_ACTOR
         end ref
 
         activate CTRL
-            CTRL --> UI : politicalAgentList
+            CTRL --> UI : politicalAgentDTOList
         deactivate CTRL
 
         UI --> MEMBER_ACTOR : shows political agent list and asks for reference date
@@ -32,7 +32,7 @@ activate MEMBER_ACTOR
     MEMBER_ACTOR -> UI : selects political agent and enters reference date
     activate UI
 
-        UI -> CTRL : consultIntegratedSituation(politicalAgent, referenceDate)
+        UI -> CTRL : consultIntegratedSituation(politicalAgentDTO, referenceDate)
         activate CTRL
 
             CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
@@ -47,7 +47,7 @@ activate MEMBER_ACTOR
                 Build Integrated Situation
             end ref
 
-            CTRL --> UI : integratedSituation
+            CTRL --> UI : integratedSituationDTO
         deactivate CTRL
 
         UI --> MEMBER_ACTOR : shows integrated situation for selected date
