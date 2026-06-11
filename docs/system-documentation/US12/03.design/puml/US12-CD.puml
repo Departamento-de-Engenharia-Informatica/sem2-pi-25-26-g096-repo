@@ -52,6 +52,34 @@ class Complaint {
     + Complaint(id, incidentDate, description, politicalMandate)
 }
 
+class PoliticalAgentDTO {
+    - agentId : String
+    - name : String
+}
+
+class PoliticalAgentMapper {
+    + toDTOList(politicalAgentList : List<PoliticalAgent>) : List<PoliticalAgentDTO>
+    + toDTO(politicalAgent : PoliticalAgent) : PoliticalAgentDTO
+}
+
+class RoleDTO {
+    - designation : String
+}
+
+class RoleMapper {
+    + toDTOList(roleList : List<Role>) : List<RoleDTO>
+    + toDTO(role : Role) : RoleDTO
+}
+
+class ComplaintDTO {
+    - id : String
+    - status : ComplaintStatus
+}
+
+class ComplaintMapper {
+    + toDTO(complaint : Complaint) : ComplaintDTO
+}
+
 class UserRepository {
     + getCitizenByEmail(email)
 }
@@ -85,9 +113,9 @@ class Repositories {
 
 class SubmitComplaintController {
     + SubmitComplaintController()
-    + getPoliticalAgents()
-    + getRoles()
-    + createComplaint(politicalAgent, role, incidentDate, description)
+    + getPoliticalAgents() : List<PoliticalAgentDTO>
+    + getRoles() : List<RoleDTO>
+    + createComplaint(politicalAgentDTO : PoliticalAgentDTO, roleDTO : RoleDTO, incidentDate : LocalDate, description : String) : ComplaintDTO
     - getCitizenFromSession()
     - validateIncidentDate(incidentDate)
 }
@@ -101,8 +129,11 @@ note right of SubmitComplaintController
 end note
 
 SubmitComplaintUI .> SubmitComplaintController
-SubmitComplaintController .> Repositories
+SubmitComplaintUI ..> PoliticalAgentDTO
+SubmitComplaintUI ..> RoleDTO
+SubmitComplaintUI ..> ComplaintDTO
 
+SubmitComplaintController .> Repositories
 SubmitComplaintController ..> ApplicationSession
 SubmitComplaintController ..> UserSession
 SubmitComplaintController ..> UserRepository
@@ -110,6 +141,21 @@ SubmitComplaintController ..> PoliticalAgentRepository
 SubmitComplaintController ..> RoleRepository
 SubmitComplaintController ..> PoliticalMandateRepository
 SubmitComplaintController ..> ComplaintRepository
+SubmitComplaintController ..> PoliticalAgentMapper
+SubmitComplaintController ..> RoleMapper
+SubmitComplaintController ..> ComplaintMapper
+SubmitComplaintController ..> PoliticalAgentDTO
+SubmitComplaintController ..> RoleDTO
+SubmitComplaintController ..> ComplaintDTO
+
+PoliticalAgentMapper ..> PoliticalAgent
+PoliticalAgentMapper ..> PoliticalAgentDTO
+
+RoleMapper ..> Role
+RoleMapper ..> RoleDTO
+
+ComplaintMapper ..> Complaint
+ComplaintMapper ..> ComplaintDTO
 
 Repositories -> "1" Repositories : instance
 Repositories --> "1" UserRepository : userRepository

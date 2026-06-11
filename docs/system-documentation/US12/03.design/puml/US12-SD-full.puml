@@ -11,7 +11,9 @@ participant ":SubmitComplaintController" as CTRL
 participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "politicalAgentRepository\n:PoliticalAgentRepository" as AGENT_REPO
+participant "PoliticalAgentMapper" as AGENT_MAPPER
 participant "roleRepository\n:RoleRepository" as ROLE_REPO
+participant "RoleMapper" as ROLE_MAPPER
 participant "ApplicationSession" as APP_SESSION
 participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
 participant "currentSession\n:UserSession" as CURRENT_SESSION
@@ -20,6 +22,7 @@ participant "citizen\n:Citizen" as CITIZEN
 participant "politicalMandateRepository\n:PoliticalMandateRepository" as MANDATE_REPO
 participant "complaintRepository\n:ComplaintRepository" as COMPLAINT_REPO
 participant "complaint\n:Complaint" as COMPLAINT
+participant "ComplaintMapper" as COMPLAINT_MAPPER
 
 activate CITIZEN_ACTOR
 
@@ -44,7 +47,12 @@ activate CITIZEN_ACTOR
                 AGENT_REPO --> CTRL : politicalAgentList
             deactivate AGENT_REPO
 
-            CTRL --> UI : politicalAgentList
+            CTRL -> AGENT_MAPPER : toDTOList(politicalAgentList)
+            activate AGENT_MAPPER
+                AGENT_MAPPER --> CTRL : politicalAgentDTOList
+            deactivate AGENT_MAPPER
+
+            CTRL --> UI : politicalAgentDTOList
         deactivate CTRL
 
         UI -> CTRL : getRoles()
@@ -64,7 +72,12 @@ activate CITIZEN_ACTOR
                 ROLE_REPO --> CTRL : roleList
             deactivate ROLE_REPO
 
-            CTRL --> UI : roleList
+            CTRL -> ROLE_MAPPER : toDTOList(roleList)
+            activate ROLE_MAPPER
+                ROLE_MAPPER --> CTRL : roleDTOList
+            deactivate ROLE_MAPPER
+
+            CTRL --> UI : roleDTOList
         deactivate CTRL
 
         UI --> CITIZEN_ACTOR : asks political agent, role, date and description
@@ -72,7 +85,7 @@ activate CITIZEN_ACTOR
 
     CITIZEN_ACTOR -> UI : provides selected data and description
     activate UI
-        UI -> CTRL : createComplaint(politicalAgent, role, incidentDate, description)
+        UI -> CTRL : createComplaint(politicalAgentDTO, roleDTO, incidentDate, description)
         activate CTRL
 
             CTRL -> CTRL : getCitizenFromSession()
@@ -125,7 +138,7 @@ activate CITIZEN_ACTOR
                 REPOS_SINGLETON --> CTRL : politicalMandateRepository
             deactivate REPOS_SINGLETON
 
-            CTRL -> MANDATE_REPO : getMandateByAgentRoleAndDate(politicalAgent, role, incidentDate)
+            CTRL -> MANDATE_REPO : getMandateByAgentRoleAndDate(politicalAgentDTO.agentId, roleDTO.designation, incidentDate)
             activate MANDATE_REPO
                 MANDATE_REPO --> CTRL : mandate
             deactivate MANDATE_REPO
@@ -160,7 +173,12 @@ activate CITIZEN_ACTOR
                 COMPLAINT_REPO --> CTRL : success
             deactivate COMPLAINT_REPO
 
-            CTRL --> UI : complaintId, SUBMITTED
+            CTRL -> COMPLAINT_MAPPER : toDTO(complaint)
+            activate COMPLAINT_MAPPER
+                COMPLAINT_MAPPER --> CTRL : complaintDTO
+            deactivate COMPLAINT_MAPPER
+
+            CTRL --> UI : complaintDTO
         deactivate CTRL
 
         UI --> CITIZEN_ACTOR : informs operation success with complaint identifier

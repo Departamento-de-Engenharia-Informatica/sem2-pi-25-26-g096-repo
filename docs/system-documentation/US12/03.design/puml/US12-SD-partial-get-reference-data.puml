@@ -9,7 +9,9 @@ participant ":SubmitComplaintController" as CTRL
 participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "politicalAgentRepository\n:PoliticalAgentRepository" as AGENT_REPO
+participant "PoliticalAgentMapper" as AGENT_MAPPER
 participant "roleRepository\n:RoleRepository" as ROLE_REPO
+participant "RoleMapper" as ROLE_MAPPER
 
 autonumber 3
 -> CTRL : getPoliticalAgents()
@@ -31,6 +33,11 @@ activate CTRL
             AGENT_REPO --> CTRL : politicalAgentList
         deactivate AGENT_REPO
 
+        CTRL -> AGENT_MAPPER : toDTOList(politicalAgentList)
+        activate AGENT_MAPPER
+            AGENT_MAPPER --> CTRL : politicalAgentDTOList
+        deactivate AGENT_MAPPER
+
         CTRL -> REPOS : getInstance()
         activate REPOS
             REPOS --> CTRL : repositories
@@ -45,9 +52,15 @@ activate CTRL
         activate ROLE_REPO
             ROLE_REPO --> CTRL : roleList
         deactivate ROLE_REPO
+
+        CTRL -> ROLE_MAPPER : toDTOList(roleList)
+        activate ROLE_MAPPER
+            ROLE_MAPPER --> CTRL : roleDTOList
+        deactivate ROLE_MAPPER
+
     end
     autonumber 4
-    <-- CTRL : politicalAgentList, roleList
+    <-- CTRL : politicalAgentDTOList, roleDTOList
 deactivate CTRL
 
 @enduml

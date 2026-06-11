@@ -25,7 +25,7 @@ activate CITIZEN_ACTOR
 
     CITIZEN_ACTOR -> UI : provides selected data and description
     activate UI
-        UI -> CTRL : createComplaint(politicalAgent, role, incidentDate, description)
+        UI -> CTRL : createComplaint(politicalAgentDTO, roleDTO, incidentDate, description)
         activate CTRL
 
             CTRL -> CTRL : getCitizenFromSession()
@@ -40,7 +40,7 @@ activate CITIZEN_ACTOR
                 Create and Save Complaint
             end ref
 
-            CTRL --> UI : complaintId, SUBMITTED
+            CTRL --> UI : complaintDTO
         deactivate CTRL
 
         UI --> CITIZEN_ACTOR : informs operation success with complaint identifier

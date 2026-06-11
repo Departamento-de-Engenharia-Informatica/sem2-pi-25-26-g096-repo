@@ -10,9 +10,10 @@ participant "politicalMandateRepository:\nPoliticalMandateRepository" as MANDATE
 participant "complaintRepository:\nComplaintRepository" as COMPLAINT_REPO
 participant "citizen\n:Citizen" as CITIZEN
 participant "complaint\n:Complaint" as COMPLAINT
+participant "ComplaintMapper" as COMPLAINT_MAPPER
 
 autonumber 8
--> CTRL : createComplaint(politicalAgent, role, incidentDate, description)
+-> CTRL : createComplaint(politicalAgentDTO, roleDTO, incidentDate, description)
 autonumber 8.1
 activate CTRL
     group Create and Save Complaint
@@ -31,7 +32,7 @@ activate CTRL
             REPOS_SINGLETON --> CTRL : politicalMandateRepository
         deactivate REPOS_SINGLETON
 
-        CTRL -> MANDATE_REPO : getMandateByAgentRoleAndDate(politicalAgent, role, incidentDate)
+        CTRL -> MANDATE_REPO : getMandateByAgentRoleAndDate(politicalAgentDTO.agentId, roleDTO.designation, incidentDate)
         activate MANDATE_REPO
             MANDATE_REPO --> CTRL : mandate
         deactivate MANDATE_REPO
@@ -61,9 +62,15 @@ activate CTRL
         activate COMPLAINT_REPO
             COMPLAINT_REPO --> CTRL : success
         deactivate COMPLAINT_REPO
+
+        CTRL -> COMPLAINT_MAPPER : toDTO(complaint)
+        activate COMPLAINT_MAPPER
+            COMPLAINT_MAPPER --> CTRL : complaintDTO
+        deactivate COMPLAINT_MAPPER
+
     end
     autonumber 9
-    <-- CTRL : complaintId, SUBMITTED
+    <-- CTRL : complaintDTO
 deactivate CTRL
 
 @enduml
