@@ -9,6 +9,7 @@ participant ":ConsultAssetsController" as CTRL
 participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "politicalAgentRepository\n:PoliticalAgentRepository" as AGENT_REPO
+participant "PoliticalAgentMapper" as AGENT_MAPPER
 
 autonumber 3
  -> CTRL : getPoliticalAgents()
@@ -30,10 +31,16 @@ activate CTRL
         activate AGENT_REPO
             AGENT_REPO --> CTRL : politicalAgentList
         deactivate AGENT_REPO
+
+        CTRL -> AGENT_MAPPER : toDTOList(politicalAgentList)
+        activate AGENT_MAPPER
+            AGENT_MAPPER --> CTRL : politicalAgentDTOList
+        deactivate AGENT_MAPPER
+
     end
 
     autonumber 4
-    <-- CTRL : politicalAgentList
+    <-- CTRL : politicalAgentDTOList
 deactivate CTRL
 
 @enduml

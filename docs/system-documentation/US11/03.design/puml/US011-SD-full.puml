@@ -11,6 +11,7 @@ participant ":ConsultAssetsController" as CTRL
 participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "politicalAgentRepository\n:PoliticalAgentRepository" as AGENT_REPO
+participant "PoliticalAgentMapper" as AGENT_MAPPER
 participant "ApplicationSession" as APP_SESSION
 participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
 participant "currentSession\n:UserSession" as CURRENT_SESSION
@@ -18,6 +19,7 @@ participant "userRepository\n:UserRepository" as USER_REPO
 participant "user\n:Person" as USER
 participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
 participant "assetVisibilityService\n:AssetVisibilityService" as VISIBILITY_SERVICE
+participant "AssetViewMapper" as ASSET_MAPPER
 
 activate USER_ACTOR
 
@@ -42,7 +44,12 @@ activate USER_ACTOR
                 AGENT_REPO --> CTRL : politicalAgentList
             deactivate AGENT_REPO
 
-            CTRL --> UI : politicalAgentList
+            CTRL -> AGENT_MAPPER : toDTOList(politicalAgentList)
+            activate AGENT_MAPPER
+                AGENT_MAPPER --> CTRL : politicalAgentDTOList
+            deactivate AGENT_MAPPER
+
+            CTRL --> UI : politicalAgentDTOList
         deactivate CTRL
 
         UI --> USER_ACTOR : shows political agent list and asks for reference date
@@ -50,7 +57,7 @@ activate USER_ACTOR
 
     USER_ACTOR -> UI : selects political agent and enters reference date
     activate UI
-        UI -> CTRL : consultAssets(politicalAgent, referenceDate)
+        UI -> CTRL : consultAssets(politicalAgentDTO, referenceDate)
         activate CTRL
 
             CTRL -> CTRL : getAuthenticatedUserFromSession()
@@ -98,7 +105,7 @@ activate USER_ACTOR
                 REPOS_SINGLETON --> CTRL : declarationRepository
             deactivate REPOS_SINGLETON
 
-            CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
+            CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgentDTO.agentId, referenceDate)
             activate DECL_REPO
                 DECL_REPO --> CTRL : declarations
             deactivate DECL_REPO
@@ -113,7 +120,12 @@ activate USER_ACTOR
                 VISIBILITY_SERVICE --> CTRL : filteredAssets
             deactivate VISIBILITY_SERVICE
 
-            CTRL --> UI : filteredAssets
+            CTRL -> ASSET_MAPPER : toDTOList(filteredAssets)
+            activate ASSET_MAPPER
+                ASSET_MAPPER --> CTRL : assetViewDTOList
+            deactivate ASSET_MAPPER
+
+            CTRL --> UI : assetViewDTOList
         deactivate CTRL
 
         UI --> USER_ACTOR : shows filtered assets for selected date

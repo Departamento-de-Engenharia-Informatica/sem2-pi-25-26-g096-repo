@@ -22,7 +22,7 @@ activate USER_ACTOR
         end ref
 
         activate CTRL
-            CTRL --> UI : politicalAgentList
+            CTRL --> UI : politicalAgentDTOList
         deactivate CTRL
 
         UI --> USER_ACTOR : shows political agent list and asks for reference date
@@ -30,7 +30,7 @@ activate USER_ACTOR
 
     USER_ACTOR -> UI : selects political agent and enters reference date
     activate UI
-        UI -> CTRL : consultAssets(politicalAgent, referenceDate)
+        UI -> CTRL : consultAssets(politicalAgentDTO, referenceDate)
         activate CTRL
 
             CTRL -> CTRL : getAuthenticatedUserFromSession()
@@ -45,7 +45,7 @@ activate USER_ACTOR
                 Consult Assets with Role Filter
             end ref
 
-            CTRL --> UI : filteredAssets
+            CTRL --> UI : assetViewDTOList
         deactivate CTRL
 
         UI --> USER_ACTOR : shows filtered assets for selected date

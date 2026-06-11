@@ -64,6 +64,28 @@ class AssetVisibilityService {
     + applyRoleMasking(user, assetViews)
 }
 
+class PoliticalAgentDTO {
+    - agentId : String
+    - name : String
+}
+
+class PoliticalAgentMapper {
+    + toDTOList(politicalAgentList : List<PoliticalAgent>) : List<PoliticalAgentDTO>
+    + toDTO(politicalAgent : PoliticalAgent) : PoliticalAgentDTO
+}
+
+class AssetViewDTO {
+    - propertyType : String
+    - locationLabel : String
+    - acquisitionValue : String
+    - marketValue : String
+}
+
+class AssetViewMapper {
+    + toDTOList(assetViews : List<AssetView>) : List<AssetViewDTO>
+    + toDTO(assetView : AssetView) : AssetViewDTO
+}
+
 class PoliticalAgentRepository {
     + getPoliticalAgents()
 }
@@ -86,8 +108,8 @@ class Repositories {
 
 class ConsultAssetsController {
     + ConsultAssetsController()
-    + getPoliticalAgents()
-    + consultAssets(politicalAgent, referenceDate)
+    + getPoliticalAgents() : List<PoliticalAgentDTO>
+    + consultAssets(politicalAgentDTO : PoliticalAgentDTO, referenceDate : LocalDate) : List<AssetViewDTO>
     - getAuthenticatedUserFromSession()
 }
 
@@ -109,6 +131,9 @@ Person <|-- Journalist
 Person <|-- PoliticalAgent
 
 ConsultAssetsUI .> ConsultAssetsController
+ConsultAssetsUI ..> PoliticalAgentDTO
+ConsultAssetsUI ..> AssetViewDTO
+
 ConsultAssetsController .> Repositories
 ConsultAssetsController ..> PoliticalAgentRepository
 ConsultAssetsController ..> DeclarationRepository
@@ -116,6 +141,16 @@ ConsultAssetsController ..> UserRepository
 ConsultAssetsController ..> ApplicationSession
 ConsultAssetsController ..> UserSession
 ConsultAssetsController ..> AssetVisibilityService
+ConsultAssetsController ..> PoliticalAgentMapper
+ConsultAssetsController ..> AssetViewMapper
+ConsultAssetsController ..> PoliticalAgentDTO
+ConsultAssetsController ..> AssetViewDTO
+
+PoliticalAgentMapper ..> PoliticalAgent
+PoliticalAgentMapper ..> PoliticalAgentDTO
+
+AssetViewMapper ..> AssetView
+AssetViewMapper ..> AssetViewDTO
 
 Repositories -> "1" Repositories : instance
 Repositories --> "1" PoliticalAgentRepository : politicalAgentRepository

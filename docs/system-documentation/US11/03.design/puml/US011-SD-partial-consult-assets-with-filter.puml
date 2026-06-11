@@ -8,9 +8,10 @@ participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "declarationRepository:\nDeclarationRepository" as DECL_REPO
 participant "assetVisibilityService\n:AssetVisibilityService" as VISIBILITY_SERVICE
+participant "AssetViewMapper" as ASSET_MAPPER
 
 autonumber 8
--> CTRL : consultAssets(politicalAgent, referenceDate)
+-> CTRL : consultAssets(politicalAgentDTO, referenceDate)
 autonumber 8.1
 activate CTRL
     group Consult Assets with Role Filter
@@ -24,7 +25,7 @@ activate CTRL
             REPOS_SINGLETON --> CTRL : declarationRepository
         deactivate REPOS_SINGLETON
 
-        CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgent, referenceDate)
+        CTRL -> DECL_REPO : getDeclarationsByPoliticalAgentUntilDate(politicalAgentDTO.agentId, referenceDate)
         activate DECL_REPO
             DECL_REPO --> CTRL : declarations
         deactivate DECL_REPO
@@ -38,9 +39,15 @@ activate CTRL
         activate VISIBILITY_SERVICE
             VISIBILITY_SERVICE --> CTRL : filteredAssets
         deactivate VISIBILITY_SERVICE
+
+        CTRL -> ASSET_MAPPER : toDTOList(filteredAssets)
+        activate ASSET_MAPPER
+            ASSET_MAPPER --> CTRL : assetViewDTOList
+        deactivate ASSET_MAPPER
+
     end
     autonumber 9
-    <-- CTRL : filteredAssets
+    <-- CTRL : assetViewDTOList
 deactivate CTRL
 
 @enduml
