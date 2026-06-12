@@ -15,6 +15,9 @@ skinparam class {
     BackgroundColor<<Service>> White
     BackgroundColor<<Mapper>> White
     BackgroundColor<<DTO>> White
+    BackgroundColor<<Adapter>> White
+    BackgroundColor<<External>> White
+    BackgroundColor<<Factory>> White
 }
 
 package "Enums" {
@@ -227,6 +230,13 @@ package "Domain" {
         - creationDate : LocalDateTime
     }
 
+    class Notification {
+        - recipientEmail : String
+        - subject : String
+        - message : String
+        - sentDate : LocalDateTime
+    }
+
     class IntegratedSituation {
         - referenceDate : LocalDate
         - totalIncome : double
@@ -291,6 +301,7 @@ package "DTOs / Mappers / Services" {
     class InstitutionDTO <<DTO>> {
         + id : String
         + name : String
+        + taxId : String
     }
 
     class PoliticalAgentDTO <<DTO>> {
@@ -313,6 +324,30 @@ package "DTOs / Mappers / Services" {
         - marketValue : String
     }
 
+    class RegistrationRequestDTO <<DTO>> {
+        + name : String
+        + taxId : String
+        + email : String
+        + password : String
+        + requestedRole : RequestedRole
+        + nationalIdentityCardNumber : String
+        + pressCardNumber : String
+        + requestedPosition : String
+        + requestedInstitution : String
+    }
+
+    class RegistrationRequestResultDTO <<DTO>> {
+        + requestId : String
+        + requestDate : LocalDate
+        + status : RequestStatus
+        + message : String
+    }
+
+    class RequestRegistrationMapper <<Mapper>> {
+        + toInstitutionDTOList(institutions) : List<InstitutionDTO>
+        + toResultDTO(registrationRequest) : RegistrationRequestResultDTO
+    }
+
     class PoliticalAgentMapper <<Mapper>> {
         + toDTOList(politicalAgents)
         + toDTO(politicalAgent)
@@ -326,6 +361,104 @@ package "DTOs / Mappers / Services" {
 
     class AssetVisibilityService <<Service>> {
         + applyRoleMasking(user, assetViews)
+    }
+
+    class PendingRegistrationRequestDTO <<DTO>> {
+        + requestId : String
+        + requestDate : LocalDate
+        + requestedRole : RequestedRole
+    }
+
+    class RegistrationRequestDetailsDTO <<DTO>> {
+        + requestId : String
+        + name : String
+        + taxId : String
+        + email : String
+        + requestedRole : RequestedRole
+        + nationalIdentityCardNumber : String
+        + pressCardNumber : String
+        + requestedPosition : String
+        + requestedInstitution : String
+    }
+
+    class RegistrationDecisionDTO <<DTO>> {
+        + accepted : boolean
+        + rejectionReason : String
+    }
+
+    class RegistrationDecisionNotificationDTO <<DTO>> {
+        + recipientEmail : String
+        + subject : String
+        + message : String
+    }
+
+    class RegistrationRequestMapper <<Mapper>> {
+        + toPendingDTOList(requests) : List<PendingRegistrationRequestDTO>
+        + toDetailsDTO(request) : RegistrationRequestDetailsDTO
+        + toNotificationDTO(request, annotation) : RegistrationDecisionNotificationDTO
+    }
+
+    class SubmittedDeclarationDTO <<DTO>> {
+        + declarationId : String
+        + submissionDate : LocalDate
+        + status : DeclarationStatus
+    }
+
+    class DeclarationDetailsDTO <<DTO>> {
+        + declarationId : String
+        + submissionDate : LocalDate
+        + status : DeclarationStatus
+        + subsidies : List<String>
+        + assets : List<String>
+        + positions : List<String>
+        + securityHoldings : List<String>
+    }
+
+    class ValidationDecisionDTO <<DTO>> {
+        + verdict : ValidationVerdict
+        + targetReference : String
+        + commentText : String
+    }
+
+    class ValidationResultDTO <<DTO>> {
+        + declarationId : String
+        + status : DeclarationStatus
+        + verdict : ValidationVerdict
+        + message : String
+    }
+
+    class DeclarationMapper <<Mapper>> {
+        + toSubmittedDTOList(declarations) : List<SubmittedDeclarationDTO>
+        + toDetailsDTO(declaration) : DeclarationDetailsDTO
+        + toResultDTO(declaration, validation) : ValidationResultDTO
+    }
+
+    interface EmailService <<Service>> {
+        + sendRegistrationDecisionNotification(notificationDTO)
+    }
+
+    class GmailEmailServiceAdapter <<Adapter>> {
+        + sendRegistrationDecisionNotification(notificationDTO)
+    }
+
+    class DeiEmailServiceAdapter <<Adapter>> {
+        + sendRegistrationDecisionNotification(notificationDTO)
+    }
+
+    class EmailServiceFactory <<Factory>> {
+        + createEmailService() : EmailService
+    }
+
+    class ApplicationProperties {
+        + getProperty(key) : String
+    }
+
+    class GmailEmailAPI <<External>> {
+        + send(to, subject, body)
+    }
+
+    class DeiEmailAPI <<External>> {
+        + sendMessage(to, subject, body)
     }
 }
 
@@ -400,16 +533,16 @@ package "Repositories" {
 package "Controllers (C)" {
     class RequestRegistrationController <<Controller>> {
         + getRequestedRoles() : RequestedRole[]
-        + getInstitutions() : List<Institution>
-        + createRegistrationRequest(...) : RegistrationRequest
+        + getInstitutions() : List<InstitutionDTO>
+        + createRegistrationRequest(registrationRequestDTO) : RegistrationRequestResultDTO
     }
 
     class ApproveRejectRegistrationController <<Controller>> {
         - registrationRequest : RegistrationRequest
-        + getPendingRegistrationRequests() : List<RegistrationRequest>
-        + selectRegistrationRequest(registrationRequest)
-        + acceptRegistrationRequest() : User
-        + rejectRegistrationRequest(rejectionReason) : Annotation
+        + getPendingRegistrationRequests() : List<PendingRegistrationRequestDTO>
+        + selectRegistrationRequest(requestId) : RegistrationRequestDetailsDTO
+        + acceptRegistrationRequest(decisionDTO) : RegistrationRequestDetailsDTO
+        + rejectRegistrationRequest(decisionDTO) : RegistrationRequestDetailsDTO
     }
 
     class ListInstitutionsController <<Controller>> {
@@ -430,10 +563,10 @@ package "Controllers (C)" {
 
     class ValidateDeclarationController <<Controller>> {
         - declaration : Declaration
-        + getSubmittedDeclarations() : List<Declaration>
-        + selectDeclaration(declaration)
-        + approveDeclaration() : Validation
-        + rejectDeclaration(targetReference, commentText) : Validation
+        + getSubmittedDeclarations() : List<SubmittedDeclarationDTO>
+        + selectDeclaration(declarationId) : DeclarationDetailsDTO
+        + approveDeclaration(decisionDTO) : ValidationResultDTO
+        + rejectDeclaration(decisionDTO) : ValidationResultDTO
     }
 
     class ConsultIntegratedSituationController <<Controller>> {
@@ -486,6 +619,7 @@ RegistrationRequest --> "1" RequestedRole : requestedRole
 RegistrationRequest --> "1" RequestStatus : status
 RegistrationRequest --> "0..1" User : createdUser
 RegistrationRequest --> "0..1" Administrator : reviewedBy
+RegistrationRequest --> "0..1" Notification : decisionNotification
 
 Administrator "1" -- "0..*" Institution : registers >
 Institution --> "1" InstitutionType : type
@@ -516,6 +650,7 @@ Validation --> "1" ValidationVerdict : verdict
 Validation *-- "0..*" Annotation : annotations
 Annotation --> "0..1" Declaration : commentsOn
 Annotation --> "0..1" RegistrationRequest : justifies rejection of >
+Notification ..> "0..1" Annotation : may include reason from >
 
 EthicsCommitteeMember --> "*" IntegratedSituation : consultations
 IntegratedSituation --> "1" PoliticalAgent : politicalAgent
@@ -592,5 +727,33 @@ AssetDTO ..> LocationDTO
 PoliticalAgentMapper ..> PoliticalAgentDTO
 IncomeEvolutionMapper ..> IncomeEvolutionDTO
 AssetVisibilityService ..> AssetView
+RequestRegistrationController ..> RegistrationRequestDTO
+RequestRegistrationController ..> RequestRegistrationMapper
+RequestRegistrationMapper ..> InstitutionDTO
+RequestRegistrationMapper ..> RegistrationRequestResultDTO
+RequestRegistrationMapper ..> RegistrationRequest
+RequestRegistrationMapper ..> Institution
+RegistrationRequestMapper ..> PendingRegistrationRequestDTO
+RegistrationRequestMapper ..> RegistrationRequestDetailsDTO
+RegistrationRequestMapper ..> RegistrationDecisionNotificationDTO
+RegistrationRequestMapper ..> RegistrationRequest
+RegistrationRequestMapper ..> Annotation
+ApproveRejectRegistrationController ..> RegistrationRequestMapper
+ApproveRejectRegistrationController ..> RegistrationDecisionDTO
+ApproveRejectRegistrationController ..> EmailServiceFactory
+ApproveRejectRegistrationController ..> EmailService
+EmailService <|.. GmailEmailServiceAdapter
+EmailService <|.. DeiEmailServiceAdapter
+GmailEmailServiceAdapter ..> GmailEmailAPI
+DeiEmailServiceAdapter ..> DeiEmailAPI
+EmailServiceFactory ..> ApplicationProperties
+EmailServiceFactory ..> EmailService
+ValidateDeclarationController ..> DeclarationMapper
+ValidateDeclarationController ..> ValidationDecisionDTO
+DeclarationMapper ..> SubmittedDeclarationDTO
+DeclarationMapper ..> DeclarationDetailsDTO
+DeclarationMapper ..> ValidationResultDTO
+DeclarationMapper ..> Declaration
+DeclarationMapper ..> Validation
 
 @enduml

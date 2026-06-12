@@ -141,6 +141,13 @@ class Annotation {
   creationDate
 }
 
+class Notification {
+  recipientEmail
+  subject
+  message
+  sentDate
+}
+
 class Subsidy {
   amount
   nature
@@ -189,6 +196,8 @@ RegistrationRequest "1" -- "0..1" User : creates if accepted >
 
 Administrator "1" -- "0..*" RegistrationRequest : reviews >
 Annotation "0..*" -- "0..1" RegistrationRequest : justifies rejection of >
+RegistrationRequest "1" -- "0..1" Notification : originates >
+Notification "0..1" ..> "0..1" Annotation : may include reason from >
 
 PoliticalAgent "1" -- "0..*" PoliticalMandate : holds >
 PoliticalMandate --> "1" PoliticalOffice
