@@ -1,0 +1,58 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+participant ":RequestRegistrationUI" as UI
+participant ":RequestRegistrationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "registrationRequestRepository\n:RegistrationRequestRepository" as REQ_REPO
+participant "requestRegistrationMapper\n:RequestRegistrationMapper" as MAPPER
+participant "registrationRequest\n:RegistrationRequest" as REQ
+
+UI -> CTRL : createRegistrationRequest(registrationRequestDTO)
+activate CTRL
+    CTRL -> REPOS : getInstance()
+    activate REPOS
+        REPOS --> CTRL : repositories
+    deactivate REPOS
+
+    CTRL -> REPOS_SINGLETON : getRegistrationRequestRepository()
+    activate REPOS_SINGLETON
+        REPOS_SINGLETON --> CTRL : registrationRequestRepository
+    deactivate REPOS_SINGLETON
+
+    CTRL -> REQ_REPO : createRegistrationRequest(name, taxId, email, password,
+    activate REQ_REPO
+        REQ_REPO --> REQ** : create(name, taxId, email, password,
+
+        REQ -> REQ : validateData()
+        activate REQ
+            REQ --> REQ : true
+        deactivate REQ
+
+        REQ -> REQ : validateRoleSpecificData()
+        activate REQ
+            REQ --> REQ : true
+        deactivate REQ
+
+        REQ_REPO -> REQ_REPO : addRegistrationRequest(registrationRequest)
+        activate REQ_REPO
+            REQ_REPO --> REQ_REPO : true
+        deactivate REQ_REPO
+
+        REQ_REPO --> CTRL : registrationRequest
+    deactivate REQ_REPO
+
+    CTRL -> MAPPER : toResultDTO(registrationRequest)
+    activate MAPPER
+        MAPPER --> CTRL : registrationRequestResultDTO
+    deactivate MAPPER
+
+    CTRL --> UI : registrationRequestResultDTO
+deactivate CTRL
+
+@enduml

@@ -1,0 +1,16 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+participant ":RequestRegistrationUI" as UI
+participant ":RequestRegistrationController" as CTRL
+
+UI -> CTRL : getRequestedRoles()
+activate CTRL
+    CTRL --> UI : requestedRoleList
+deactivate CTRL
+
+@enduml

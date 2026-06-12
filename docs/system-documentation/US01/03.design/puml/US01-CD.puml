@@ -6,6 +6,12 @@ skinparam linetype polyline
 'skinparam linetype orto
 
 skinparam classAttributeIconSize 0
+hide circle
+
+skinparam class {
+    BackgroundColor<<DTO>> White
+    BackgroundColor<<Mapper>> White
+}
 
 enum RequestedRole {
     POLITICAL_AGENT
@@ -41,6 +47,35 @@ class Institution {
     - taxId : String
 }
 
+class RegistrationRequestDTO <<DTO>> {
+    + name : String
+    + taxId : String
+    + email : String
+    + password : String
+    + requestedRole : RequestedRole
+    + nationalIdentityCardNumber : String
+    + pressCardNumber : String
+    + requestedPosition : String
+    + requestedInstitution : String
+}
+
+class InstitutionDTO <<DTO>> {
+    + name : String
+    + taxId : String
+}
+
+class RegistrationRequestResultDTO <<DTO>> {
+    + requestId : String
+    + requestDate : LocalDate
+    + status : RequestStatus
+    + message : String
+}
+
+class RequestRegistrationMapper <<Mapper>> {
+    + toInstitutionDTOList(institutions) : List<InstitutionDTO>
+    + toResultDTO(registrationRequest) : RegistrationRequestResultDTO
+}
+
 class RegistrationRequestRepository {
     + createRegistrationRequest(name, taxId, email, password, requestedRole,\n  nationalIdentityCardNumber, pressCardNumber,\n  requestedPosition, requestedInstitution)
     - addRegistrationRequest(registrationRequest)
@@ -61,8 +96,8 @@ class Repositories {
 class RequestRegistrationController {
     + RequestRegistrationController()
     + getRequestedRoles()
-    + getInstitutions()
-    + createRegistrationRequest(name, taxId, email, password, requestedRole,\n  nationalIdentityCardNumber, pressCardNumber,\n  requestedPosition, requestedInstitution)
+    + getInstitutions() : List<InstitutionDTO>
+    + createRegistrationRequest(registrationRequestDTO) : RegistrationRequestResultDTO
 }
 
 note right of RequestRegistrationController
@@ -92,6 +127,8 @@ RequestRegistrationController ..> RegistrationRequestRepository
 RequestRegistrationController ..> InstitutionRepository
 RequestRegistrationController ..> RegistrationRequest
 RequestRegistrationController ..> RequestedRole
+RequestRegistrationController ..> RegistrationRequestDTO
+RequestRegistrationController ..> RequestRegistrationMapper
 
 Repositories -> "1" Repositories : instance
 Repositories --> "1" RegistrationRequestRepository : registrationRequestRepository
@@ -100,6 +137,11 @@ Repositories --> "1" InstitutionRepository : institutionRepository
 RegistrationRequestRepository --> "*" RegistrationRequest : registrationRequests
 
 InstitutionRepository --> "*" Institution : institutions
+
+RequestRegistrationMapper ..> Institution
+RequestRegistrationMapper ..> InstitutionDTO
+RequestRegistrationMapper ..> RegistrationRequest
+RequestRegistrationMapper ..> RegistrationRequestResultDTO
 
 RegistrationRequest --> "1" RequestedRole : requestedRole
 RegistrationRequest --> "1" RequestStatus : status

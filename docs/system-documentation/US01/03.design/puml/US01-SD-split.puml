@@ -1,0 +1,61 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Future User" as FUTURE_USER
+participant ":RequestRegistrationUI" as UI
+participant ":RequestRegistrationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+participant "registrationRequestRepository\n:RegistrationRequestRepository" as REQ_REPO
+participant "requestRegistrationMapper\n:RequestRegistrationMapper" as MAPPER
+participant "registrationRequest\n:RegistrationRequest" as REQ
+
+activate FUTURE_USER
+
+    FUTURE_USER -> UI : asks to register in the platform
+    activate UI
+        UI --> CTRL** : create()
+
+        ref over UI, CTRL
+            get requested roles
+        end ref
+
+        UI --> FUTURE_USER : presents available role list
+    deactivate UI
+
+    FUTURE_USER -> UI : selects requested role
+    activate UI
+
+        alt selected role is POLITICAL_AGENT
+            ref over UI, CTRL, REPOS, REPOS_SINGLETON, INST_REPO, MAPPER
+                get institutions
+            end ref
+            UI --> FUTURE_USER : requests personal data, Political Agent mandatory details,
+        else selected role is not POLITICAL_AGENT
+            UI --> FUTURE_USER : requests personal data and role-specific mandatory details
+        end
+
+    deactivate UI
+
+    FUTURE_USER -> UI : submits requested data
+    activate UI
+        UI --> FUTURE_USER : displays entered data and requests confirmation
+    deactivate UI
+
+    FUTURE_USER -> UI : confirms the registration request
+    activate UI
+        ref over UI, CTRL, REPOS, REPOS_SINGLETON, REQ_REPO, MAPPER, REQ
+            create registration request
+        end ref
+        UI --> FUTURE_USER : informs that the request was successfully submitted
+        UI --> FUTURE_USER : notifies that access is pending administrator approval
+    deactivate UI
+
+deactivate FUTURE_USER
+
+@enduml

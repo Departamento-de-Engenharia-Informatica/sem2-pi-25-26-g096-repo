@@ -14,6 +14,7 @@ participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "institutionRepository\n:InstitutionRepository" as INST_REPO
 participant "registrationRequestRepository\n:RegistrationRequestRepository" as REQ_REPO
+participant "requestRegistrationMapper\n:RequestRegistrationMapper" as MAPPER
 participant "registrationRequest\n:RegistrationRequest" as REQ
 
 activate FUTURE_USER
@@ -49,10 +50,15 @@ activate FUTURE_USER
 
                 CTRL -> INST_REPO : getInstitutions()
                 activate INST_REPO
-                    INST_REPO --> CTRL : institutionList
+                    INST_REPO --> CTRL : institutions
                 deactivate INST_REPO
 
-                CTRL --> UI : institutionList
+                CTRL -> MAPPER : toInstitutionDTOList(institutions)
+                activate MAPPER
+                    MAPPER --> CTRL : institutionDTOList
+                deactivate MAPPER
+
+                CTRL --> UI : institutionDTOList
             deactivate CTRL
 
             UI --> FUTURE_USER : requests personal data, Political Agent mandatory details,\nand existing institution selection or new institution input
@@ -72,7 +78,7 @@ activate FUTURE_USER
 
     FUTURE_USER -> UI : confirms the registration request
     activate UI
-        UI -> CTRL : createRegistrationRequest(name, taxId, email, password,\nrequestedRole, nationalIdentityCardNumber,\npressCardNumber, requestedPosition, requestedInstitution)
+        UI -> CTRL : createRegistrationRequest(registrationRequestDTO)
         activate CTRL
 
             CTRL -> REPOS : getInstance()
@@ -108,7 +114,12 @@ activate FUTURE_USER
                 REQ_REPO --> CTRL : registrationRequest
             deactivate REQ_REPO
 
-            CTRL --> UI : registrationRequest
+            CTRL -> MAPPER : toResultDTO(registrationRequest)
+            activate MAPPER
+                MAPPER --> CTRL : registrationRequestResultDTO
+            deactivate MAPPER
+
+            CTRL --> UI : registrationRequestResultDTO
         deactivate CTRL
 
         UI --> FUTURE_USER : informs that the request was successfully submitted

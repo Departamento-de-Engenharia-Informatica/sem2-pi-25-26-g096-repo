@@ -62,6 +62,10 @@ number, the elected position/function, and the institution for which they were e
 * **AC6:** When requesting the **Political Agent** role, the future user must be able to indicate the elected 
 position/function and institution either by selecting existing records or by providing new ones when they are not yet registered in the system.
 
+* **AC7:** The submitted registration request must remain in the `PENDING` status until it is accepted or rejected by an Administrator.
+
+* **AC8:** The password must contain seven alphanumeric characters, including at least three uppercase letters and two digits.
+
 
 ---
 
@@ -110,7 +114,5 @@ this story, no request can transition from PENDING to an active account.
 
 ### 1.7. Other Relevant Remarks
 
-* The password must comply with the non-functional security requirement: seven alphanumeric characters including at 
-least three uppercase letters and two digits.
 * No personally identifiable information is exposed to other users during the pending phase.
 * The request entity must support serialization to guarantee data persistence across application restarts.

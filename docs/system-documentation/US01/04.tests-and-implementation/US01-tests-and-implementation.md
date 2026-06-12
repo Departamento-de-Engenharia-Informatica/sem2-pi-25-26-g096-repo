@@ -2,7 +2,7 @@
 
 ## 4. Tests
 
-The following unit tests are designed from the acceptance criteria, analysis model and design model of US01. They focus on the `RegistrationRequest`, `RequestedRole`, `RequestStatus`, `RequestRegistrationController` and `RegistrationRequestRepository` responsibilities identified in the design.
+The following unit tests are designed from the acceptance criteria, analysis model and design model of US01. They focus on the `RegistrationRequest`, `RequestedRole`, `RequestStatus`, DTO mapping, `RequestRegistrationController` and `RegistrationRequestRepository` responsibilities identified in the design.
 
 ### Acceptance Criteria Coverage
 
@@ -14,6 +14,8 @@ The following unit tests are designed from the acceptance criteria, analysis mod
 | AC4 - Journalist must provide press card number.                                                             | Test 4           |
 | AC5 - Political Agent must provide national identity card number, elected position and institution.          | Test 5           |
 | AC6 - Political Agent may select existing records or provide new elected position and institution.           | Test 6           |
+| AC7 - The registration request remains pending until an Administrator accepts or rejects it.                 | Tests 2 and 7    |
+| AC8 - Password must have seven alphanumeric characters, at least three uppercase letters and two digits.      | Test 8           |
 
 **Test 1:** Check that the available roles are obtained from the predefined `RequestedRole` list - AC1.
 
@@ -38,12 +40,12 @@ This test validates the main outcome of US01: the system creates a registration 
 ```java
 @Test
 public void ensureRegistrationRequestIsCreatedWithPendingStatus() {
-    RegistrationRequest request = controller.createRegistrationRequest(
+    RegistrationRequestResultDTO result = controller.createRegistrationRequest(new RegistrationRequestDTO(
         "Future User", "123456789", "future.user@email.com", "ABC12de",
-        RequestedRole.CITIZEN, "12345678", null, null, null);
+        RequestedRole.CITIZEN, "12345678", null, null, null));
 
-    assertNotNull(request);
-    assertEquals(RequestStatus.PENDING, request.getStatus());
+    assertNotNull(result);
+    assertEquals(RequestStatus.PENDING, result.status);
 }
 ```
 
@@ -54,9 +56,9 @@ This test verifies the role-specific mandatory data for the Ordinary Citizen rol
 ```java
 @Test(expected = IllegalArgumentException.class)
 public void ensureCitizenRequiresNationalIdentityCardNumber() {
-    controller.createRegistrationRequest(
+    controller.createRegistrationRequest(new RegistrationRequestDTO(
         "Future Citizen", "123456789", "citizen@email.com", "ABC12de",
-        RequestedRole.CITIZEN, null, null, null, null);
+        RequestedRole.CITIZEN, null, null, null, null));
 }
 ```
 
@@ -67,9 +69,9 @@ This test verifies that the system asks for, and validates, the mandatory detail
 ```java
 @Test(expected = IllegalArgumentException.class)
 public void ensureJournalistRequiresPressCardNumber() {
-    controller.createRegistrationRequest(
+    controller.createRegistrationRequest(new RegistrationRequestDTO(
         "Future Journalist", "123456789", "journalist@email.com", "ABC12de",
-        RequestedRole.JOURNALIST, null, null, null, null);
+        RequestedRole.JOURNALIST, null, null, null, null));
 }
 ```
 
@@ -80,9 +82,9 @@ This test validates the complete mandatory data set for a Political Agent. The r
 ```java
 @Test(expected = IllegalArgumentException.class)
 public void ensurePoliticalAgentRequiresAllMandatoryDetails() {
-    controller.createRegistrationRequest(
+    controller.createRegistrationRequest(new RegistrationRequestDTO(
         "Future Political Agent", "123456789", "agent@email.com", "ABC12de",
-        RequestedRole.POLITICAL_AGENT, "12345678", null, "Councillor", null);
+        RequestedRole.POLITICAL_AGENT, "12345678", null, "Councillor", null));
 }
 ```
 
@@ -93,33 +95,63 @@ This test ensures that the request accepts the two alternatives stated by the cl
 ```java
 @Test
 public void ensurePoliticalAgentCanUseExistingOrNewPositionAndInstitution() {
-    RegistrationRequest existingDataRequest = controller.createRegistrationRequest(
+    RegistrationRequestResultDTO existingDataRequest = controller.createRegistrationRequest(new RegistrationRequestDTO(
         "Political Agent One", "123456789", "agent.one@email.com", "ABC12de",
         RequestedRole.POLITICAL_AGENT, "12345678", null,
-        "Councillor", "Municipal Council");
+        "Councillor", "Municipal Council"));
 
-    RegistrationRequest newDataRequest = controller.createRegistrationRequest(
+    RegistrationRequestResultDTO newDataRequest = controller.createRegistrationRequest(new RegistrationRequestDTO(
         "Political Agent Two", "987654321", "agent.two@email.com", "ABC12de",
         RequestedRole.POLITICAL_AGENT, "87654321", null,
-        "New Elected Position", "New Institution");
+        "New Elected Position", "New Institution"));
 
     assertNotNull(existingDataRequest);
     assertNotNull(newDataRequest);
 }
 ```
 
-**Test 7:** Check that a valid registration request is persisted in the repository.
+**Test 7:** Check that a valid registration request is persisted in the repository and remains pending - AC7.
 
 This test verifies the responsibility assigned to `RegistrationRequestRepository` in the design: after successful validation, the request must be stored so that it can later be reviewed in US02.
 
 ```java
 @Test
 public void ensureRegistrationRequestIsPersistedAfterCreation() {
-    RegistrationRequest request = controller.createRegistrationRequest(
+    RegistrationRequestResultDTO result = controller.createRegistrationRequest(new RegistrationRequestDTO(
         "Future User", "123456789", "future.user@email.com", "ABC12de",
-        RequestedRole.CITIZEN, "12345678", null, null, null);
+        RequestedRole.CITIZEN, "12345678", null, null, null));
 
-    assertTrue(registrationRequestRepository.getRegistrationRequests().contains(request));
+    RegistrationRequest request = registrationRequestRepository.getById(result.requestId);
+
+    assertNotNull(request);
+    assertEquals(RequestStatus.PENDING, request.getStatus());
+}
+```
+
+**Test 8:** Check that the password policy is enforced - AC8.
+
+This test verifies the explicit password rule: seven alphanumeric characters, including at least three uppercase letters and two digits.
+
+```java
+@Test(expected = IllegalArgumentException.class)
+public void ensurePasswordMustFollowRequiredFormat() {
+    controller.createRegistrationRequest(new RegistrationRequestDTO(
+        "Future User", "123456789", "future.user@email.com", "AB12def",
+        RequestedRole.CITIZEN, "12345678", null, null, null));
+}
+```
+
+**Test 9:** Check that institutions are returned to the UI as DTOs.
+
+This test confirms that the UI receives `InstitutionDTO` objects instead of domain objects when the selected role is Political Agent.
+
+```java
+@Test
+public void ensureInstitutionsAreReturnedAsDTOs() {
+    List<InstitutionDTO> institutions = controller.getInstitutions();
+
+    assertFalse(institutions.isEmpty());
+    assertTrue(institutions.get(0) instanceof InstitutionDTO);
 }
 ```
 
@@ -129,6 +161,8 @@ public void ensureRegistrationRequestIsPersistedAfterCreation() {
 The implementation should follow the design responsibilities:
 
 * `RequestRegistrationController` coordinates the use case.
+* `RegistrationRequestDTO` carries submitted data from the UI to the controller.
+* `RequestRegistrationMapper` converts domain objects into DTOs for the UI.
 * `RequestedRole` provides the predefined role list.
 * `RegistrationRequest` validates common and role-specific mandatory data.
 * `RegistrationRequestRepository` creates and stores valid requests with status `PENDING`.

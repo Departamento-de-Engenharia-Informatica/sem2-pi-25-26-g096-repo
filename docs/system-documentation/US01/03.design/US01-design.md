@@ -14,10 +14,12 @@
 |                | ... knowing existing institutions to display when the selected role is Political Agent? | InstitutionRepository         | Information Expert / Pure Fabrication: it keeps the collection of registered institutions.                                        |
 | Step 3         | ... saving the inputted data temporarily?                                               | RequestRegistrationUI         | Information Expert: the UI keeps the data typed by the actor before confirmation.                                                 |
 |                | ... showing the entered data and requesting confirmation?                               | RequestRegistrationUI         | Pure Fabrication: responsible for displaying information and interacting with the actor.                                          |
-| Step 4         | ... creating the RegistrationRequest?                                                   | RegistrationRequestRepository | Creator: the repository records and manages RegistrationRequest instances.                                                        |
+| Step 4         | ... carrying submitted registration data between UI and controller?                     | RegistrationRequestDTO        | DTO: transfers input data without exposing or creating domain objects in the UI.                                                   |
+|                | ... creating the RegistrationRequest?                                                   | RegistrationRequestRepository | Creator: the repository records and manages RegistrationRequest instances.                                                        |
 |                | ... validating the request data locally?                                                | RegistrationRequest           | Information Expert: the request owns its own data and can validate its mandatory and role-specific attributes.                    |
 |                | ... setting the initial request status as PENDING?                                      | RegistrationRequest           | Information Expert: the status belongs to the RegistrationRequest being created.                                                  |
 |                | ... saving the created registration request?                                            | RegistrationRequestRepository | Information Expert: it knows and manages all registration requests.                                                               |
+|                | ... preparing data to be returned to the UI?                                            | RequestRegistrationMapper     | Mapper / DTO: converts domain objects into DTOs suitable for presentation.                                                        |
 |                | ... informing operation success?                                                        | RequestRegistrationUI         | Pure Fabrication: responsible for user interaction and feedback.                                                                  |
 
 ### Systematization
@@ -38,6 +40,10 @@ Other software classes identified:
 * Repositories
 * RegistrationRequestRepository
 * InstitutionRepository
+* RegistrationRequestDTO
+* InstitutionDTO
+* RegistrationRequestResultDTO
+* RequestRegistrationMapper
 
 ---
 
@@ -51,7 +57,23 @@ This diagram shows the full sequence of interactions between the classes involve
 
 ### Split Diagrams
 
-No split diagrams were produced for this user story because the full sequence diagram is small enough to be read as a single diagram.
+The following diagram shows the same sequence of interactions between the classes involved in the realization of this user story, but it is split in partial diagrams to improve readability.
+
+It uses Interaction Occurrence (a.k.a. Interaction Use).
+
+![Sequence Diagram - Split](svg/US01-SD-split.svg)
+
+**Get Requested Roles**
+
+![Sequence Diagram - Partial - Get Requested Roles](svg/US01-SD-partial-get-requested-roles.svg)
+
+**Get Institutions**
+
+![Sequence Diagram - Partial - Get Institutions](svg/US01-SD-partial-get-institutions.svg)
+
+**Create Registration Request**
+
+![Sequence Diagram - Partial - Create Registration Request](svg/US01-SD-partial-create-registration-request.svg)
 
 ---
 
