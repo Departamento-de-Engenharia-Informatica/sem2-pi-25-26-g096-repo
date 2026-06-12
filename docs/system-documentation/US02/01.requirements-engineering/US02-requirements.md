@@ -17,6 +17,10 @@ platform.
 
 > The System Administrator is responsible for managing the system and its access privileges.
 
+> A notification message must be sent to the user informing them of the decision (accepted or rejected).
+
+> The system must support multiple email service providers (e.g., Gmail, DEI service). The specific provider to be used must be defined through a configuration file, and at least two different implementations should be available.
+
 
 **From the Forum:**
 
@@ -53,6 +57,10 @@ platform.
 * **AC4:** When rejecting a registration request, the Administrator must provide a rejection reason/comment.
 
 * **AC5:** When accepting a registration request, the system must automatically create the corresponding user account.
+
+* **AC6:** A notification message must be sent to the user informing them of the decision (accepted or rejected).
+
+* **AC7:** The system must support multiple email service providers. The provider to be used must be defined through a configuration file, and at least two implementations must be available.
 ---
 
 ### 1.4. Found out Dependencies
@@ -68,6 +76,7 @@ platform.
 * Selected data:
   * Pending registration request
   * Decision: accept or reject
+  * Email service provider, indirectly selected through the configuration file
 
 * Typed data:
   * Rejection reason/comment, when rejecting the request
@@ -77,6 +86,7 @@ platform.
 * List of pending registration requests
 * Details of the selected request
 * Result of the operation (success or failure)
+* Notification message sent to the requester with the decision outcome
 
 ---
 
@@ -90,3 +100,4 @@ platform.
 
 * An accepted request results in an active user account with the role and permissions originally requested.
 * A rejected request does not create any account; the requester may be informed of the outcome.
+* Email provider selection is a technical configuration concern and should not be hard-coded in the use case controller.

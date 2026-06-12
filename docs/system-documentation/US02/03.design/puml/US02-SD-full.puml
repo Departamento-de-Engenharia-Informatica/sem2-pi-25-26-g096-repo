@@ -13,205 +13,185 @@ participant ":ApproveRejectRegistrationController" as CTRL
 participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "registrationRequestRepository\n:RegistrationRequestRepository" as REQ_REPO
+participant "mapper\n:RegistrationRequestMapper" as MAPPER
 participant "ApplicationSession" as APP_SESSION
 participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
 participant "currentSession\n:UserSession" as CURRENT_SESSION
 participant "userRepository\n:UserRepository" as USER_REPO
 participant "registrationRequest\n:RegistrationRequest" as REQ
-participant "administrator\n:Administrator" as ADMIN_OBJ
-participant "user\n:User" as USER
-participant "annotation\n:Annotation" as ANNOTATION
+participant "emailServiceFactory\n:EmailServiceFactory" as EMAIL_FACTORY
+participant "emailService\n:EmailService" as EMAIL_SERVICE
 
-activate ADMIN
+ADMIN -> UI : asks to manage pending registration requests
+activate UI
+    UI --> CTRL** : create()
+    UI -> CTRL : getPendingRegistrationRequests()
+    activate CTRL
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
 
-    ADMIN -> UI : asks to manage pending registration requests
+        CTRL -> REPOS_SINGLETON : getRegistrationRequestRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : registrationRequestRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> REQ_REPO : getPendingRegistrationRequests()
+        activate REQ_REPO
+            REQ_REPO --> CTRL : pendingRequests
+        deactivate REQ_REPO
+
+        CTRL -> MAPPER : toPendingDTOList(pendingRequests)
+        activate MAPPER
+            MAPPER --> CTRL : pendingRequestDTOList
+        deactivate MAPPER
+
+        CTRL --> UI : pendingRequestDTOList
+    deactivate CTRL
+    UI --> ADMIN : presents pending request DTO list
+deactivate UI
+
+ADMIN -> UI : selects a pending request
+activate UI
+    UI -> CTRL : selectRegistrationRequest(requestId)
+    activate CTRL
+        CTRL -> CTRL : keep selected registrationRequest
+        CTRL -> MAPPER : toDetailsDTO(registrationRequest)
+        activate MAPPER
+            MAPPER --> CTRL : requestDetailsDTO
+        deactivate MAPPER
+        CTRL --> UI : requestDetailsDTO
+    deactivate CTRL
+    UI --> ADMIN : shows request details
+deactivate UI
+
+alt accepts registration request
+    ADMIN -> UI : confirms acceptance
     activate UI
-        UI --> CTRL** : create()
-
-        UI -> CTRL : getPendingRegistrationRequests()
+        UI -> CTRL : acceptRegistrationRequest(decisionDTO)
         activate CTRL
+            CTRL -> CTRL : getAdministratorFromSession()
+            activate CTRL
+            CTRL -> APP_SESSION : getInstance()
+            activate APP_SESSION
+                APP_SESSION --> CTRL : appSession
+            deactivate APP_SESSION
+
+            CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
+            activate APP_SESSION_SINGLETON
+                APP_SESSION_SINGLETON --> CTRL : currentSession
+            deactivate APP_SESSION_SINGLETON
+
+            CTRL -> CURRENT_SESSION : getUserEmail()
+            activate CURRENT_SESSION
+                CURRENT_SESSION --> CTRL : administratorEmail
+            deactivate CURRENT_SESSION
+
             CTRL -> REPOS : getInstance()
             activate REPOS
                 REPOS --> CTRL : repositories
             deactivate REPOS
 
-            CTRL -> REPOS_SINGLETON : getRegistrationRequestRepository()
+            CTRL -> REPOS_SINGLETON : getUserRepository()
             activate REPOS_SINGLETON
-                REPOS_SINGLETON --> CTRL : registrationRequestRepository
+                REPOS_SINGLETON --> CTRL : userRepository
             deactivate REPOS_SINGLETON
 
-            CTRL -> REQ_REPO : getPendingRegistrationRequests()
-            activate REQ_REPO
-                REQ_REPO --> CTRL : pendingRegistrationRequests
-            deactivate REQ_REPO
+            CTRL -> USER_REPO : getAdministratorByEmail(administratorEmail)
+            activate USER_REPO
+                USER_REPO --> CTRL : administrator
+            deactivate USER_REPO
+            CTRL --> CTRL : administrator
+            deactivate CTRL
 
-            CTRL --> UI : pendingRegistrationRequests
+            CTRL -> REQ : accept(administrator)
+            activate REQ
+                REQ --> CTRL : user
+            deactivate REQ
+            CTRL -> USER_REPO : addUser(user)
+            activate USER_REPO
+                USER_REPO --> CTRL : true
+            deactivate USER_REPO
+
+            CTRL -> MAPPER : toNotificationDTO(registrationRequest, null)
+            activate MAPPER
+                MAPPER --> CTRL : notificationDTO
+            deactivate MAPPER
+            CTRL -> EMAIL_FACTORY : createEmailService()
+            activate EMAIL_FACTORY
+                EMAIL_FACTORY --> CTRL : emailService
+            deactivate EMAIL_FACTORY
+            CTRL -> EMAIL_SERVICE : sendRegistrationDecisionNotification(notificationDTO)
+
+            CTRL -> MAPPER : toDetailsDTO(registrationRequest)
+            MAPPER --> CTRL : updatedRequestDetailsDTO
+            CTRL --> UI : updatedRequestDetailsDTO
         deactivate CTRL
-
-        UI --> ADMIN : presents list of pending registration requests
+        UI --> ADMIN : informs acceptance and notification result
     deactivate UI
-
-    ADMIN -> UI : selects a registration request
+else rejects registration request
+    ADMIN -> UI : provides rejection reason and confirms rejection
     activate UI
-        UI -> CTRL : selectRegistrationRequest(registrationRequest)
+        UI -> CTRL : rejectRegistrationRequest(decisionDTO)
         activate CTRL
-            CTRL -> CTRL : keep selected registrationRequest
-            CTRL --> UI : registrationRequestDetails
+            CTRL -> CTRL : getAdministratorFromSession()
+            activate CTRL
+            CTRL -> APP_SESSION : getInstance()
+            activate APP_SESSION
+                APP_SESSION --> CTRL : appSession
+            deactivate APP_SESSION
+
+            CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
+            activate APP_SESSION_SINGLETON
+                APP_SESSION_SINGLETON --> CTRL : currentSession
+            deactivate APP_SESSION_SINGLETON
+
+            CTRL -> CURRENT_SESSION : getUserEmail()
+            activate CURRENT_SESSION
+                CURRENT_SESSION --> CTRL : administratorEmail
+            deactivate CURRENT_SESSION
+
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+                REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPOS_SINGLETON : getUserRepository()
+            activate REPOS_SINGLETON
+                REPOS_SINGLETON --> CTRL : userRepository
+            deactivate REPOS_SINGLETON
+
+            CTRL -> USER_REPO : getAdministratorByEmail(administratorEmail)
+            activate USER_REPO
+                USER_REPO --> CTRL : administrator
+            deactivate USER_REPO
+            CTRL --> CTRL : administrator
+            deactivate CTRL
+
+            CTRL -> REQ : reject(administrator, decisionDTO.rejectionReason)
+            activate REQ
+                REQ --> CTRL : annotation
+            deactivate REQ
+
+            CTRL -> MAPPER : toNotificationDTO(registrationRequest, annotation)
+            activate MAPPER
+                MAPPER --> CTRL : notificationDTO
+            deactivate MAPPER
+            CTRL -> EMAIL_FACTORY : createEmailService()
+            activate EMAIL_FACTORY
+                EMAIL_FACTORY --> CTRL : emailService
+            deactivate EMAIL_FACTORY
+            CTRL -> EMAIL_SERVICE : sendRegistrationDecisionNotification(notificationDTO)
+
+            CTRL -> MAPPER : toDetailsDTO(registrationRequest)
+            activate MAPPER
+                MAPPER --> CTRL : updatedRequestDetailsDTO
+            deactivate MAPPER
+            CTRL --> UI : updatedRequestDetailsDTO
         deactivate CTRL
-
-        UI --> ADMIN : shows registration request details
+        UI --> ADMIN : informs rejection and notification result
     deactivate UI
-
-    alt accepts registration request
-
-        ADMIN -> UI : accepts the registration request
-        activate UI
-            UI --> ADMIN : asks for confirmation
-        deactivate UI
-
-        ADMIN -> UI : confirms acceptance
-        activate UI
-            UI -> CTRL : acceptRegistrationRequest()
-            activate CTRL
-
-                CTRL -> CTRL : getAdministratorFromSession()
-                activate CTRL
-                    CTRL -> APP_SESSION : getInstance()
-                    activate APP_SESSION
-                        APP_SESSION --> CTRL : appSession
-                    deactivate APP_SESSION
-
-                    CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
-                    activate APP_SESSION_SINGLETON
-                        APP_SESSION_SINGLETON --> CTRL : currentSession
-                    deactivate APP_SESSION_SINGLETON
-
-                    CTRL -> CURRENT_SESSION : getUserEmail()
-                    activate CURRENT_SESSION
-                        CURRENT_SESSION --> CTRL : email
-                    deactivate CURRENT_SESSION
-
-                    CTRL -> REPOS : getInstance()
-                    activate REPOS
-                        REPOS --> CTRL : repositories
-                    deactivate REPOS
-
-                    CTRL -> REPOS_SINGLETON : getUserRepository()
-                    activate REPOS_SINGLETON
-                        REPOS_SINGLETON --> CTRL : userRepository
-                    deactivate REPOS_SINGLETON
-
-                    CTRL -> USER_REPO : getAdministratorByEmail(email)
-                    activate USER_REPO
-                        USER_REPO --> CTRL : administrator
-                    deactivate USER_REPO
-
-                    CTRL --> CTRL : administrator
-                deactivate CTRL
-
-                CTRL -> REQ : accept(administrator)
-                activate REQ
-                    REQ -> REQ : registerDecision(administrator)
-                    activate REQ
-                        REQ --> REQ : decision recorded
-                    deactivate REQ
-
-                    REQ -> REQ : createUser()
-                    activate REQ
-                        REQ --> USER** : create concrete User according to requestedRole
-                        REQ --> REQ : user
-                    deactivate REQ
-
-                    REQ --> CTRL : user
-                deactivate REQ
-
-                CTRL -> USER_REPO : addUser(user)
-                activate USER_REPO
-                    USER_REPO -> USER_REPO : validateUser(user)
-                    activate USER_REPO
-                        USER_REPO --> USER_REPO : true
-                    deactivate USER_REPO
-
-                    USER_REPO --> CTRL : true
-                deactivate USER_REPO
-
-                CTRL --> UI : user
-            deactivate CTRL
-
-            UI --> ADMIN : informs that the request was accepted and the user account was created
-        deactivate UI
-
-    else rejects registration request
-
-        ADMIN -> UI : rejects the registration request
-        activate UI
-            UI --> ADMIN : asks for rejection reason
-        deactivate UI
-
-        ADMIN -> UI : provides rejection reason
-        activate UI
-            UI --> ADMIN : asks for confirmation
-        deactivate UI
-
-        ADMIN -> UI : confirms rejection
-        activate UI
-            UI -> CTRL : rejectRegistrationRequest(rejectionReason)
-            activate CTRL
-
-                CTRL -> CTRL : getAdministratorFromSession()
-                activate CTRL
-                    CTRL -> APP_SESSION : getInstance()
-                    activate APP_SESSION
-                        APP_SESSION --> CTRL : appSession
-                    deactivate APP_SESSION
-
-                    CTRL -> APP_SESSION_SINGLETON : getCurrentSession()
-                    activate APP_SESSION_SINGLETON
-                        APP_SESSION_SINGLETON --> CTRL : currentSession
-                    deactivate APP_SESSION_SINGLETON
-
-                    CTRL -> CURRENT_SESSION : getUserEmail()
-                    activate CURRENT_SESSION
-                        CURRENT_SESSION --> CTRL : email
-                    deactivate CURRENT_SESSION
-
-                    CTRL -> REPOS : getInstance()
-                    activate REPOS
-                        REPOS --> CTRL : repositories
-                    deactivate REPOS
-
-                    CTRL -> REPOS_SINGLETON : getUserRepository()
-                    activate REPOS_SINGLETON
-                        REPOS_SINGLETON --> CTRL : userRepository
-                    deactivate REPOS_SINGLETON
-
-                    CTRL -> USER_REPO : getAdministratorByEmail(email)
-                    activate USER_REPO
-                        USER_REPO --> CTRL : administrator
-                    deactivate USER_REPO
-
-                    CTRL --> CTRL : administrator
-                deactivate CTRL
-
-                CTRL -> REQ : reject(administrator, rejectionReason)
-                activate REQ
-                    REQ -> REQ : registerDecision(administrator)
-                    activate REQ
-                        REQ --> REQ : decision recorded
-                    deactivate REQ
-
-                    REQ --> ANNOTATION** : create(rejectionReason)
-                    REQ --> CTRL : annotation
-                deactivate REQ
-
-                CTRL --> UI : annotation
-            deactivate CTRL
-
-            UI --> ADMIN : informs that the request was rejected
-        deactivate UI
-
-    end
-
-deactivate ADMIN
+end
 
 @enduml

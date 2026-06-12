@@ -2,118 +2,70 @@
 'skinparam monochrome true
 skinparam packageStyle rectangle
 skinparam shadowing false
-
 autonumber
 
-'hide footbox
 actor "Administrator" as ADMIN
-
 participant ":ApproveRejectRegistrationUI" as UI
 participant ":ApproveRejectRegistrationController" as CTRL
-participant "registrationRequest\n:RegistrationRequest" as REQ
 
-activate ADMIN
+ADMIN -> UI : asks to manage pending registration requests
+activate UI
+    UI --> CTRL** : create()
+    UI -> CTRL : getPendingRegistrationRequests()
+    activate CTRL
+        ref over CTRL
+            Get Pending Registration Requests
+        end ref
+        CTRL --> UI : pendingRequestDTOList
+    deactivate CTRL
+    UI --> ADMIN : presents pending request DTO list
+deactivate UI
 
-    ADMIN -> UI : asks to manage pending registration requests
+ADMIN -> UI : selects a pending request
+activate UI
+    UI -> CTRL : selectRegistrationRequest(requestId)
+    activate CTRL
+        CTRL --> UI : requestDetailsDTO
+    deactivate CTRL
+    UI --> ADMIN : shows request details
+deactivate UI
+
+alt accepts registration request
+    ADMIN -> UI : confirms acceptance
     activate UI
-
-        UI --> CTRL** : create()
-
-        UI -> CTRL : getPendingRegistrationRequests()
+        UI -> CTRL : acceptRegistrationRequest(decisionDTO)
         activate CTRL
             ref over CTRL
-                Get Pending Registration Requests
+                Get Administrator
             end ref
-
-            CTRL --> UI : pendingRegistrationRequests
+            ref over CTRL
+                Accept Registration Request
+            end ref
+            ref over CTRL
+                Send Registration Decision Notification
+            end ref
+            CTRL --> UI : updatedRequestDetailsDTO
         deactivate CTRL
-
-        UI --> ADMIN : presents list of pending registration requests
+        UI --> ADMIN : informs acceptance and notification result
     deactivate UI
-
-    ADMIN -> UI : selects a registration request
+else rejects registration request
+    ADMIN -> UI : provides rejection reason and confirms rejection
     activate UI
-
-        UI -> CTRL : selectRegistrationRequest(registrationRequest)
+        UI -> CTRL : rejectRegistrationRequest(decisionDTO)
         activate CTRL
-            CTRL -> CTRL : keep selected registrationRequest
-            CTRL --> UI : registrationRequestDetails
+            ref over CTRL
+                Get Administrator
+            end ref
+            ref over CTRL
+                Reject Registration Request
+            end ref
+            ref over CTRL
+                Send Registration Decision Notification
+            end ref
+            CTRL --> UI : updatedRequestDetailsDTO
         deactivate CTRL
-
-        UI --> ADMIN : shows registration request details
+        UI --> ADMIN : informs rejection and notification result
     deactivate UI
-
-    alt accepts registration request
-
-        ADMIN -> UI : accepts the registration request
-        activate UI
-            UI --> ADMIN : asks for confirmation
-        deactivate UI
-
-        ADMIN -> UI : confirms acceptance
-        activate UI
-
-            UI -> CTRL : acceptRegistrationRequest()
-            activate CTRL
-
-                CTRL -> CTRL : getAdministratorFromSession()
-                activate CTRL
-                    ref over CTRL
-                        Get Administrator
-                    end ref
-
-                    CTRL --> CTRL : administrator
-                deactivate CTRL
-
-                ref over CTRL, REQ
-                    Accept Registration Request
-                end ref
-
-                CTRL --> UI : user
-            deactivate CTRL
-
-            UI --> ADMIN : informs that the request was accepted and the user account was created
-        deactivate UI
-
-    else rejects registration request
-
-        ADMIN -> UI : rejects the registration request
-        activate UI
-            UI --> ADMIN : asks for rejection reason
-        deactivate UI
-
-        ADMIN -> UI : provides rejection reason
-        activate UI
-            UI --> ADMIN : asks for confirmation
-        deactivate UI
-
-        ADMIN -> UI : confirms rejection
-        activate UI
-
-            UI -> CTRL : rejectRegistrationRequest(rejectionReason)
-            activate CTRL
-
-                CTRL -> CTRL : getAdministratorFromSession()
-                activate CTRL
-                    ref over CTRL
-                        Get Administrator
-                    end ref
-
-                    CTRL --> CTRL : administrator
-                deactivate CTRL
-
-                ref over CTRL, REQ
-                    Reject Registration Request
-                end ref
-
-                CTRL --> UI : annotation
-            deactivate CTRL
-
-            UI --> ADMIN : informs that the request was rejected
-        deactivate UI
-
-    end
-
-deactivate ADMIN
+end
 
 @enduml

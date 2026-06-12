@@ -1,0 +1,39 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":ApproveRejectRegistrationController" as CTRL
+participant "mapper\n:RegistrationRequestMapper" as MAPPER
+participant "emailServiceFactory\n:EmailServiceFactory" as FACTORY
+participant "applicationProperties\n:ApplicationProperties" as PROPS
+participant "emailService\n:EmailService" as EMAIL_SERVICE
+
+autonumber
+-> CTRL : notifyRequester(registrationRequest, annotation)
+activate CTRL
+    note right of CTRL
+        annotation is null when the
+        request was accepted.
+    end note
+
+    CTRL -> MAPPER : toNotificationDTO(registrationRequest, annotation)
+    activate MAPPER
+        MAPPER --> CTRL : notificationDTO
+    deactivate MAPPER
+
+    CTRL -> FACTORY : createEmailService()
+    activate FACTORY
+        FACTORY -> PROPS : getProperty("email.service.class")
+        activate PROPS
+            PROPS --> FACTORY : adapterClassName
+        deactivate PROPS
+        FACTORY -> FACTORY : create adapter using Java Reflection
+        FACTORY --> CTRL : emailService
+    deactivate FACTORY
+
+    CTRL -> EMAIL_SERVICE : sendRegistrationDecisionNotification(notificationDTO)
+    <-- CTRL : notification sent
+deactivate CTRL
+
+@enduml

@@ -5,39 +5,27 @@ skinparam shadowing false
 
 participant ":ApproveRejectRegistrationController" as CTRL
 participant "registrationRequest\n:RegistrationRequest" as REQ
-participant "annotation\n:Annotation" as ANNOTATION
+participant "mapper\n:RegistrationRequestMapper" as MAPPER
 
-autonumber 15
--> CTRL : rejectRegistrationRequest(rejectionReason)
-
-autonumber 15.1
+autonumber
+-> CTRL : rejectRegistrationRequest(decisionDTO)
 activate CTRL
+    note right of CTRL
+        administrator was obtained through
+        the Get Administrator partial SD
+    end note
 
-    group Reject Registration Request
+    CTRL -> REQ : reject(administrator, decisionDTO.rejectionReason)
+    activate REQ
+        REQ --> CTRL : annotation
+    deactivate REQ
 
-        note right of CTRL
-            administrator was obtained
-            through the Get Administrator partial SD
-        end note
+    CTRL -> MAPPER : toDetailsDTO(registrationRequest)
+    activate MAPPER
+        MAPPER --> CTRL : updatedRequestDetailsDTO
+    deactivate MAPPER
 
-        CTRL -> REQ : reject(administrator, rejectionReason)
-        activate REQ
-
-            REQ -> REQ : registerDecision(administrator)
-            activate REQ
-                REQ --> REQ : decision recorded
-            deactivate REQ
-
-            REQ --> ANNOTATION** : create(rejectionReason)
-
-            REQ --> CTRL : annotation
-        deactivate REQ
-
-    end
-
-    autonumber 16
-    <-- CTRL : annotation
-
+    <-- CTRL : updatedRequestDetailsDTO
 deactivate CTRL
 
 @enduml

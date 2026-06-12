@@ -15,6 +15,7 @@ The following concepts are relevant in this user story:
 - **Annotation** – represents the rejection reason/comment provided by the Administrator when a registration request is rejected.
 - **RequestStatus** – describes the lifecycle state of the registration request.
 - **RequestedRole** – describes the role originally requested by the FutureUser.
+- **Notification** – represents the information that must be sent to the requester after the Administrator's decision. When the request is rejected, the notification may include the rejection reason recorded in the `Annotation`.
 
 ---
 
@@ -23,7 +24,7 @@ The following concepts are relevant in this user story:
 | Category | Conceptual / Candidate Class |
 |---|---|
 | Business Transactions | RegistrationRequest |
-| Transaction line items | Annotation |
+| Transaction line items | Annotation, Notification |
 | Roles of People or Organizations | FutureUser, User, Administrator, PoliticalAgent, Citizen, Journalist, EthicsCommitteeMember |
 | Descriptions of Things | RequestedRole, RequestStatus |
 
@@ -38,6 +39,8 @@ The following concepts are relevant in this user story:
 | RegistrationRequest | refers to              | RequestedRole         |
 | RegistrationRequest | has status             | RequestStatus         |
 | RegistrationRequest | creates if accepted    | User                  |
+| RegistrationRequest | originates             | Notification          |
+| Notification        | may include reason from | Annotation            |
 | User                | is specialised as      | PoliticalAgent        |
 | User                | is specialised as      | Citizen               |
 | User                | is specialised as      | Journalist            |
@@ -64,6 +67,12 @@ The following concepts are relevant in this user story:
 **Annotation**
 - text
 - creationDate
+
+**Notification**
+- recipientEmail
+- subject
+- message
+- sentDate
 
 **User**
 - name
@@ -92,3 +101,5 @@ The following concepts are relevant in this user story:
 - **Automatic user creation:** when a request is accepted, the system creates a concrete `User` according to the `RequestedRole`.
 - **Rejection reason:** when a request is rejected, an `Annotation` is associated with the `RegistrationRequest` to record the rejection reason/comment.
 - **Administrator role not requested:** `Administrator` does not appear in `RequestedRole` because administrator accounts are not created through the self-registration process.
+- **Notification after decision:** after accepting or rejecting a request, the system must notify the requester about the decision outcome. For rejected requests, the notification can include the reason already recorded in the `Annotation`, avoiding a duplicated source of truth.
+- **Email provider as variation point:** the concrete email provider is expected to vary between deployments (e.g., Gmail or DEI service). This is not a domain concept; the analysis only identifies the need to send a notification, while the design protects the system from provider-specific APIs through an adapter-based solution.

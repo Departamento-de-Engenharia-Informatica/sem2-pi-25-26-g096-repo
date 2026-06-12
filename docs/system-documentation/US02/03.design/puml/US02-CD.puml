@@ -3,9 +3,15 @@
 skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam linetype polyline
-'skinparam linetype orto
-
 skinparam classAttributeIconSize 0
+
+skinparam class {
+    BackgroundColor<<DTO>> White
+    BackgroundColor<<Mapper>> White
+    BackgroundColor<<Adapter>> White
+    BackgroundColor<<External>> White
+    BackgroundColor<<Factory>> White
+}
 
 enum RequestedRole {
     POLITICAL_AGENT
@@ -68,6 +74,76 @@ class Annotation {
     + Annotation(text)
 }
 
+class Notification {
+    - recipientEmail : String
+    - subject : String
+    - message : String
+    - sentDate : LocalDateTime
+}
+
+class PendingRegistrationRequestDTO <<DTO>> {
+    + requestId : String
+    + requestDate : LocalDate
+    + requestedRole : RequestedRole
+}
+
+class RegistrationRequestDetailsDTO <<DTO>> {
+    + requestId : String
+    + name : String
+    + taxId : String
+    + email : String
+    + requestedRole : RequestedRole
+    + nationalIdentityCardNumber : String
+    + pressCardNumber : String
+    + requestedPosition : String
+    + requestedInstitution : String
+}
+
+class RegistrationDecisionDTO <<DTO>> {
+    + accepted : boolean
+    + rejectionReason : String
+}
+
+class RegistrationDecisionNotificationDTO <<DTO>> {
+    + recipientEmail : String
+    + subject : String
+    + message : String
+}
+
+class RegistrationRequestMapper <<Mapper>> {
+    + toPendingDTOList(requests) : List<PendingRegistrationRequestDTO>
+    + toDetailsDTO(request) : RegistrationRequestDetailsDTO
+    + toNotificationDTO(request, annotation) : RegistrationDecisionNotificationDTO
+}
+
+interface EmailService {
+    + sendRegistrationDecisionNotification(notificationDTO)
+}
+
+class GmailEmailServiceAdapter <<Adapter>> {
+    + sendRegistrationDecisionNotification(notificationDTO)
+}
+
+class DeiEmailServiceAdapter <<Adapter>> {
+    + sendRegistrationDecisionNotification(notificationDTO)
+}
+
+class GmailEmailAPI <<External>> {
+    + send(to, subject, body)
+}
+
+class DeiEmailAPI <<External>> {
+    + sendMessage(to, subject, body)
+}
+
+class EmailServiceFactory <<Factory>> {
+    + createEmailService() : EmailService
+}
+
+class ApplicationProperties {
+    + getProperty(key) : String
+}
+
 class RegistrationRequestRepository {
     + getPendingRegistrationRequests()
     + addRegistrationRequest(registrationRequest)
@@ -101,32 +177,13 @@ class ApproveRejectRegistrationController {
     - registrationRequest : RegistrationRequest
 
     + ApproveRejectRegistrationController()
-    + getPendingRegistrationRequests()
-    + selectRegistrationRequest(registrationRequest)
-    + acceptRegistrationRequest()
-    + rejectRegistrationRequest(rejectionReason)
-    - getAdministratorFromSession()
+    + getPendingRegistrationRequests() : List<PendingRegistrationRequestDTO>
+    + selectRegistrationRequest(requestId) : RegistrationRequestDetailsDTO
+    + acceptRegistrationRequest(decisionDTO) : RegistrationRequestDetailsDTO
+    + rejectRegistrationRequest(decisionDTO) : RegistrationRequestDetailsDTO
+    - getAdministratorFromSession() : Administrator
+    - notifyRequester(request, annotation)
 }
-
-note right of ApproveRejectRegistrationController
-    The selected registration request
-    is temporarily kept by the controller.
-end note
-
-note bottom of RegistrationRequest
-    accept() changes the status to ACCEPTED,
-    records the decision timestamp and administrator,
-    and creates the corresponding User.
-
-    reject() changes the status to REJECTED,
-    records the decision timestamp and administrator,
-    and creates the rejection Annotation.
-end note
-
-note bottom of RegistrationRequestRepository
-    Used to obtain the list of
-    pending registration requests.
-end note
 
 class ApproveRejectRegistrationUI {
 }
@@ -142,10 +199,25 @@ ApproveRejectRegistrationUI .> ApproveRejectRegistrationController
 ApproveRejectRegistrationController .> Repositories
 ApproveRejectRegistrationController ..> RegistrationRequestRepository
 ApproveRejectRegistrationController ..> UserRepository
-ApproveRejectRegistrationController ..> RegistrationRequest
-ApproveRejectRegistrationController ..> Administrator
+ApproveRejectRegistrationController ..> RegistrationRequestMapper
+ApproveRejectRegistrationController ..> EmailServiceFactory
+ApproveRejectRegistrationController ..> EmailService
+ApproveRejectRegistrationController ..> RegistrationDecisionDTO
 ApproveRejectRegistrationController ..> ApplicationSession
 ApproveRejectRegistrationController ..> UserSession
+
+RegistrationRequestMapper ..> RegistrationRequest
+RegistrationRequestMapper ..> Annotation
+RegistrationRequestMapper ..> PendingRegistrationRequestDTO
+RegistrationRequestMapper ..> RegistrationRequestDetailsDTO
+RegistrationRequestMapper ..> RegistrationDecisionNotificationDTO
+
+EmailService <|.. GmailEmailServiceAdapter
+EmailService <|.. DeiEmailServiceAdapter
+GmailEmailServiceAdapter ..> GmailEmailAPI : adapts >
+DeiEmailServiceAdapter ..> DeiEmailAPI : adapts >
+EmailServiceFactory ..> ApplicationProperties
+EmailServiceFactory ..> EmailService : creates using reflection >
 
 Repositories -> "1" Repositories : instance
 Repositories --> "1" RegistrationRequestRepository : registrationRequestRepository
@@ -162,5 +234,19 @@ RegistrationRequest --> "1" RequestStatus : status
 RegistrationRequest --> "0..1" User : createdUser
 RegistrationRequest --> "0..1" Administrator : reviewedBy
 RegistrationRequest --> "0..1" Annotation : rejectionAnnotation
+RegistrationRequest --> "0..1" Notification : decisionNotification
+Notification ..> "0..1" Annotation : may include reason from >
+
+note bottom of EmailService
+    Stable interface used by the system.
+    Concrete email providers are hidden
+    behind adapters.
+end note
+
+note bottom of EmailServiceFactory
+    Reads the configured adapter class
+    from a properties file and creates it
+    using Java Reflection.
+end note
 
 @enduml
