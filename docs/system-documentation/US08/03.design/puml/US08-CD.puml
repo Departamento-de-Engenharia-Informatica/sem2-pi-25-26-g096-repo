@@ -7,6 +7,11 @@ skinparam linetype polyline
 
 skinparam classAttributeIconSize 0
 
+skinparam class {
+    BackgroundColor<<DTO>> White
+    BackgroundColor<<Mapper>> White
+}
+
 enum DeclarationStatus {
     SUBMITTED
     VALIDATED
@@ -55,6 +60,41 @@ class Annotation {
     + Annotation(text, targetReference, declaration)
 }
 
+class SubmittedDeclarationDTO <<DTO>> {
+    + declarationId : String
+    + submissionDate : LocalDate
+    + status : DeclarationStatus
+}
+
+class DeclarationDetailsDTO <<DTO>> {
+    + declarationId : String
+    + submissionDate : LocalDate
+    + status : DeclarationStatus
+    + subsidies : List<String>
+    + assets : List<String>
+    + positions : List<String>
+    + securityHoldings : List<String>
+}
+
+class ValidationDecisionDTO <<DTO>> {
+    + verdict : ValidationVerdict
+    + targetReference : String
+    + commentText : String
+}
+
+class ValidationResultDTO <<DTO>> {
+    + declarationId : String
+    + status : DeclarationStatus
+    + verdict : ValidationVerdict
+    + message : String
+}
+
+class DeclarationMapper <<Mapper>> {
+    + toSubmittedDTOList(declarations) : List<SubmittedDeclarationDTO>
+    + toDetailsDTO(declaration) : DeclarationDetailsDTO
+    + toResultDTO(declaration, validation) : ValidationResultDTO
+}
+
 class Subsidy {
     - amount : double
     - nature : String
@@ -97,10 +137,10 @@ class ValidateDeclarationController {
     - declaration : Declaration
 
     + ValidateDeclarationController()
-    + getSubmittedDeclarations()
-    + selectDeclaration(declaration)
-    + approveDeclaration()
-    + rejectDeclaration(targetReference, commentText)
+    + getSubmittedDeclarations() : List<SubmittedDeclarationDTO>
+    + selectDeclaration(declarationId) : DeclarationDetailsDTO
+    + approveDeclaration(decisionDTO) : ValidationResultDTO
+    + rejectDeclaration(decisionDTO) : ValidationResultDTO
     - getEthicsCommitteeMemberFromSession()
 }
 
@@ -137,6 +177,8 @@ ValidateDeclarationController ..> UserSession
 ValidateDeclarationController ..> Declaration
 ValidateDeclarationController ..> EthicsCommitteeMember
 ValidateDeclarationController ..> ValidationVerdict
+ValidateDeclarationController ..> DeclarationMapper
+ValidateDeclarationController ..> ValidationDecisionDTO
 
 Repositories -> "1" Repositories : instance
 Repositories --> "1" DeclarationRepository : declarationRepository
@@ -155,6 +197,12 @@ Validation --> "1" ValidationVerdict : verdict
 Validation --> "*" Annotation : annotations
 
 Annotation --> "0..1" Declaration : commentsOn
+
+DeclarationMapper ..> Declaration
+DeclarationMapper ..> Validation
+DeclarationMapper ..> SubmittedDeclarationDTO
+DeclarationMapper ..> DeclarationDetailsDTO
+DeclarationMapper ..> ValidationResultDTO
 
 Declaration --> "1" DeclarationStatus : status
 Declaration --> "*" Subsidy : subsidies

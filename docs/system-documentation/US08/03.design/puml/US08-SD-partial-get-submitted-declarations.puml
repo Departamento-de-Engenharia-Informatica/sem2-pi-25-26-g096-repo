@@ -7,6 +7,7 @@ participant ":ValidateDeclarationController" as CTRL
 participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
+participant "declarationMapper\n:DeclarationMapper" as MAPPER
 
 autonumber 3
 -> CTRL : getSubmittedDeclarations()
@@ -31,10 +32,15 @@ activate CTRL
             DECL_REPO --> CTRL : submittedDeclarations
         deactivate DECL_REPO
 
+        CTRL -> MAPPER : toSubmittedDTOList(submittedDeclarations)
+        activate MAPPER
+            MAPPER --> CTRL : submittedDeclarationDTOList
+        deactivate MAPPER
+
     end
 
     autonumber 4
-    <-- CTRL : submittedDeclarations
+    <-- CTRL : submittedDeclarationDTOList
 
 deactivate CTRL
 

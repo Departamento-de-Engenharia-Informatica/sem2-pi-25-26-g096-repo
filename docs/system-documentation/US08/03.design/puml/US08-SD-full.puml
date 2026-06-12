@@ -18,6 +18,7 @@ participant "appSession\n:ApplicationSession" as APP_SESSION_SINGLETON
 participant "currentSession\n:UserSession" as CURRENT_SESSION
 participant "userRepository\n:UserRepository" as USER_REPO
 participant "member\n:EthicsCommitteeMember" as MEMBER
+participant "declarationMapper\n:DeclarationMapper" as MAPPER
 participant "declaration\n:Declaration" as DECL
 participant "validation\n:Validation" as VALIDATION
 participant "annotation\n:Annotation" as ANNOTATION
@@ -45,7 +46,12 @@ activate MEMBER_ACTOR
                 DECL_REPO --> CTRL : submittedDeclarations
             deactivate DECL_REPO
 
-            CTRL --> UI : submittedDeclarations
+            CTRL -> MAPPER : toSubmittedDTOList(submittedDeclarations)
+            activate MAPPER
+                MAPPER --> CTRL : submittedDeclarationDTOList
+            deactivate MAPPER
+
+            CTRL --> UI : submittedDeclarationDTOList
         deactivate CTRL
 
         UI --> MEMBER_ACTOR : presents list of submitted declarations
@@ -53,10 +59,14 @@ activate MEMBER_ACTOR
 
     MEMBER_ACTOR -> UI : selects a declaration of interests
     activate UI
-        UI -> CTRL : selectDeclaration(declaration)
+        UI -> CTRL : selectDeclaration(declarationId)
         activate CTRL
             CTRL -> CTRL : keep selected declaration
-            CTRL --> UI : declarationDetails
+            CTRL -> MAPPER : toDetailsDTO(declaration)
+            activate MAPPER
+                MAPPER --> CTRL : declarationDetailsDTO
+            deactivate MAPPER
+            CTRL --> UI : declarationDetailsDTO
         deactivate CTRL
 
         UI --> MEMBER_ACTOR : shows declaration details
@@ -66,7 +76,7 @@ activate MEMBER_ACTOR
 
         MEMBER_ACTOR -> UI : approves the declaration
         activate UI
-            UI -> CTRL : approveDeclaration()
+            UI -> CTRL : approveDeclaration(validationDecisionDTO)
             activate CTRL
 
                 CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
@@ -104,7 +114,7 @@ activate MEMBER_ACTOR
                     CTRL --> CTRL : member
                 deactivate CTRL
 
-                CTRL -> MEMBER : validateDeclaration(declaration, APPROVED, null)
+                CTRL -> MEMBER : validateDeclaration(declaration, APPROVED, null, null)
                 activate MEMBER
                     MEMBER --> VALIDATION** : create(declaration, APPROVED)
 
@@ -121,7 +131,12 @@ activate MEMBER_ACTOR
                     MEMBER --> CTRL : validation
                 deactivate MEMBER
 
-                CTRL --> UI : validation
+                CTRL -> MAPPER : toResultDTO(declaration, validation)
+                activate MAPPER
+                    MAPPER --> CTRL : validationResultDTO
+                deactivate MAPPER
+
+                CTRL --> UI : validationResultDTO
             deactivate CTRL
 
             UI --> MEMBER_ACTOR : informs that the declaration was successfully validated
@@ -136,7 +151,7 @@ activate MEMBER_ACTOR
 
         MEMBER_ACTOR -> UI : submits target sections/items and inconsistency comments
         activate UI
-            UI -> CTRL : rejectDeclaration(targetReference, commentText)
+            UI -> CTRL : rejectDeclaration(validationDecisionDTO)
             activate CTRL
 
                 CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
@@ -197,7 +212,12 @@ activate MEMBER_ACTOR
                     MEMBER --> CTRL : validation
                 deactivate MEMBER
 
-                CTRL --> UI : validation
+                CTRL -> MAPPER : toResultDTO(declaration, validation)
+                activate MAPPER
+                    MAPPER --> CTRL : validationResultDTO
+                deactivate MAPPER
+
+                CTRL --> UI : validationResultDTO
             deactivate CTRL
 
             UI --> MEMBER_ACTOR : informs that the declaration was rejected

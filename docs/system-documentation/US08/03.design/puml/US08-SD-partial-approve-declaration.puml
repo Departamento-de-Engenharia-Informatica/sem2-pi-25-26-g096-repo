@@ -7,9 +7,10 @@ participant ":ValidateDeclarationController" as CTRL
 participant "member\n:EthicsCommitteeMember" as MEMBER
 participant "declaration\n:Declaration" as DECL
 participant "validation\n:Validation" as VALIDATION
+participant "declarationMapper\n:DeclarationMapper" as MAPPER
 
 autonumber 15
--> CTRL : approveDeclaration()
+-> CTRL : approveDeclaration(validationDecisionDTO)
 
 autonumber 15.1
 activate CTRL
@@ -22,7 +23,7 @@ activate CTRL
             partial SD
         end note
 
-        CTRL -> MEMBER : validateDeclaration(declaration, APPROVED, null)
+        CTRL -> MEMBER : validateDeclaration(declaration, APPROVED, null, null)
         activate MEMBER
             MEMBER --> VALIDATION** : create(declaration, APPROVED)
 
@@ -39,10 +40,15 @@ activate CTRL
             MEMBER --> CTRL : validation
         deactivate MEMBER
 
+        CTRL -> MAPPER : toResultDTO(declaration, validation)
+        activate MAPPER
+            MAPPER --> CTRL : validationResultDTO
+        deactivate MAPPER
+
     end
 
     autonumber 16
-    <-- CTRL : validation
+    <-- CTRL : validationResultDTO
 
 deactivate CTRL
 

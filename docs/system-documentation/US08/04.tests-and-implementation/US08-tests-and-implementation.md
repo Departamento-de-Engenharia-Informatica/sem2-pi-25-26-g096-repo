@@ -2,15 +2,18 @@
 
 ## 4. Tests
 
-The following unit tests are designed from the acceptance criteria, analysis model and design model of US08. They focus on the `ValidateDeclarationController`, `DeclarationRepository`, `EthicsCommitteeMember`, `Declaration`, `Validation`, `ValidationVerdict`, `DeclarationStatus` and `Annotation` responsibilities.
+The following unit tests are designed from the acceptance criteria, analysis model and design model of US08. They focus on the `ValidateDeclarationController`, DTO mapping, `DeclarationRepository`, `EthicsCommitteeMember`, `Declaration`, `Validation`, `ValidationVerdict`, `DeclarationStatus` and `Annotation` responsibilities.
 
 ### Acceptance Criteria Coverage
 
-| Acceptance Criterion                                                                | Covered by    |
-|-------------------------------------------------------------------------------------|---------------|
-| AC1 - When correct, the declaration is validated.                                   | Tests 3 and 4 |
-| AC2 - When incorrect, the section/item with inconsistencies must be commented.      | Tests 5 and 6 |
-| AC3 - When incorrect, the declaration is rejected and remains in `REJECTED` status. | Test 7        |
+| Acceptance Criterion                                                                                         | Covered by    |
+|--------------------------------------------------------------------------------------------------------------|---------------|
+| AC1 - Only members of the Ethics Committee can validate Declarations of Interests.                           | Tests 8 and 9 |
+| AC2 - Only Declarations of Interests in the `SUBMITTED` status can be validated.                             | Tests 1 and 10 |
+| AC3 - When correct, the Declaration of Interests is validated.                                               | Tests 3 and 4 |
+| AC4 - When incorrect, the section/item with inconsistencies must be commented.                               | Tests 5 and 6 |
+| AC5 - Rejection `Annotation` must have a mandatory `targetReference`.                                        | Tests 5 and 6 |
+| AC6 - When incorrect, the Declaration of Interests is rejected and remains in the `REJECTED` status.         | Test 7        |
 
 **Test 1:** Check that only submitted declarations are listed for validation.
 
@@ -19,10 +22,10 @@ This test verifies that the Ethics Committee Member is only presented with decla
 ```java
 @Test
 public void ensureOnlySubmittedDeclarationsAreListed() {
-    List<Declaration> declarations = controller.getSubmittedDeclarations();
+    List<SubmittedDeclarationDTO> declarations = controller.getSubmittedDeclarations();
 
-    for (Declaration declaration : declarations) {
-        assertEquals(DeclarationStatus.SUBMITTED, declaration.getStatus());
+    for (SubmittedDeclarationDTO declaration : declarations) {
+        assertEquals(DeclarationStatus.SUBMITTED, declaration.status);
     }
 }
 ```
@@ -36,15 +39,13 @@ This test validates the consultation step before the decision. The selected decl
 public void ensureSelectedDeclarationDetailsCanBeConsulted() {
     Declaration declaration = createSubmittedDeclaration();
 
-    controller.selectDeclaration(declaration);
+    DeclarationDetailsDTO details = controller.selectDeclaration(declaration.getId());
 
-    Declaration selectedDeclaration = controller.getSelectedDeclaration();
-
-    assertEquals(declaration, selectedDeclaration);
-    assertNotNull(selectedDeclaration.getSubsidies());
-    assertNotNull(selectedDeclaration.getAssets());
-    assertNotNull(selectedDeclaration.getPositions());
-    assertNotNull(selectedDeclaration.getSecurityHoldings());
+    assertEquals(declaration.getId(), details.declarationId);
+    assertNotNull(details.subsidies);
+    assertNotNull(details.assets);
+    assertNotNull(details.positions);
+    assertNotNull(details.securityHoldings);
 }
 ```
 
@@ -56,9 +57,9 @@ This test verifies the expected result when the declaration is considered correc
 @Test
 public void ensureApprovingCorrectDeclarationChangesStatusToValidated() {
     Declaration declaration = createSubmittedDeclaration();
-    controller.selectDeclaration(declaration);
+    controller.selectDeclaration(declaration.getId());
 
-    controller.approveDeclaration();
+    controller.approveDeclaration(new ValidationDecisionDTO(ValidationVerdict.APPROVED, null, null));
 
     assertEquals(DeclarationStatus.VALIDATED, declaration.getStatus());
 }
@@ -72,13 +73,13 @@ This test confirms that validation is recorded as a domain act, not only as a st
 @Test
 public void ensureApprovingDeclarationCreatesApprovedValidation() {
     Declaration declaration = createSubmittedDeclaration();
-    controller.selectDeclaration(declaration);
+    controller.selectDeclaration(declaration.getId());
 
-    Validation validation = controller.approveDeclaration();
+    ValidationResultDTO result = controller.approveDeclaration(new ValidationDecisionDTO(ValidationVerdict.APPROVED, null, null));
 
-    assertNotNull(validation);
-    assertEquals(ValidationVerdict.APPROVED, validation.getVerdict());
-    assertNotNull(validation.getValidationDate());
+    assertNotNull(result);
+    assertEquals(ValidationVerdict.APPROVED, result.verdict);
+    assertEquals(DeclarationStatus.VALIDATED, result.status);
 }
 ```
 
@@ -90,9 +91,9 @@ This test enforces the requirement that inconsistencies must be commented and as
 @Test(expected = IllegalArgumentException.class)
 public void ensureRejectingDeclarationRequiresComments() {
     Declaration declaration = createSubmittedDeclaration();
-    controller.selectDeclaration(declaration);
+    controller.selectDeclaration(declaration.getId());
 
-    controller.rejectDeclaration(null, null);
+    controller.rejectDeclaration(new ValidationDecisionDTO(ValidationVerdict.REJECTED, null, null));
 }
 ```
 
@@ -104,9 +105,12 @@ This test verifies that the comment is recorded inside the validation and that t
 @Test
 public void ensureRejectingDeclarationCreatesAnnotationWithComments() {
     Declaration declaration = createSubmittedDeclaration();
-    controller.selectDeclaration(declaration);
+    controller.selectDeclaration(declaration.getId());
 
-    Validation validation = controller.rejectDeclaration("Asset", "Asset item has inconsistent market value.");
+    controller.rejectDeclaration(new ValidationDecisionDTO(
+        ValidationVerdict.REJECTED, "Asset", "Asset item has inconsistent market value."));
+
+    Validation validation = ethicsCommitteeMember.getLastValidation();
 
     assertFalse(validation.getAnnotations().isEmpty());
     assertEquals("Asset", validation.getAnnotations().get(0).getTargetReference());
@@ -122,9 +126,10 @@ This test validates the lifecycle rule clarified by the client: a rejected decla
 @Test
 public void ensureRejectedDeclarationRemainsRejected() {
     Declaration declaration = createSubmittedDeclaration();
-    controller.selectDeclaration(declaration);
+    controller.selectDeclaration(declaration.getId());
 
-    controller.rejectDeclaration("Position", "Position remuneration is inconsistent.");
+    controller.rejectDeclaration(new ValidationDecisionDTO(
+        ValidationVerdict.REJECTED, "Position", "Position remuneration is inconsistent."));
 
     assertEquals(DeclarationStatus.REJECTED, declaration.getStatus());
 }
@@ -138,11 +143,55 @@ This test verifies the responsibility identified in the domain model: an `Ethics
 @Test
 public void ensureValidationIsAssociatedWithEthicsCommitteeMember() {
     Declaration declaration = createSubmittedDeclaration();
-    controller.selectDeclaration(declaration);
+    controller.selectDeclaration(declaration.getId());
 
-    Validation validation = controller.approveDeclaration();
+    controller.approveDeclaration(new ValidationDecisionDTO(ValidationVerdict.APPROVED, null, null));
+    Validation validation = ethicsCommitteeMember.getLastValidation();
 
     assertTrue(ethicsCommitteeMember.getValidations().contains(validation));
+}
+```
+
+**Test 9:** Check that a non-Ethics Committee user cannot validate declarations - AC1.
+
+This test verifies the actor restriction explicitly stated in the acceptance criteria.
+
+```java
+@Test(expected = IllegalStateException.class)
+public void ensureOnlyEthicsCommitteeMembersCanValidateDeclarations() {
+    authenticateAsCitizen();
+    Declaration declaration = createSubmittedDeclaration();
+    controller.selectDeclaration(declaration.getId());
+
+    controller.approveDeclaration(new ValidationDecisionDTO(ValidationVerdict.APPROVED, null, null));
+}
+```
+
+**Test 10:** Check that a declaration not in `SUBMITTED` status cannot be validated - AC2.
+
+This test enforces the lifecycle precondition: already validated or rejected declarations cannot be validated again.
+
+```java
+@Test(expected = IllegalStateException.class)
+public void ensureOnlySubmittedDeclarationsCanBeValidated() {
+    Declaration declaration = createValidatedDeclaration();
+    controller.selectDeclaration(declaration.getId());
+
+    controller.approveDeclaration(new ValidationDecisionDTO(ValidationVerdict.APPROVED, null, null));
+}
+```
+
+**Test 11:** Check that submitted declarations are returned to the UI as DTOs.
+
+This test verifies the DTO boundary introduced in the design.
+
+```java
+@Test
+public void ensureSubmittedDeclarationsAreReturnedAsDTOs() {
+    List<SubmittedDeclarationDTO> declarations = controller.getSubmittedDeclarations();
+
+    assertFalse(declarations.isEmpty());
+    assertTrue(declarations.get(0) instanceof SubmittedDeclarationDTO);
 }
 ```
 
@@ -152,6 +201,8 @@ public void ensureValidationIsAssociatedWithEthicsCommitteeMember() {
 The implementation should follow the design responsibilities:
 
 * `ValidateDeclarationController` coordinates the selected declaration and obtains the current Ethics Committee Member from the session.
+* `SubmittedDeclarationDTO`, `DeclarationDetailsDTO`, `ValidationDecisionDTO` and `ValidationResultDTO` are used at the UI/controller boundary.
+* `DeclarationMapper` converts domain objects and validation results into DTOs.
 * `DeclarationRepository` provides declarations with status `SUBMITTED`.
 * `EthicsCommitteeMember.validateDeclaration(declaration, verdict, targetReference, commentText)` creates and stores the `Validation`.
 * `Declaration.approve()` changes the status to `VALIDATED`.

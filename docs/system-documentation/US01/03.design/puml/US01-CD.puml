@@ -6,7 +6,6 @@ skinparam linetype polyline
 'skinparam linetype orto
 
 skinparam classAttributeIconSize 0
-hide circle
 
 skinparam class {
     BackgroundColor<<DTO>> White

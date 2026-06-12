@@ -8,9 +8,10 @@ participant "member\n:EthicsCommitteeMember" as MEMBER
 participant "declaration\n:Declaration" as DECL
 participant "validation\n:Validation" as VALIDATION
 participant "annotation\n:Annotation" as ANNOTATION
+participant "declarationMapper\n:DeclarationMapper" as MAPPER
 
 autonumber 15
--> CTRL : rejectDeclaration(targetReference, commentText)
+-> CTRL : rejectDeclaration(validationDecisionDTO)
 
 autonumber 15.1
 activate CTRL
@@ -46,10 +47,15 @@ activate CTRL
             MEMBER --> CTRL : validation
         deactivate MEMBER
 
+        CTRL -> MAPPER : toResultDTO(declaration, validation)
+        activate MAPPER
+            MAPPER --> CTRL : validationResultDTO
+        deactivate MAPPER
+
     end
 
     autonumber 16
-    <-- CTRL : validation
+    <-- CTRL : validationResultDTO
 
 deactivate CTRL
 

@@ -24,7 +24,7 @@ activate MEMBER_ACTOR
                 Get Submitted Declarations
             end ref
 
-            CTRL --> UI : submittedDeclarations
+            CTRL --> UI : submittedDeclarationDTOList
         deactivate CTRL
 
         UI --> MEMBER_ACTOR : presents list of submitted declarations
@@ -32,10 +32,10 @@ activate MEMBER_ACTOR
 
     MEMBER_ACTOR -> UI : selects a declaration of interests
     activate UI
-        UI -> CTRL : selectDeclaration(declaration)
+        UI -> CTRL : selectDeclaration(declarationId)
         activate CTRL
             CTRL -> CTRL : keep selected declaration
-            CTRL --> UI : declarationDetails
+            CTRL --> UI : declarationDetailsDTO
         deactivate CTRL
 
         UI --> MEMBER_ACTOR : shows declaration details
@@ -45,7 +45,7 @@ activate MEMBER_ACTOR
 
         MEMBER_ACTOR -> UI : approves the declaration
         activate UI
-            UI -> CTRL : approveDeclaration()
+            UI -> CTRL : approveDeclaration(validationDecisionDTO)
             activate CTRL
 
                 CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
@@ -61,7 +61,7 @@ activate MEMBER_ACTOR
                     Approve Declaration
                 end ref
 
-                CTRL --> UI : validation
+                CTRL --> UI : validationResultDTO
             deactivate CTRL
 
             UI --> MEMBER_ACTOR : informs that the declaration was successfully validated
@@ -76,7 +76,7 @@ activate MEMBER_ACTOR
 
         MEMBER_ACTOR -> UI : submits target sections/items and inconsistency comments
         activate UI
-            UI -> CTRL : rejectDeclaration(targetReference, commentText)
+            UI -> CTRL : rejectDeclaration(validationDecisionDTO)
             activate CTRL
 
                 CTRL -> CTRL : getEthicsCommitteeMemberFromSession()
@@ -92,7 +92,7 @@ activate MEMBER_ACTOR
                     Reject Declaration
                 end ref
 
-                CTRL --> UI : validation
+                CTRL --> UI : validationResultDTO
             deactivate CTRL
 
             UI --> MEMBER_ACTOR : informs that the declaration was rejected

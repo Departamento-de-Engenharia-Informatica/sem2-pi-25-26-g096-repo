@@ -36,11 +36,17 @@ are held accountable for the accuracy and completeness of their declarations.
 
 ### 1.3. Acceptance Criteria
 
-* **AC1:** When correct, it is validated.
+* **AC1:** Only members of the Ethics Committee can validate Declarations of Interests.
 
-* **AC2:** When incorrect, the section/item with inconsistencies must be commented.
+* **AC2:** Only Declarations of Interests in the `SUBMITTED` status can be validated.
 
-* **AC3:** When incorrect, the Declaration of Interests is rejected and remains in the `REJECTED` status.
+* **AC3:** When correct, the Declaration of Interests is validated.
+
+* **AC4:** When incorrect, the section/item with inconsistencies must be commented.
+
+* **AC5:** When incorrect, the rejection `Annotation` must have a mandatory `targetReference` identifying the inconsistent section/item.
+
+* **AC6:** When incorrect, the Declaration of Interests is rejected and remains in the `REJECTED` status.
 
 ---
 
@@ -77,6 +83,5 @@ it can be validated.
 
 ### 1.7. Other Relevant Remarks
 
-* Only members of the Ethics Committee can validate declarations.
-* A rejected declaration remains in the `REJECTED` status. If the Political Agent needs to correct or update the 
+* If the Political Agent needs to correct or update the 
 information, a new extraordinary Declaration of Interests must be submitted.
