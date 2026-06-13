@@ -27,7 +27,7 @@ activate UI
 
         UI -> CTRL : getInstitutionsByType(type)
         activate CTRL
-            CTRL --> UI : institutionList
+            CTRL --> UI : institutionDTOList
         deactivate CTRL
 
     UI --> AGENT : displays institutions ordered alphabetically
@@ -66,29 +66,35 @@ ref over CTRL : Get Institutions By Type
     participant "Repositories" as REPOS
     participant "repositories\n:Repositories" as REPOS_SINGLETON
     participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+    participant "InstitutionMapper" as MAPPER
     
     activate CTRL
         CTRL -> REPOS : getInstance()
         activate REPOS
             REPOS --> CTRL : repositories
         deactivate REPOS
-
+ 
         CTRL -> REPOS_SINGLETON : getInstitutionRepository()
         activate REPOS_SINGLETON
             REPOS_SINGLETON --> CTRL : institutionRepository
         deactivate REPOS_SINGLETON
-
+ 
         CTRL -> INST_REPO : getInstitutionsByType(type)
         activate INST_REPO
             INST_REPO --> CTRL : institutionList
         deactivate INST_REPO
-
+ 
         CTRL -> INST_REPO : getInstitutionsSorted()
         activate INST_REPO
             INST_REPO --> CTRL : sortedInstitutionList
         deactivate INST_REPO
-
-        CTRL --> CTRL : return institutionList
+ 
+        CTRL -> MAPPER : toDTOList(sortedInstitutionList)
+        activate MAPPER
+            MAPPER --> CTRL : institutionDTOList
+        deactivate MAPPER
+ 
+        CTRL --> CTRL : return institutionDTOList
     deactivate CTRL
 end ref
 

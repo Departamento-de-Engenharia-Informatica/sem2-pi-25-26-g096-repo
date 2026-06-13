@@ -88,14 +88,28 @@ InstitutionTypeRepository --> "*" InstitutionType : institutionTypes
 class ListInstitutionsController {
     + ListInstitutionsController()
     + getInstitutionTypes() : List<InstitutionType>
-    + getInstitutionsByType(type : InstitutionType) : List<Institution>
+    + getInstitutionsByType(type : InstitutionType) : List<InstitutionDTO>
     - getPoliticalAgentFromSession() : PoliticalAgent
+}
+
+class InstitutionDTO {
+    - name : String
+    - type : String
+    + InstitutionDTO(name : String, type : String)
+    + getName() : String
+    + getType() : String
+}
+
+class InstitutionMapper {
+    + toDTOList(institutions : List<Institution>) : List<InstitutionDTO>
+    + toDTO(institution : Institution) : InstitutionDTO
 }
 
 note right of ListInstitutionsController
     getInstitutionsByType() retrieves institutions
-    from the repository and sorts them alphabetically
-    by name before returning to the UI (AC1).
+    from the repository, sorts them alphabetically
+    by name, and maps them to DTOs before returning
+    to the UI (AC1).
 end note
 
 ListInstitutionsController ..> Repositories
@@ -104,6 +118,11 @@ ListInstitutionsController ..> InstitutionTypeRepository
 ListInstitutionsController ..> PoliticalAgent
 ListInstitutionsController ..> ApplicationSession
 ListInstitutionsController ..> UserSession
+ListInstitutionsController ..> InstitutionMapper
+ListInstitutionsController ..> InstitutionDTO
+
+InstitutionMapper ..> Institution
+InstitutionMapper ..> InstitutionDTO
 
 '========================
 ' UI Layer
@@ -113,5 +132,6 @@ class ListInstitutionsUI {
 }
 
 ListInstitutionsUI --> ListInstitutionsController
+ListInstitutionsUI ..> InstitutionDTO
 
 @enduml

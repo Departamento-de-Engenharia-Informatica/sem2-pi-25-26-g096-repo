@@ -13,6 +13,7 @@ participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "institutionTypeRepository\n:InstitutionTypeRepository" as TYPE_REPO
 participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+participant "InstitutionMapper" as MAPPER
 
 activate AGENT
 
@@ -70,7 +71,12 @@ activate UI
                 INST_REPO --> CTRL : sortedInstitutionList
             deactivate INST_REPO
 
-            CTRL --> UI : institutionList
+            CTRL -> MAPPER : toDTOList(sortedInstitutionList)
+            activate MAPPER
+                MAPPER --> CTRL : institutionDTOList
+            deactivate MAPPER
+
+            CTRL --> UI : institutionDTOList
         deactivate CTRL
 
     UI --> AGENT : displays institutions ordered alphabetically
