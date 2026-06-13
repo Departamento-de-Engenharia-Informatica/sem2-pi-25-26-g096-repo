@@ -42,6 +42,24 @@ activate PA
         UI --> PA : requests declaration data
     deactivate UI
 
+    PA -> UI : selects declaration type and chooses\nwhether to import previous declaration
+    activate UI
+
+        opt import previous declaration requested
+            UI -> CTRL : getPreviousDeclaration()
+            activate CTRL
+                ref over CTRL, REPOS
+                    Get Previous Declaration
+                end ref
+                CTRL --> UI : previousDeclarationDTO
+            deactivate CTRL
+
+            UI --> PA : presents pre-filled data from\nprevious declaration
+        end
+
+        UI --> PA : requests household, position, subsidy,\nasset and security holding data
+    deactivate UI
+
     PA -> UI : provides declaration data
     activate UI
         UI --> PA : shows entered data and requests confirmation

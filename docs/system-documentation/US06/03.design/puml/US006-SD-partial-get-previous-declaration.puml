@@ -1,0 +1,55 @@
+@startuml US006-SD-partial-get-previous-declaration
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+participant ":SubmitDeclarationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories\n:Repositories" as REPOS_SINGLETON
+participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
+participant "politicalAgent\n:PoliticalAgent" as PAO
+
+autonumber 7
+-> CTRL : getPreviousDeclaration()
+
+autonumber 7.1
+activate CTRL
+
+    group Get Previous Declaration
+
+        CTRL -> CTRL : getPoliticalAgentFromSession()
+        activate CTRL
+            ref over CTRL
+                Get Political Agent
+            end ref
+            CTRL --> CTRL : politicalAgent
+        deactivate CTRL
+
+        CTRL -> REPOS : getInstance()
+        activate REPOS
+            REPOS --> CTRL : repositories
+        deactivate REPOS
+
+        CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : declarationRepository
+        deactivate REPOS_SINGLETON
+
+        CTRL -> DECL_REPO : findLastByPoliticalAgent(politicalAgent)
+        activate DECL_REPO
+            DECL_REPO --> CTRL : previousDeclaration
+        deactivate DECL_REPO
+
+        CTRL -> CTRL : mapToDeclarationDTO(previousDeclaration)
+        activate CTRL
+            CTRL --> CTRL : previousDeclarationDTO
+        deactivate CTRL
+
+    end
+
+    autonumber 8
+    <-- CTRL : previousDeclarationDTO
+
+deactivate CTRL
+
+@enduml

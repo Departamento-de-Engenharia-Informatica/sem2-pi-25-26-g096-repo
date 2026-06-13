@@ -11,19 +11,43 @@ participant "declarationRepository\n:DeclarationRepository" as DECL_REPO
 participant "politicalAgent\n:PoliticalAgent" as PAO
 participant "declaration\n:Declaration" as DECL
 
-autonumber 15
+autonumber 20
 -> CTRL : createDeclaration(politicalAgent, declarationDTO)
 
-autonumber 15.1
+autonumber 20.1
 activate CTRL
 
     group Create Declaration
+
+        CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+        activate REPOS_SINGLETON
+            REPOS_SINGLETON --> CTRL : declarationRepository
+        deactivate REPOS_SINGLETON
+
+        alt declarationDTO.type == INITIAL
+            CTRL -> DECL_REPO : existsInitialDeclaration(politicalAgent)
+            activate DECL_REPO
+                DECL_REPO --> CTRL : false
+            deactivate DECL_REPO
+        else declarationDTO.type == REGULAR
+            CTRL -> DECL_REPO : existsRegularDeclarationForYear(politicalAgent, year)
+            activate DECL_REPO
+                DECL_REPO --> CTRL : false
+            deactivate DECL_REPO
+        end
 
         CTRL -> PAO : createDeclaration(declarationDTO.type)
         activate PAO
             PAO --> DECL** : create(declarationType, submissionDate)
             PAO --> CTRL : declaration
         deactivate PAO
+
+        loop for each householdMemberDTO
+            CTRL -> DECL : addHouseholdMember(householdMemberDTO.name,\nhouseholdMemberDTO.taxId, householdMemberDTO.birthDate,\nhouseholdMemberDTO.relationship)
+            activate DECL
+                DECL --> CTRL : householdMember
+            deactivate DECL
+        end
 
         loop for each positionDTO
             CTRL -> INST_REPO : getById(positionDTO.institutionId)
@@ -55,7 +79,12 @@ activate CTRL
         end
 
         loop for each assetDTO
-            CTRL -> DECL : addAsset(assetDTO.propertyType, assetDTO.acquisitionValue,\nassetDTO.marketValue, assetDTO.location.parish,\nassetDTO.location.county, assetDTO.location.district)
+            CTRL -> CTRL : mapToLocation(assetDTO.location)
+            activate CTRL
+                CTRL --> CTRL : location
+            deactivate CTRL
+
+            CTRL -> DECL : addAsset(assetDTO.propertyType, assetDTO.acquisitionValue,\nassetDTO.marketValue, location)
             activate DECL
                 DECL --> CTRL : asset
             deactivate DECL
@@ -73,15 +102,27 @@ activate CTRL
             deactivate DECL
         end
 
+        alt declarationDTO.type == EXCEPTIONAL
+            CTRL -> DECL : setAmendmentReason(declarationDTO.amendmentReason)
+            activate DECL
+            deactivate DECL
+
+            opt declarationDTO.amendedDeclarationId != null
+                CTRL -> DECL_REPO : getById(declarationDTO.amendedDeclarationId)
+                activate DECL_REPO
+                    DECL_REPO --> CTRL : amendedDeclaration
+                deactivate DECL_REPO
+
+                CTRL -> DECL : setAmendedDeclaration(amendedDeclaration)
+                activate DECL
+                deactivate DECL
+            end
+        end
+
         CTRL -> DECL : validateData()
         activate DECL
             DECL --> CTRL : true
         deactivate DECL
-
-        CTRL -> REPOS_SINGLETON : getDeclarationRepository()
-        activate REPOS_SINGLETON
-            REPOS_SINGLETON --> CTRL : declarationRepository
-        deactivate REPOS_SINGLETON
 
         CTRL -> DECL_REPO : save(declaration)
         activate DECL_REPO
@@ -90,7 +131,7 @@ activate CTRL
 
     end
 
-    autonumber 16
+    autonumber 21
     <-- CTRL : declaration
 
 deactivate CTRL

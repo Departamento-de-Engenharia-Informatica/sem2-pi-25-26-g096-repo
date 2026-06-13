@@ -31,6 +31,11 @@ activate CTRL
             FUNC_REPO --> CTRL : functions
         deactivate FUNC_REPO
 
+        CTRL -> CTRL : mapToFunctionDTOList(functions)
+        activate CTRL
+            CTRL --> CTRL : functionDTOList
+        deactivate CTRL
+
     end
 
     autonumber 6

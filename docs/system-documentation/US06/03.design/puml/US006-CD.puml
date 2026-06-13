@@ -14,8 +14,13 @@ class SubmitDeclarationController {
     + getDeclarationTypes()
     + getInstitutions()
     + getFunctions()
+    + getPreviousDeclaration()
     + submitDeclaration(declarationDTO)
     - getPoliticalAgentFromSession()
+    - mapToInstitutionDTOList(institutions) : List<InstitutionDTO>
+    - mapToFunctionDTOList(functions) : List<FunctionDTO>
+    - mapToDeclarationDTO(declaration) : DeclarationDTO
+    - mapToLocation(locationDTO) : Location
 }
 
 class ApplicationSession {
@@ -53,6 +58,10 @@ class FunctionRepository {
 
 class DeclarationRepository {
     + save(declaration)
+    + findLastByPoliticalAgent(politicalAgent)
+    + existsInitialDeclaration(politicalAgent)
+    + existsRegularDeclarationForYear(politicalAgent, year)
+    + getById(id)
 }
 
 class PoliticalAgent {
@@ -66,23 +75,44 @@ class PoliticalAgent {
 
 class Declaration {
     - submissionDate : LocalDate
+    - amendmentReason : String
 
     + Declaration(declarationType, submissionDate)
+    + addHouseholdMember(name, taxId, birthDate, relationship)
     + addPosition(positionType, startDate, endDate,\nremuneration, function, institution)
     + addSubsidy(amount, nature, institution)
-    + addAsset(propertyType, acquisitionValue,\nmarketValue, parish, county, district)
+    + addAsset(propertyType, acquisitionValue,\nmarketValue, location)
     + addSecurityHolding(title, marketValue,\nstake, percentage, institution)
+    + setAmendmentReason(amendmentReason)
+    + setAmendedDeclaration(amendedDeclaration)
     + validateData()
     + getSubmissionDate()
     + getStatus()
+    + getType()
+    + getHouseholdMembers()
+    + getPositions()
+    + getSubsidies()
+    + getAssets()
+    + getSecurityHoldings()
 }
 
 note bottom of Declaration
     Each add* operation validates the entry
     before adding it to the declaration.
     validateData() performs the final global validation,
-    including the rule that at least one entry must exist.
+    including AC1 (at least one household member),
+    AC7 (at least one financial entry), and AC6
+    (exceptional declarations require amendmentReason
+    and/or an amended declaration reference).
+    get* operations expose collections to support
+    mapToDeclarationDTO in getPreviousDeclaration().
 end note
+
+class HouseholdMember {
+    - name : String
+    - taxId : String
+    - birthDate : LocalDate
+}
 
 class Position {
     - startDate : LocalDate
@@ -124,10 +154,20 @@ class Function {
 
 class DeclarationDTO {
     + type : DeclarationType
+    + amendmentReason : String
+    + amendedDeclarationId : String
+    + householdMembers : List<HouseholdMemberDTO>
     + positions : List<PositionDTO>
     + subsidies : List<SubsidyDTO>
     + assets : List<AssetDTO>
     + securityHoldings : List<SecurityHoldingDTO>
+}
+
+class HouseholdMemberDTO {
+    + name : String
+    + taxId : String
+    + birthDate : LocalDate
+    + relationship : HouseholdRelationship
 }
 
 class PositionDTO {
@@ -199,6 +239,12 @@ enum PropertyType {
     RURAL
 }
 
+enum HouseholdRelationship {
+    PARTNER
+    DESCENDANT
+    OTHER
+}
+
 SubmitDeclarationUI .> SubmitDeclarationController
 
 SubmitDeclarationController .> Repositories
@@ -212,6 +258,7 @@ SubmitDeclarationController ..> DeclarationDTO
 SubmitDeclarationController ..> InstitutionDTO
 SubmitDeclarationController ..> FunctionDTO
 SubmitDeclarationController ..> PoliticalAgent
+SubmitDeclarationController ..> Declaration
 
 ApplicationSession -> "1" ApplicationSession : instance
 ApplicationSession ..> UserSession
@@ -227,14 +274,18 @@ InstitutionRepository --> "*" Institution : institutions
 FunctionRepository --> "*" Function : functions
 DeclarationRepository --> "*" Declaration : declarations
 
-PoliticalAgent "1" --> "0..*" Declaration : submits >
+PoliticalAgent "1" *-- "0..*" Declaration : submits >
 Declaration --> "1" DeclarationType : type
 Declaration --> "1" DeclarationStatus : status
+Declaration "0..*" -- "0..1" Declaration : amends >
 
+Declaration "1" *-- "1..*" HouseholdMember : declares >
 Declaration "1" *-- "0..*" Position : contains >
 Declaration "1" *-- "0..*" Subsidy : contains >
 Declaration "1" *-- "0..*" Asset : contains >
 Declaration "1" *-- "0..*" SecurityHolding : contains >
+
+HouseholdMember --> "1" HouseholdRelationship : relationship
 
 Position --> "1" PositionType : type
 Position "*" --> "1" Institution : held at >
@@ -247,10 +298,12 @@ Asset "1" --> "1" Location : located in >
 
 SecurityHolding "*" --> "1" Institution : held in >
 
+DeclarationDTO ..> HouseholdMemberDTO
 DeclarationDTO ..> PositionDTO
 DeclarationDTO ..> SubsidyDTO
 DeclarationDTO ..> AssetDTO
 DeclarationDTO ..> SecurityHoldingDTO
 AssetDTO ..> LocationDTO
+HouseholdMemberDTO --> "1" HouseholdRelationship
 
 @enduml

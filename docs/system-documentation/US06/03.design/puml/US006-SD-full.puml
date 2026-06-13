@@ -49,6 +49,11 @@ activate PA
                 INST_REPO --> CTRL : institutions
             deactivate INST_REPO
 
+            CTRL -> CTRL : mapToInstitutionDTOList(institutions)
+            activate CTRL
+                CTRL --> CTRL : institutionDTOList
+            deactivate CTRL
+
             CTRL --> UI : institutionDTOList
         deactivate CTRL
 
@@ -69,13 +74,61 @@ activate PA
                 FUNC_REPO --> CTRL : functions
             deactivate FUNC_REPO
 
+            CTRL -> CTRL : mapToFunctionDTOList(functions)
+            activate CTRL
+                CTRL --> CTRL : functionDTOList
+            deactivate CTRL
+
             CTRL --> UI : functionDTOList
         deactivate CTRL
 
         UI --> PA : requests declaration data
     deactivate UI
 
-    PA -> UI : provides declaration data
+    PA -> UI : selects declaration type and chooses\nwhether to import previous declaration
+    activate UI
+
+        opt import previous declaration requested
+            UI -> CTRL : getPreviousDeclaration()
+            activate CTRL
+                CTRL -> CTRL : getPoliticalAgentFromSession()
+                activate CTRL
+                    ref over CTRL, PA_REPO
+                        Get Political Agent
+                    end ref
+                    CTRL --> CTRL : politicalAgent
+                deactivate CTRL
+
+                CTRL -> REPOS : getInstance()
+                activate REPOS
+                    REPOS --> CTRL : repositories
+                deactivate REPOS
+
+                CTRL -> REPOS_SINGLETON : getDeclarationRepository()
+                activate REPOS_SINGLETON
+                    REPOS_SINGLETON --> CTRL : declarationRepository
+                deactivate REPOS_SINGLETON
+
+                CTRL -> DECL_REPO : findLastByPoliticalAgent(politicalAgent)
+                activate DECL_REPO
+                    DECL_REPO --> CTRL : previousDeclaration
+                deactivate DECL_REPO
+
+                CTRL -> CTRL : mapToDeclarationDTO(previousDeclaration)
+                activate CTRL
+                    CTRL --> CTRL : previousDeclarationDTO
+                deactivate CTRL
+
+                CTRL --> UI : previousDeclarationDTO
+            deactivate CTRL
+
+            UI --> PA : presents pre-filled household members,\npositions, subsidies, assets and\nsecurity holdings from previous declaration
+        end
+
+        UI --> PA : requests household, position, subsidy,\nasset and security holding data
+    deactivate UI
+
+    PA -> UI : provides declaration data\n(household members, positions, subsidies,\nassets, security holdings, and,\nif Exceptional, amendment data)
     activate UI
         UI --> PA : shows entered data and requests confirmation
     deactivate UI
@@ -85,41 +138,48 @@ activate PA
         UI -> CTRL : submitDeclaration(declarationDTO)
         activate CTRL
 
-            CTRL -> APP_SESSION : getInstance()
-            activate APP_SESSION
-                APP_SESSION --> CTRL : appSession
-            deactivate APP_SESSION
-
-            CTRL -> APP : getCurrentSession()
-            activate APP
-                APP --> CTRL : userSession
-            deactivate APP
-
-            CTRL -> SESSION : getUserId()
-            activate SESSION
-                SESSION --> CTRL : userId
-            deactivate SESSION
+            CTRL -> CTRL : getPoliticalAgentFromSession()
+            activate CTRL
+                ref over CTRL, PA_REPO
+                    Get Political Agent
+                end ref
+                CTRL --> CTRL : politicalAgent
+            deactivate CTRL
 
             CTRL -> REPOS : getInstance()
             activate REPOS
                 REPOS --> CTRL : repositories
             deactivate REPOS
 
-            CTRL -> REPOS_SINGLETON : getPoliticalAgentRepository()
+            CTRL -> REPOS_SINGLETON : getDeclarationRepository()
             activate REPOS_SINGLETON
-                REPOS_SINGLETON --> CTRL : politicalAgentRepository
+                REPOS_SINGLETON --> CTRL : declarationRepository
             deactivate REPOS_SINGLETON
 
-            CTRL -> PA_REPO : getByUserId(userId)
-            activate PA_REPO
-                PA_REPO --> CTRL : politicalAgent
-            deactivate PA_REPO
+            alt declarationDTO.type == INITIAL
+                CTRL -> DECL_REPO : existsInitialDeclaration(politicalAgent)
+                activate DECL_REPO
+                    DECL_REPO --> CTRL : false
+                deactivate DECL_REPO
+            else declarationDTO.type == REGULAR
+                CTRL -> DECL_REPO : existsRegularDeclarationForYear(politicalAgent, year)
+                activate DECL_REPO
+                    DECL_REPO --> CTRL : false
+                deactivate DECL_REPO
+            end
 
             CTRL -> PAO : createDeclaration(declarationDTO.type)
             activate PAO
                 PAO --> DECL** : create(declarationType, submissionDate)
                 PAO --> CTRL : declaration
             deactivate PAO
+
+            loop for each householdMemberDTO
+                CTRL -> DECL : addHouseholdMember(householdMemberDTO.name,\nhouseholdMemberDTO.taxId, householdMemberDTO.birthDate,\nhouseholdMemberDTO.relationship)
+                activate DECL
+                    DECL --> CTRL : householdMember
+                deactivate DECL
+            end
 
             loop for each positionDTO
                 CTRL -> INST_REPO : getById(positionDTO.institutionId)
@@ -151,7 +211,12 @@ activate PA
             end
 
             loop for each assetDTO
-                CTRL -> DECL : addAsset(assetDTO.propertyType, assetDTO.acquisitionValue,\nassetDTO.marketValue, assetDTO.location.parish,\nassetDTO.location.county, assetDTO.location.district)
+                CTRL -> CTRL : mapToLocation(assetDTO.location)
+                activate CTRL
+                    CTRL --> CTRL : location
+                deactivate CTRL
+
+                CTRL -> DECL : addAsset(assetDTO.propertyType, assetDTO.acquisitionValue,\nassetDTO.marketValue, location)
                 activate DECL
                     DECL --> CTRL : asset
                 deactivate DECL
@@ -169,15 +234,27 @@ activate PA
                 deactivate DECL
             end
 
+            alt declarationDTO.type == EXCEPTIONAL
+                CTRL -> DECL : setAmendmentReason(declarationDTO.amendmentReason)
+                activate DECL
+                deactivate DECL
+
+                opt declarationDTO.amendedDeclarationId != null
+                    CTRL -> DECL_REPO : getById(declarationDTO.amendedDeclarationId)
+                    activate DECL_REPO
+                        DECL_REPO --> CTRL : amendedDeclaration
+                    deactivate DECL_REPO
+
+                    CTRL -> DECL : setAmendedDeclaration(amendedDeclaration)
+                    activate DECL
+                    deactivate DECL
+                end
+            end
+
             CTRL -> DECL : validateData()
             activate DECL
                 DECL --> CTRL : true
             deactivate DECL
-
-            CTRL -> REPOS_SINGLETON : getDeclarationRepository()
-            activate REPOS_SINGLETON
-                REPOS_SINGLETON --> CTRL : declarationRepository
-            deactivate REPOS_SINGLETON
 
             CTRL -> DECL_REPO : save(declaration)
             activate DECL_REPO
