@@ -34,6 +34,12 @@ enum PropertyType << Enum >> {
   RURAL
 }
 
+enum HouseholdRelationship << Enum >> {
+  PARTNER
+  DESCENDANT
+  OTHER
+}
+
 class PoliticalAgent {
   name
   email
@@ -41,6 +47,13 @@ class PoliticalAgent {
 
 class Declaration {
   submissionDate
+  amendmentReason
+}
+
+class HouseholdMember {
+  name
+  taxId
+  birthDate
 }
 
 class Position {
@@ -84,10 +97,14 @@ class Location {
 PoliticalAgent "1" -down- "0..*" Declaration : submits >
 Declaration --> "1" DeclarationType
 Declaration --> "1" DeclarationStatus
+Declaration "1" *-down- "1..*" HouseholdMember : declares >
 Declaration "1" *-down- "0..*" Position : contains >
 Declaration "1" *-down- "0..*" Subsidy : contains >
 Declaration "1" *-down- "0..*" Asset : contains >
 Declaration "1" *-down- "0..*" SecurityHolding : contains >
+Declaration "0..*" -- "0..1" Declaration : amends >
+
+HouseholdMember --> "1" HouseholdRelationship
 
 Position --> "1" PositionType
 Position "0..*" -down- "1" Institution : held at >
