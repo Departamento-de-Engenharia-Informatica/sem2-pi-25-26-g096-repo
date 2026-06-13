@@ -13,6 +13,7 @@ participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "institutionTypeRepository\n:InstitutionTypeRepository" as TYPE_REPO
 participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+participant "InstitutionMapper" as MAPPER
 
 activate ADMIN
 
@@ -79,7 +80,12 @@ activate UI
                 INST_REPO --> CTRL : institution
             deactivate INST_REPO
 
-            CTRL --> UI : institution
+            CTRL -> MAPPER : toDTO(institution)
+            activate MAPPER
+                MAPPER --> CTRL : institutionDTO
+            deactivate MAPPER
+
+            CTRL --> UI : institutionDTO
         deactivate CTRL
 
     UI --> ADMIN : displays success message

@@ -12,6 +12,7 @@ participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "institutionTypeRepository\n:InstitutionTypeRepository" as TYPE_REPO
 participant "institutionRepository\n:InstitutionRepository" as INST_REPO
+participant "InstitutionMapper" as MAPPER
 
 activate ADMIN
 
@@ -43,18 +44,18 @@ activate UI
 
     UI --> ADMIN : displays Institution types
 
-    ADMIN -> UI : selects type and enters name
+    ADMIN -> UI : selects type and enters name, taxId
 
-        UI -> CTRL : registerInstitution(name, type)
+        UI -> CTRL : registerInstitution(name, taxId, type)
         activate CTRL
 
-            CTRL -> INST** : create(name, type)
+            CTRL -> INST** : create(name, taxId, type)
             activate INST
             deactivate INST
 
             CTRL -> INST : validate()
             activate INST
-                INST --> CTRL : validation result
+                INST --> CTRL : validation result (AC2)
             deactivate INST
 
             alt validation successful
@@ -68,14 +69,28 @@ activate UI
                     REPOS_SINGLETON --> CTRL : institutionRepository
                 deactivate REPOS_SINGLETON
 
-                CTRL -> INST_REPO : save(institution)
+                CTRL -> INST_REPO : isDuplicate(name, type)
                 activate INST_REPO
-                    INST_REPO --> CTRL : success
+                    INST_REPO --> CTRL : duplicate result (AC3)
                 deactivate INST_REPO
 
-                CTRL --> UI : success
+                alt not duplicate
+                    CTRL -> INST_REPO : save(institution)
+                    activate INST_REPO
+                        INST_REPO --> CTRL : institution
+                    deactivate INST_REPO
+
+                    CTRL -> MAPPER : toDTO(institution)
+                    activate MAPPER
+                        MAPPER --> CTRL : institutionDTO
+                    deactivate MAPPER
+
+                    CTRL --> UI : institutionDTO
+                else duplicate
+                    CTRL --> UI : failure/duplicate error message
+                end
             else validation failed
-                CTRL --> UI : failure/error message
+                CTRL --> UI : failure/validation error message
             end
 
         deactivate CTRL

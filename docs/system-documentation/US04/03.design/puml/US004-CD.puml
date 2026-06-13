@@ -90,15 +90,28 @@ InstitutionTypeRepository --> "*" InstitutionType : institutionTypes
 class RegisterInstitutionController {
     + RegisterInstitutionController()
     + getInstitutionTypes() : List<InstitutionType>
-    + registerInstitution(name : String, taxId : String, type : InstitutionType) : Institution
+    + registerInstitution(name : String, taxId : String, type : InstitutionType) : InstitutionDTO
     - getAdministratorFromSession() : Administrator
+}
+
+class InstitutionDTO {
+    - name : String
+    - type : String
+    + InstitutionDTO(name : String, type : String)
+    + getName() : String
+    + getType() : String
+}
+
+class InstitutionMapper {
+    + toDTO(institution : Institution) : InstitutionDTO
 }
 
 note right of RegisterInstitutionController
     registerInstitution() creates an Institution,
     calls Institution.validate() (AC2),
     checks InstitutionRepository.isDuplicate() (AC3),
-    and persists via InstitutionRepository.save().
+    persists via InstitutionRepository.save(),
+    and maps the result to InstitutionDTO.
 end note
 
 RegisterInstitutionController ..> Repositories
@@ -109,6 +122,11 @@ RegisterInstitutionController ..> Institution
 RegisterInstitutionController ..> Administrator
 RegisterInstitutionController ..> ApplicationSession
 RegisterInstitutionController ..> UserSession
+RegisterInstitutionController ..> InstitutionMapper
+RegisterInstitutionController ..> InstitutionDTO
+
+InstitutionMapper ..> Institution
+InstitutionMapper ..> InstitutionDTO
 
 '========================
 ' UI Layer
@@ -118,5 +136,6 @@ class RegisterInstitutionUI {
 }
 
 RegisterInstitutionUI --> RegisterInstitutionController
+RegisterInstitutionUI ..> InstitutionDTO
 
 @enduml
