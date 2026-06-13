@@ -17,6 +17,7 @@
 |                | ... checking for duplicate institutions (AC3)?              | InstitutionRepository           | Information Expert: has access to all persisted institutions.                |
 |                | ... creating the Institution object?                        | RegisterInstitutionController   | Creator (delegated): has all data needed to initialise Institution.          |
 |                | ... saving the new institution?                             | InstitutionRepository           | Information Expert: manages persistence of Institution objects.              |
+|                | ... converting saved Institution to DTO?                     | InstitutionMapper             | Pure Fabrication: maps saved domain entity to DTO to decouple layers.        |
 | Step 6         | ... informing operation success or failure?                 | RegisterInstitutionUI           | Pure Fabrication: presents result to the actor.                              |
 
 ### 3.2. Systematization
@@ -36,6 +37,8 @@ Other software classes (i.e. Pure Fabrication) identified:
 * Repositories
 * InstitutionRepository
 * InstitutionTypeRepository
+* InstitutionDTO
+* InstitutionMapper
 * ApplicationSession
 * UserSession
 

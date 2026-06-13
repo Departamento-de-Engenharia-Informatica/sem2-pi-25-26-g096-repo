@@ -26,7 +26,7 @@ public void setUp() {
 
 @Test
 public void ensureEmptyListReturnsValidGroupedFormat() {
-    Map<InstitutionType, List<Institution>> grouped = controller.getInstitutionsByType(null);
+    Map<InstitutionType, List<InstitutionDTO>> grouped = controller.getInstitutionsByType(null);
 
     assertNotNull(grouped);
     assertTrue(grouped.isEmpty());
@@ -43,7 +43,7 @@ public void ensureInstitutionsAreGroupedByType() {
     controller.getInstitutionRepository().save(new Institution("Alpha Company", InstitutionType.COMPANY));
     controller.getInstitutionRepository().save(new Institution("Beta Party", InstitutionType.POLITICAL_PARTY));
 
-    Map<InstitutionType, List<Institution>> grouped = controller.getAllInstitutionsGrouped();
+    Map<InstitutionType, List<InstitutionDTO>> grouped = controller.getAllInstitutionsGrouped();
 
     assertTrue(grouped.containsKey(InstitutionType.COMPANY));
     assertTrue(grouped.containsKey(InstitutionType.POLITICAL_PARTY));
@@ -63,7 +63,7 @@ public void ensureInstitutionsWithinTypeAreSortedAlphabetically() {
     controller.getInstitutionRepository().save(new Institution("Alpha Company", InstitutionType.COMPANY));
     controller.getInstitutionRepository().save(new Institution("Gamma Company", InstitutionType.COMPANY));
 
-    List<Institution> companies = controller.getInstitutionsByType(InstitutionType.COMPANY);
+    List<InstitutionDTO> companies = controller.getInstitutionsByType(InstitutionType.COMPANY);
 
     assertEquals("Alpha Company", companies.get(0).getName());
     assertEquals("Gamma Company", companies.get(1).getName());
@@ -93,11 +93,12 @@ public void ensureAllFivePredefinedInstitutionTypesAreAvailable() {
 
 The implementation should follow the design responsibilities:
 
-* `ListInstitutionsController` coordinates the use case: it obtains the institution types and retrieves institutions filtered and sorted before presenting them to the UI.
+* `ListInstitutionsController` coordinates the use case: it obtains the institution types and retrieves institutions filtered and sorted, and converts them to DTOs before presenting them to the UI.
 * `InstitutionTypeRepository` provides the predefined list of institution types; it is the single source of truth for valid types (AC1 compliance).
 * `InstitutionRepository.getInstitutionsByType(type)` retrieves the raw (unsorted) list of institutions matching a given type.
-* `ListInstitutionsController.getInstitutionsByType(type)` sorts the retrieved list alphabetically by institution name before returning it to the UI layer.
-* `ListInstitutionsUI` presents the grouped and ordered result to the Political Agent; it has no sorting or grouping logic of its own.
+* `ListInstitutionsController.getInstitutionsByType(type)` sorts the retrieved list alphabetically by institution name, and uses `InstitutionMapper` to map it to `InstitutionDTO`s before returning it to the UI layer.
+* `InstitutionMapper` maps `Institution` domain entities to simple `InstitutionDTO` data transfer objects.
+* `ListInstitutionsUI` presents the grouped and ordered DTO result to the Political Agent; it has no sorting, grouping, or domain entity access of its own.
 
 
 ## 6. Integration and Demo

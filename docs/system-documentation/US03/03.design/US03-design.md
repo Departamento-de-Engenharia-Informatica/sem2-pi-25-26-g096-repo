@@ -14,6 +14,7 @@
 | Step 3         | ... saving selected institution type?                           | ListInstitutionsUI            | IE: temporarily keeps user input data.                                 |
 | Step 4         | ... retrieving institutions by selected type?                   | InstitutionRepository         | IE: maintains Institution persistence and retrieval logic.             |
 | Step 5         | ... ordering institutions alphabetically?                       | ListInstitutionsController    | Controller applies application logic before presentation.              |
+|                | ... converting domain objects to DTOs?                         | InstitutionMapper             | Pure Fabrication: maps domain objects to DTOs to decouple layers.      |
 | Step 6         | ... presenting institutions grouped by type and success?        | ListInstitutionsUI            | Pure Fabrication: responsible for displaying results.                  |
 
 ### 3.2. Systematization
@@ -32,6 +33,8 @@ Other software classes (i.e. Pure Fabrication) identified:
 * Repositories
 * InstitutionRepository
 * InstitutionTypeRepository
+* InstitutionDTO
+* InstitutionMapper
 * ApplicationSession
 * UserSession
 

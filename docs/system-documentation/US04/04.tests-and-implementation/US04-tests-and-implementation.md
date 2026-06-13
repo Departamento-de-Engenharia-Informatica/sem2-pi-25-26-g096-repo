@@ -27,11 +27,11 @@ public void setUp() {
 
 @Test
 public void ensureRegistrationWithValidTypeAndNameSucceeds() {
-    Institution institution = controller.registerInstitution("My Institution", "500000001", InstitutionType.COMPANY);
+    InstitutionDTO institution = controller.registerInstitution("My Institution", "500000001", InstitutionType.COMPANY);
 
     assertNotNull(institution);
     assertEquals("My Institution", institution.getName());
-    assertEquals(InstitutionType.COMPANY, institution.getType());
+    assertEquals(InstitutionType.COMPANY.name(), institution.getType());
 }
 ```
 
@@ -123,12 +123,14 @@ public void ensureDuplicateInstitutionIsRejected() {
 
 The implementation should follow the design responsibilities:
 
-* `RegisterInstitutionController` coordinates the use case: it obtains the available types from `InstitutionTypeRepository`, accepts the Administrator's input, creates the `Institution` domain object, checks for duplicates (AC3), and saves it via `InstitutionRepository`.
+* `RegisterInstitutionController` coordinates the use case: it obtains the available types from `InstitutionTypeRepository`, accepts the Administrator's input, creates the `Institution` domain object, checks for duplicates (AC3), saves it via `InstitutionRepository`, and converts it to `InstitutionDTO` before returning it to the UI.
 * `InstitutionTypeRepository` provides the predefined list of types required by AC1; no type outside this list may be used.
 * `Institution.validate()` enforces the domain invariants (non-null, non-empty name — AC2; non-null type — AC1) on construction, acting as the domain layer guard.
 * `InstitutionRepository.isDuplicate(name, type)` checks for an existing institution with the same name and type before saving (AC3).
 * `InstitutionRepository.save(institution)` persists the validated institution and makes it available for future queries (including US03 listing).
-* `RegisterInstitutionUI` presents the type list to the Administrator, collects the institution data, and delegates all logic to the controller; it contains no business logic.
+* `InstitutionMapper` maps the saved `Institution` domain entity to a simple `InstitutionDTO` data transfer object.
+* `InstitutionDTO` carries the name and type back to the UI.
+* `RegisterInstitutionUI` presents the type list to the Administrator, collects the institution data, and delegates all logic to the controller; it only receives and displays DTOs.
 
 
 ## 6. Integration and Demo
