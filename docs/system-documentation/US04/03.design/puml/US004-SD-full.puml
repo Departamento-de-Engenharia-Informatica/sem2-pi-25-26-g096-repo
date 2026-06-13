@@ -8,7 +8,7 @@ actor "Administrator" as ADMIN
 
 participant ":RegisterInstitutionUI" as UI
 participant ":RegisterInstitutionController" as CTRL
-
+participant ":Institution" as INST
 participant "Repositories" as REPOS
 participant "repositories\n:Repositories" as REPOS_SINGLETON
 participant "institutionTypeRepository\n:InstitutionTypeRepository" as TYPE_REPO
@@ -44,11 +44,20 @@ activate UI
 
     UI --> ADMIN : displays Institution types
 
-    ADMIN -> UI : selects type and enters name, tax id
+    ADMIN -> UI : selects type and enters name, taxId
     activate UI
 
         UI -> CTRL : registerInstitution(name, taxId, type)
         activate CTRL
+
+            CTRL -> INST** : create(name, taxId, type)
+            activate INST
+            deactivate INST
+
+            CTRL -> INST : validate()
+            activate INST
+                INST --> CTRL : validation result (AC2)
+            deactivate INST
 
             CTRL -> REPOS : getInstance()
             activate REPOS
@@ -60,12 +69,17 @@ activate UI
                 REPOS_SINGLETON --> CTRL : institutionRepository
             deactivate REPOS_SINGLETON
 
-            CTRL -> INST_REPO : save(name, taxId, type)
+            CTRL -> INST_REPO : isDuplicate(name, type)
             activate INST_REPO
-                INST_REPO --> CTRL : success/failure
+                INST_REPO --> CTRL : false (AC3)
             deactivate INST_REPO
 
-            CTRL --> UI : success/failure
+            CTRL -> INST_REPO : save(institution)
+            activate INST_REPO
+                INST_REPO --> CTRL : institution
+            deactivate INST_REPO
+
+            CTRL --> UI : institution
         deactivate CTRL
 
     UI --> ADMIN : displays success message

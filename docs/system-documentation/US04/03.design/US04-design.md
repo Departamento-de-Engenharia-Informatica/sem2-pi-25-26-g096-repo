@@ -12,19 +12,22 @@
 | Step 2         | ... requesting institution type selection?                  | RegisterInstitutionUI           | IE: manages interaction with the actor.                                      |
 |                | ... obtaining institution types?                            | InstitutionTypeRepository       | Information Expert: provides predefined InstitutionType list (AC1).          |
 | Step 3         | ... saving selected institution type?                       | RegisterInstitutionUI           | IE: temporarily stores user input data.                                      |
-| Step 4         | ... requesting institution data (name)?                     | RegisterInstitutionUI           | Responsible for user interaction.                                            |
-| Step 5         | ... validating and creating the Institution?                | Administrator                   | Creator pattern: Administrator registers Institutions.                       |
-|                | ... validating institution information (local validation)?  | Institution                     | Information Expert: owns its data and validation rules.                      |
+| Step 4         | ... requesting institution data (name, taxId)?              | RegisterInstitutionUI           | Pure Fabrication: responsible for user interaction.                          |
+| Step 5         | ... validating that name is not null or empty (AC2)?        | Institution                     | Information Expert: owns its data and enforces its own invariants.           |
+|                | ... checking for duplicate institutions (AC3)?              | InstitutionRepository           | Information Expert: has access to all persisted institutions.                |
+|                | ... creating the Institution object?                        | RegisterInstitutionController   | Creator (delegated): has all data needed to initialise Institution.          |
 |                | ... saving the new institution?                             | InstitutionRepository           | Information Expert: manages persistence of Institution objects.              |
-| Step 6         | ... informing operation success?                            | RegisterInstitutionUI           | Pure Fabrication: presents result to the actor.                              |
+| Step 6         | ... informing operation success or failure?                 | RegisterInstitutionUI           | Pure Fabrication: presents result to the actor.                              |
 
-### Systematization ##
+### 3.2. Systematization
 
 According to the taken rationale, the conceptual classes promoted to software classes are:
 
 * Administrator
 * Institution
 * InstitutionType
+
+> **Note:** `Address` is **not** promoted for this US. Institution address is not part of the data collected during registration in this sprint (the SSD and AC do not reference it), and it does not appear in any step of the rationale. Promoting it without a corresponding interaction would break traceability between requirements and design.
 
 Other software classes (i.e. Pure Fabrication) identified:
 
@@ -37,7 +40,7 @@ Other software classes (i.e. Pure Fabrication) identified:
 * UserSession
 
 
-## 3.2. Sequence Diagram (SD)
+## 3.3. Sequence Diagram (SD)
 
 ### Full Diagram
 
@@ -48,6 +51,6 @@ Other software classes (i.e. Pure Fabrication) identified:
 ![Sequence Diagram - split](svg/US004-SD-split.svg)
 
 
-## 3.3. Class Diagram (CD)
+## 3.4. Class Diagram (CD)
 
 ![Class Diagram](svg/US004-CD.svg)

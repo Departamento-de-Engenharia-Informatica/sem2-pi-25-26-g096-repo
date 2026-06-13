@@ -8,73 +8,80 @@ skinparam classAttributeIconSize 0
 title Design Class Diagram - US004
 
 hide circle
-hide methods
 
 '========================
 ' Session Layer
 '========================
 
 class ApplicationSession {
-    + getInstance()
-    + getCurrentSession()
+    - ApplicationSession()
+    + {static} getInstance() : ApplicationSession
+    + getCurrentSession() : UserSession
 }
 
 class UserSession {
-    + getUserEmail()
+    + getUserEmail() : String
 }
 
+ApplicationSession -> "1" ApplicationSession : instance
 ApplicationSession ..> UserSession
-
 
 '========================
 ' Domain Layer
 '========================
 
 class Administrator {
-    email
+    - email : String
 }
 
 class Institution {
-    name
-    taxIdentificationNumber
+    - name : String
+    - taxIdentificationNumber : String
+    + Institution(name, taxId, type)
+    + getName() : String
+    + getType() : InstitutionType
+    + validate() : boolean
 }
 
-class InstitutionType {
-    designation
+enum InstitutionType {
+    COMPANY
+    POLITICAL_PARTY
+    FOUNDATION
+    INSTITUTE
+    ASSOCIATION
 }
 
-class Address {
-    address
-    nameCountry
-}
-
-Institution "*" --> "1" InstitutionType
-Institution "1" --> "1..*" Address
+Institution "*" --> "1" InstitutionType : type
 Administrator "1" --> "*" Institution : registers
-
 
 '========================
 ' Repository Layer
 '========================
 
 class InstitutionRepository {
-    + save(institution)
-    + getInstitutions()
+    + save(institution : Institution) : Institution
+    + getAllInstitutions() : List<Institution>
+    + getInstitutionsByType(type : InstitutionType) : List<Institution>
+    + isDuplicate(name : String, type : InstitutionType) : boolean
 }
 
 class InstitutionTypeRepository {
-    + getInstitutionTypes()
+    + getInstitutionTypes() : List<InstitutionType>
 }
 
 class Repositories {
-    + getInstance()
-    + getInstitutionRepository()
-    + getInstitutionTypeRepository()
+    - Repositories()
+    + {static} getInstance() : Repositories
+    + getInstitutionRepository() : InstitutionRepository
+    + getInstitutionTypeRepository() : InstitutionTypeRepository
 }
 
-Repositories --> InstitutionRepository
-Repositories --> InstitutionTypeRepository
+Repositories -> "1" Repositories : instance
+Repositories --> "1" InstitutionRepository : institutionRepository
+Repositories --> "1" InstitutionTypeRepository : institutionTypeRepository
 
+InstitutionRepository --> "*" Institution : institutions
+InstitutionTypeRepository --> "*" InstitutionType : institutionTypes
 
 '========================
 ' Controller
@@ -82,9 +89,17 @@ Repositories --> InstitutionTypeRepository
 
 class RegisterInstitutionController {
     + RegisterInstitutionController()
-    + getInstitutionTypes()
-    + registerInstitution(name, taxId, type)
+    + getInstitutionTypes() : List<InstitutionType>
+    + registerInstitution(name : String, taxId : String, type : InstitutionType) : Institution
+    - getAdministratorFromSession() : Administrator
 }
+
+note right of RegisterInstitutionController
+    registerInstitution() creates an Institution,
+    calls Institution.validate() (AC2),
+    checks InstitutionRepository.isDuplicate() (AC3),
+    and persists via InstitutionRepository.save().
+end note
 
 RegisterInstitutionController ..> Repositories
 RegisterInstitutionController ..> InstitutionRepository
@@ -95,7 +110,6 @@ RegisterInstitutionController ..> Administrator
 RegisterInstitutionController ..> ApplicationSession
 RegisterInstitutionController ..> UserSession
 
-
 '========================
 ' UI Layer
 '========================
@@ -104,13 +118,5 @@ class RegisterInstitutionUI {
 }
 
 RegisterInstitutionUI --> RegisterInstitutionController
-
-
-'========================
-' Repository Relations
-'========================
-
-InstitutionRepository --> "*" Institution
-InstitutionTypeRepository --> "*" InstitutionType
 
 @enduml

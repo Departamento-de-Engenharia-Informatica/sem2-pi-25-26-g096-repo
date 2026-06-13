@@ -6,13 +6,14 @@ The following unit tests are designed from the acceptance criteria, analysis mod
 
 ### Acceptance Criteria Coverage
 
-| Acceptance Criterion                                                                                  | Covered by          |
-|-------------------------------------------------------------------------------------------------------|---------------------|
-| AC1 - The institution type must be selected from a predefined list of available types.               | Tests 2, 3 and 4    |
-| (Implicit) Institution name must not be null or empty.                                               | Test 5              |
-| (Implicit) A valid registration persists the institution in the repository.                          | Tests 1 and 5       |
+| Acceptance Criterion                                                                                                                         | Covered by       |
+|----------------------------------------------------------------------------------------------------------------------------------------------|------------------|
+| AC1 - The institution type must be selected from a predefined list of available types.                                                      | Tests 2, 3, 4    |
+| AC2 - The institution name must not be null or empty; the system must reject registration with a blank name.                                | Test 6           |
+| AC3 - The system must prevent duplicate institutions (same name and type); duplicates must be rejected.                                     | Test 7           |
+| (integration) A valid registration with all fields correct persists the institution in the repository.                                      | Tests 1, 5       |
 
-**Test 1:** Check that registration with a valid type and name succeeds — AC1 (positive path).
+**Test 1:** Check that registration with a valid type and name succeeds — AC1, AC2, AC3 (positive path).
 
 This test validates the happy path: when the Administrator selects a type from the predefined list and provides a valid name, the institution is created and returned correctly.
 
@@ -77,7 +78,7 @@ public void ensureRegistrationFailsWithTypeNotInPredefinedList() {
 }
 ```
 
-**Test 5:** Check that the registered institution is persisted in the repository.
+**Test 5:** Check that the registered institution is persisted in the repository — integration (AC1, AC2, AC3 all satisfied).
 
 This test validates the persistence side-effect of a successful registration. After `registerInstitution()` succeeds, the institution must be retrievable from the repository through the controller.
 
@@ -93,9 +94,9 @@ public void ensureRegisteredInstitutionIsPersisted() {
 }
 ```
 
-**Test 6:** Check that institution name must not be null or empty.
+**Test 6:** Check that institution name must not be null or empty — AC2.
 
-This test enforces the implicit domain invariant: an institution cannot be created without a name. The system must reject null and blank names before attempting persistence.
+This test enforces the domain invariant: an institution cannot be created without a name. The system must reject null and blank names before attempting persistence.
 
 ```java
 @Test(expected = IllegalArgumentException.class)
@@ -104,23 +105,38 @@ public void ensureInstitutionNameCannotBeNullOrEmpty() {
 }
 ```
 
+**Test 7:** Check that registering a duplicate institution is rejected — AC3.
+
+This test validates that if an institution with the same name and type already exists in the repository, the system must refuse the second registration attempt.
+
+```java
+@Test(expected = IllegalStateException.class)
+public void ensureDuplicateInstitutionIsRejected() {
+    controller.registerInstitution("Duplicate Foundation", "500000006", InstitutionType.FOUNDATION);
+    // Second attempt with same name and type must be rejected
+    controller.registerInstitution("Duplicate Foundation", "500000007", InstitutionType.FOUNDATION);
+}
+```
+
 
 ## 5. Construction (Implementation)
 
 The implementation should follow the design responsibilities:
 
-* `RegisterInstitutionController` coordinates the use case: it obtains the available types from `InstitutionTypeRepository`, accepts the Administrator's input, creates the `Institution` domain object, and saves it via `InstitutionRepository`.
+* `RegisterInstitutionController` coordinates the use case: it obtains the available types from `InstitutionTypeRepository`, accepts the Administrator's input, creates the `Institution` domain object, checks for duplicates (AC3), and saves it via `InstitutionRepository`.
 * `InstitutionTypeRepository` provides the predefined list of types required by AC1; no type outside this list may be used.
-* `Institution` validates its own invariants (non-null name, non-null type) on construction, acting as the domain layer guard.
+* `Institution.validate()` enforces the domain invariants (non-null, non-empty name — AC2; non-null type — AC1) on construction, acting as the domain layer guard.
+* `InstitutionRepository.isDuplicate(name, type)` checks for an existing institution with the same name and type before saving (AC3).
 * `InstitutionRepository.save(institution)` persists the validated institution and makes it available for future queries (including US03 listing).
 * `RegisterInstitutionUI` presents the type list to the Administrator, collects the institution data, and delegates all logic to the controller; it contains no business logic.
 
 
 ## 6. Integration and Demo
 
-For demonstration, the Administrator must be able to access the institution registration option from the main menu. The system displays the predefined list of institution types; the Administrator selects one and enters the institution name (and tax identification number). Upon successful registration, the system confirms the creation. The new institution becomes immediately available in the US03 listing.
+For demonstration, the Administrator must be able to access the institution registration option from the main menu. The system displays the predefined list of institution types; the Administrator selects one and enters the institution name (and tax identification number). Upon successful registration, the system confirms the creation. The new institution becomes immediately available in the US03 listing. If a duplicate is detected or the name is blank, the system must display an appropriate error message without persisting the institution.
 
 
 ## 7. Observations
 
-* n/a
+* AC3 (duplicate prevention) was originally classified by the client as a "technical concern". It has been formalised as a business rule to ensure catalog integrity and to provide explicit test coverage.
+* The alphabetical ordering of the institution catalog is the responsibility of US03 (listing), not US04 (registration).

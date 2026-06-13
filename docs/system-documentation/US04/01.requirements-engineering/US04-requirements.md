@@ -30,6 +30,8 @@ As an Administrator, I want to register an Institution of a given type.
 ### 1.3. Acceptance Criteria
 
 * **AC1:** The institution type must be selected from a predefined list of available types.
+* **AC2:** The institution name must not be null or empty; the system must reject any registration attempt with a blank name.
+* **AC3:** The system must prevent the registration of duplicate institutions; an institution is considered a duplicate if it has the same name and the same type as an already-registered institution.
 
 ---
 
@@ -62,4 +64,6 @@ As an Administrator, I want to register an Institution of a given type.
 ![System Sequence Diagram](svg/US04-SSD.svg)
 
 ### 1.7 Other Relevant Remarks
-N/a
+
+* The predefined institution types for Sprint 1 are: Company, Political Party, Foundation, Institute, and Association (see AC1).
+* Duplicate prevention (AC3) was originally described by the client as a "technical concern"; it is here formalised as a business rule to ensure catalog integrity across the platform.

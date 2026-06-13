@@ -19,7 +19,14 @@ activate Employee
     Employee -> System : selects the type(s) of institutions
     activate System
 
-        System --> Employee : shows institutions grouped by type, each group listed alphabetically by name
+        alt institutions found
+            System --> Employee : shows institutions grouped by type, each group listed alphabetically by name
+        else no institutions registered / none match the selected type
+            System --> Employee : informs that no institutions are available for the selected type(s)
+        end
+
     deactivate System
+
+deactivate Employee
 
 @enduml
