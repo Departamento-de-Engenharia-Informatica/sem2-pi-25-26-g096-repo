@@ -1,4 +1,4 @@
-# US006 - Analyse Income Evolution 
+# US010 - Analyse Income Evolution of a Political Agent
 
 [Requirements Engineering](01.requirements-engineering/US10-requirements.md)
 

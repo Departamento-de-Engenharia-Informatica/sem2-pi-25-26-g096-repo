@@ -34,6 +34,10 @@ activate JOURNALIST
         UI -> CTRL : getIncomeEvolution(politicalAgentId, startDate, endDate)
         activate CTRL
 
+            CTRL -> CTRL : validateDateInterval(startDate, endDate)
+            activate CTRL
+            deactivate CTRL
+
             CTRL -> CTRL : getPoliticalAgent(politicalAgentId)
             activate CTRL
                 ref over CTRL, REPOS
@@ -49,7 +53,11 @@ activate JOURNALIST
             CTRL --> UI : incomeEvolutionDTOList
         deactivate CTRL
 
-        UI --> JOURNALIST : displays income evolution
+        alt incomeEvolutionDTOList is empty
+            UI --> JOURNALIST : informs that no declarations\nexist for the selected period
+        else
+            UI --> JOURNALIST : displays income evolution\nin chronological order
+        end
     deactivate UI
 
 deactivate JOURNALIST

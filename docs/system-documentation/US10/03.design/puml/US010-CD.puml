@@ -14,6 +14,7 @@ class AnalyseIncomeEvolutionController {
     + getPoliticalAgents()
     + getIncomeEvolution(politicalAgentId, startDate, endDate)
     - getPoliticalAgent(politicalAgentId)
+    - validateDateInterval(startDate, endDate)
 }
 
 class ApplicationSession {
@@ -43,6 +44,7 @@ class DeclarationRepository {
 }
 
 class PoliticalAgent {
+    - id : String
     - name : String
     - taxId : String
     - email : String

@@ -35,7 +35,7 @@ activate CTRL
                 INC_MAPPER --> INC_MAPPER : sortedDeclarations
             deactivate INC_MAPPER
 
-            loop for each declaration
+            loop for each declaration in sortedDeclarations
                 INC_MAPPER -> DECL : getSubmissionDate()
                 activate DECL
                     DECL --> INC_MAPPER : submissionDate
