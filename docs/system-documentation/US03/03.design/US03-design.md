@@ -16,14 +16,14 @@
 | Step 5         | ... ordering institutions alphabetically?                       | ListInstitutionsController    | Controller applies application logic before presentation.              |
 | Step 6         | ... presenting institutions grouped by type and success?        | ListInstitutionsUI            | Pure Fabrication: responsible for displaying results.                  |
 
-### Systematization ##
+### 3.2. Systematization
 
 According to the taken rationale, the conceptual classes promoted to software classes are:
 
 * Institution
 * InstitutionType
-* NatureOfInstitution
-* Address
+
+> **Note:** Only `Institution` and `InstitutionType` are promoted from the domain model. No other attributes (e.g., address, nature of institution) appear in either the SSD interactions or the acceptance criteria for this US, so no additional conceptual classes are promoted. Introducing further classes without justification in the rationale would violate traceability between requirements and design.
 
 Other software classes (i.e. Pure Fabrication) identified:
 
@@ -36,7 +36,7 @@ Other software classes (i.e. Pure Fabrication) identified:
 * UserSession
 
 
-## 3.2. Sequence Diagram (SD)
+## 3.3. Sequence Diagram (SD)
 
 ### Full Diagram
 
@@ -47,6 +47,6 @@ Other software classes (i.e. Pure Fabrication) identified:
 ![Sequence Diagram - split](svg/US003-SD-split.svg)
 
 
-## 3.3. Class Diagram (CD)
+## 3.4. Class Diagram (CD)
 
 ![Class Diagram](svg/US003-CD.svg)

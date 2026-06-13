@@ -6,11 +6,13 @@ The following unit tests are designed from the acceptance criteria, analysis mod
 
 ### Acceptance Criteria Coverage
 
-| Acceptance Criterion                                                                                               | Covered by         |
-|--------------------------------------------------------------------------------------------------------------------|--------------------|
-| AC1 - Institutions must be grouped by type and listed alphabetically by name inside each type group.              | Tests 1, 2, 3 and 4 |
+| Acceptance Criterion                                                                                                                     | Covered by           |
+|------------------------------------------------------------------------------------------------------------------------------------------|----------------------|
+| AC1 - Institutions must be grouped by type and listed alphabetically by name inside each type group.                                    | Tests 2, 3           |
+| AC2 - If no institutions exist or none match the selected type, the system returns an empty valid grouped result (no null/exception).    | Test 1               |
+| AC3 - The institution types available for selection are restricted to the five predefined types of the enumeration.                     | Test 4               |
 
-**Test 1:** Check that listing all institutions returns a valid grouped format when no institutions exist — AC1.
+**Test 1:** Check that listing all institutions returns a valid grouped format when no institutions exist — AC2.
 
 This test ensures that when no institutions are registered the system returns a well-formed but empty grouped structure, not a null reference or an exception.
 
@@ -69,7 +71,7 @@ public void ensureInstitutionsWithinTypeAreSortedAlphabetically() {
 }
 ```
 
-**Test 4:** Check that all five predefined institution types are available in the system — AC1.
+**Test 4:** Check that all five predefined institution types are available in the system — AC3.
 
 This test ensures that the complete set of Sprint 1 institution types (Company, Political Party, Foundation, Institute, Association) is available via the controller, as required by the acceptance criteria and referenced in the requirements remarks.
 

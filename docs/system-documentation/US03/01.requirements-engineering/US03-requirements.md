@@ -30,6 +30,8 @@ As a Political Agent, I want to list Institutions (Companies, Political Parties,
 ### 1.3. Acceptance Criteria
 
 * **AC1:** The institutions must be grouped by type and listed alphabetically by institution name inside each type.
+* **AC2:** If no institutions are registered (or none match the selected type), the system must return an empty result in a valid grouped format — no null or exception must be raised.
+* **AC3:** The institution types available for selection must be restricted to the predefined enumeration: Company, Political Party, Foundation, Institute, and Association.
 
 ---
 
